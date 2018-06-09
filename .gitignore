@@ -1,0 +1,10 @@
+.DS_Store
+*.autosave
+*.orig*
+*~
+*.o
+*.pyc
+*.aux
+*.log
+*.out
+*.synctex.gz
