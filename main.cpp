@@ -856,8 +856,6 @@ void processcustomizationfile(std::vector<Student*> &students) {
     // create sections
     int counter = 0;
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
-    /*std::string temp = itr2.key();
-    int section = std::stoi(temp);*/
     std::string section = itr2.key();
     std::string section_name = itr2.value();
     std::cout << "MAKE ASSOCIATION " << section << " " << section_name << std::endl;
