@@ -256,7 +256,7 @@ void colorit_major(std::ostream &ostr, const std::string& s) {
 
 
 void colorit_section(std::ostream &ostr,
-                     int section, bool for_instructor, const std::string &color) {
+                     std::string section, bool for_instructor, const std::string &color) {
 
   std::string section_name;
 
@@ -264,18 +264,18 @@ void colorit_section(std::ostream &ostr,
     section_name = sectionNames[section];
   std::string section_color = sectionColors[section_name];
 
-  if (section == 0) {
+  if (section == "null") {
     section_color=color;
   }
 
   if (for_instructor) {
-    if (section != 0) {
+    if (section != "null") {
       ostr << "<td align=center bgcolor=" << section_color << ">" << section << "&nbsp;(" << section_name << ")</td>";
     } else {
       ostr << "<td align=center bgcolor=" << section_color << ">&nbsp;</td>" << std::endl;
     }
   } else {
-    if (section != 0) {
+    if (section != "null") {
       ostr << "<td align=center>" << section << "</td>";
     } else {
       ostr << "<td align=center bgcolor=" << section_color << ">&nbsp;</td>" << std::endl;
@@ -284,7 +284,7 @@ void colorit_section(std::ostream &ostr,
 
 }
 
-void colorit_section2(int section, std::string &color, std::string &label) {
+void colorit_section2(std::string section, std::string &color, std::string &label) {
   std::string section_name;
   if (validSection(section)) {
     section_name = sectionNames[section];
@@ -378,7 +378,7 @@ void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::
   std::string time = GLOBAL_EXAM_TIME;
   std::string row = "";
   std::string seat = "";
-  if (s->getSection() == 0) {
+  if (s->getSection() == "null") {
     //room = "";
     //zone = "";
     time = "";
@@ -698,7 +698,7 @@ void start_table_output( bool for_instructor,
 
   int myrank = 1;
   int myrow = 1;
-  int last_section = -1;
+  std::string last_section = "";
   for (unsigned int stu= 0; stu < students.size(); stu++) {
 
     Student *this_student = students[stu];
@@ -786,7 +786,7 @@ void start_table_output( bool for_instructor,
       std::string seat = "";
       std::string time = GLOBAL_EXAM_TIME;
 
-      if (this_student->getSection() == 0) { //LastName() == "") {
+      if (this_student->getSection() == "null") { //LastName() == "") {
         room = "";
         zone = "";
         time = "";

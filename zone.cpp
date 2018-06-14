@@ -430,7 +430,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
       ostr_zone_assignments << std::setw(20) << std::left << l  << " ";
       ostr_zone_assignments << std::setw(15) << std::left << f << " ";
       ostr_zone_assignments << std::setw(12) << std::left << s->getUserName()  << " ";
-      if (s->getSection())
+      if (s->getSection() != "null")
         ostr_zone_assignments << std::setw(12) << std::left << s->getSection()  << " ";
       else
         ostr_zone_assignments << std::setw(12) << std::left << "" << " ";
