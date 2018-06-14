@@ -13,7 +13,7 @@ Student::Student() {
   lefty = false;
   
   // registration status
-  section = 0;  
+  section = "null";  
   audit = false;
   withdraw = false;
   independentstudy = false;
@@ -268,7 +268,7 @@ float Student::lowest_test_counts_half_pct() const {
 // =============================================================================================
 
 int Student::getAllowedLateDays(int which_lecture) const {
-  if (getSection() == 0) return 0;
+  if (getSection() == "null") return 0;
   
   //int answer = 2;
 
@@ -321,7 +321,7 @@ float Student::overall_b4_moss() const {
 
 std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
 
-  if (section == 0) return "";
+  if (section == "null") return "";
 
   if (!flag_b4_moss && manual_grade != "") return manual_grade;
   

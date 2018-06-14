@@ -83,7 +83,7 @@ public:
   bool getLefty() const { return lefty; }
   
   // registration status
-  int getSection()           const { return section; }
+  const std::string& getSection()           const { return section; }
   bool getAudit()            const { return audit; }
   bool getWithdraw()         const { return withdraw; }
   bool getIndependentStudy() const { return independentstudy; }
@@ -133,7 +133,7 @@ public:
   void setLastUpdate(const std::string &s)    { lastUpdate = s; }
 
   // registration status
-  void setSection(int x) { section = x; }
+  void setSection(std::string x) { section = x; }
   void setAudit() { audit = true; }
   void setWithdraw() { withdraw = true; }
   void setIndependentStudy() { independentstudy = true; }
@@ -205,7 +205,7 @@ private:
   int default_allowed_late_days;
 
     // registration status
-  int section;
+  std::string section;
   bool audit;
   bool withdraw;
   bool independentstudy;
