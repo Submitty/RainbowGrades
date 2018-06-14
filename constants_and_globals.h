@@ -40,7 +40,7 @@ extern bool  LOWEST_TEST_COUNTS_HALF;
 extern int QUIZ_NORMALIZE_AND_DROP;
 
 // ==========================================================
-extern std::map<int,std::string> sectionNames;
+extern std::map<std::string,std::string> sectionNames;
 extern std::map<std::string,std::string> sectionColors;
 
 
@@ -62,7 +62,7 @@ extern float MAX_ICLICKER_TOTAL;
 // ==========================================================
 // PROTOTYPES 
 
-bool validSection(int section);
+bool validSection(std::string section);
 
 
 #endif // __CONSTANTS_H__

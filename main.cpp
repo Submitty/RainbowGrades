@@ -74,16 +74,16 @@ Student* STDDEV_STUDENT_POINTER;
 //====================================================================
 // INFO ABOUT NUMBER OF SECTIONS
 
-std::map<int,std::string> sectionNames;
+std::map<std::string,std::string> sectionNames;
 std::map<std::string,std::string> sectionColors;
 
-bool validSection(int section) {
+bool validSection(std::string section) {
 
   nlohmann::json::iterator itr = GLOBAL_CUSTOMIZATION_JSON.find("section");
   assert (itr != GLOBAL_CUSTOMIZATION_JSON.end());
   assert (itr->is_object());
 
-  nlohmann::json::iterator itr2 = itr->find(std::to_string(section));
+  nlohmann::json::iterator itr2 = itr->find(section);
   if (itr2 == itr->end()) return false;
   return true;
   
@@ -91,8 +91,8 @@ bool validSection(int section) {
 }
 
 
-std::string sectionName(int section) {
-  std::map<int,std::string>::const_iterator itr = sectionNames.find(section);
+std::string sectionName(std::string section) {
+  std::map<std::string,std::string>::const_iterator itr = sectionNames.find(section);
   if (itr == sectionNames.end()) 
     return "NONE";
   return itr->second;
@@ -161,8 +161,8 @@ bool by_overall(const Student* s1, const Student* s2) {
   
   if (s1_overall > s2_overall+0.0001) return true;
   if (fabs (s1_overall - s2_overall) < 0.0001 &&
-      s1->getSection() == 0 &&
-      s2->getSection() != 0)
+      s1->getSection() == "null" &&
+      s2->getSection() != "null")
     return true;
 
   return false;
@@ -175,8 +175,8 @@ bool by_test_and_exam(const Student* s1, const Student* s2) {
   
   if (val1 > val2) return true;
   if (fabs (val1-val2) < 0.0001 &&
-      s1->getSection() == 0 &&
-      s2->getSection() != 0)
+      s1->getSection() == "null" &&
+      s2->getSection() != "null")
     return true;
   
   return false;
@@ -208,15 +208,16 @@ bool by_name(const Student* s1, const Student* s2) {
            s1->getPreferredName() < s2->getPreferredName()));
 }
 
-
+//XXX: Is this going to lead to problems with section "1" vs "11" vs "2" now?
+//     Might be customizer's job to left-pad with zeros.
 bool by_section(const Student *s1, const Student *s2) {
   if (s2->getIndependentStudy() == true && s1->getIndependentStudy() == false) return false;
   if (s2->getIndependentStudy() == false && s1->getIndependentStudy() == true) return false;
-  if (s2->getSection() <= 0 && s1->getSection() <= 0) {
+  if (s2->getSection() == "null" && s1->getSection() == "null") {
     return by_name(s1,s2);
   }
-  if (s2->getSection() == 0) return true;
-  if (s1->getSection() == 0) return false;
+  if (s2->getSection() == "null") return true;
+  if (s1->getSection() == "null") return false;
   if (s1->getSection() < s2->getSection()) return true;
   if (s1->getSection() > s2->getSection()) return false;
     return by_name(s1,s2);
@@ -761,7 +762,10 @@ void MakeRosterFile(std::vector<Student*> &students) {
   for (unsigned int i = 0; i < students.size(); i++) {
     std::string foo = "active";
     if (students[i]->getLastName() == "") continue;
-    if (students[i]->getSection() <= 0 || students[i]->getSection() > 10) continue;
+
+    //XXX: Is this still being called? We definitely can have more than 10 sections in general...
+    //if (students[i]->getSection() <= 0 || students[i]->getSection() > 10) continue;
+    if (students[i]->getSection() == "null") continue;
     if (students[i]->getGradeableItemGrade(GRADEABLE_ENUM::TEST,0).getValue() < 1) {
       //std::cout << "STUDENT DID NOT TAKE TEST 1  " << students[i]->getUserName() << std::endl;
       foo = "inactive";
@@ -852,8 +856,9 @@ void processcustomizationfile(std::vector<Student*> &students) {
     // create sections
     int counter = 0;
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
-    std::string temp = itr2.key();
-    int section = std::stoi(temp);
+    /*std::string temp = itr2.key();
+    int section = std::stoi(temp);*/
+    std::string section = itr2.key();
     std::string section_name = itr2.value();
     std::cout << "MAKE ASSOCIATION " << section << " " << section_name << std::endl;
     //assert (!validSection(section));
@@ -1188,18 +1193,18 @@ void load_student_grades(std::vector<Student*> &students) {
     } else if (token == "last_update") {
       s->setLastUpdate(j[token].get<std::string>());
     } else if (token == "registration_section") {
-          int a;
+          std::string a;
           if(!j[token].is_null()) {
-            a = j[token].get<int>();
+           a = j[token].get<std::string>();
             if (!validSection(a)) {
               // the "drop" section is 0 (really should be NULL)
-              if (a != 0) {
+              if (a != "null") {
                 std::cerr << "WARNING: invalid section " << a << std::endl;
               }
             }
           }
           else{
-            a = 0;
+            a = "null";
           }
           s->setSection(a);
 
@@ -1502,7 +1507,8 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
   start_table_output(true,students,-1,month,day,year, sp,sa,sb,sc,sd);
 
   int next_rank = 1;
-  int last_section = -1;
+  //int last_section = -1;
+  std::string last_section;
 
   for (int S = 0; S < (int)students.size(); S++) {
     //int rank = next_rank;
@@ -1757,10 +1763,10 @@ void suggest_curves(std::vector<Student*> &students) {
       std::cout << gradeable_to_string(g) << " " << gradeable_id << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
       std::vector<float> scores;
       
-      std::map<int, int> section_counts;
+      std::map<std::string, int> section_counts;
       
       for (unsigned int S = 0; S < students.size(); S++) {
-        if (students[S]->getSection() > 0 && students[S]->getGradeableItemGrade(g,item).getValue() > 0) {
+        if (students[S]->getSection() != "null" && students[S]->getGradeableItemGrade(g,item).getValue() > 0) {
           scores.push_back(students[S]->getGradeableItemGrade(g,item).getValue());
           section_counts[students[S]->getSection()]++;
         }
@@ -1797,8 +1803,8 @@ void suggest_curves(std::vector<Student*> &students) {
       
       int total = 0;
       std::cout << "   ";
-      for (std::map<int,int>::iterator itr = section_counts.begin(); itr != section_counts.end(); itr++) {
-        std::cout << " sec#" << itr->first << "=" << itr->second << "  ";
+      for (std::map<std::string,int>::iterator itr = section_counts.begin(); itr != section_counts.end(); itr++) {
+        std::cout << " sec" << itr->first << "=" << itr->second << "  ";
         total += itr->second;
       }
       std::cout << "  TOTAL = " << total << std::endl;
