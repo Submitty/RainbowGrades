@@ -292,6 +292,7 @@ bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value
   if (s2 == "exercise")                        { return_value = GRADEABLE_ENUM::EXERCISE;          return true;  }
   if (s2 == "lecture_exercise")                { return_value = GRADEABLE_ENUM::LECTURE_EXERCISE;  return true;  }
   if (s2 == "reading")                         { return_value = GRADEABLE_ENUM::READING;           return true;  }
+  if (s2 == "worksheet")                       { return_value = GRADEABLE_ENUM::WORKSHEET;         return true;  }
   if (s2 == "lab")                             { return_value = GRADEABLE_ENUM::LAB;               return true;  }
   if (s2 == "recitation")                      { return_value = GRADEABLE_ENUM::RECITATION;        return true;  }
   if (s2 == "project")                         { return_value = GRADEABLE_ENUM::PROJECT;           return true;  }
@@ -1688,7 +1689,7 @@ int main(int argc, char* argv[]) {
     }
     else {
       std::cerr << "UNKNOWN SORT OPTION " << GLOBAL_sort_order << std::endl;
-      std::cerr << "  Usage: " << argv[0] << " [ by_overall | by_name | by_section | by_zone | by_iclicker | by_lab | by_exercise | by_reading | by_hw | by_test | by_exam | by_test_and_exam ]" << std::endl;
+      std::cerr << "  Usage: " << argv[0] << " [ by_overall | by_name | by_section | by_zone | by_iclicker | by_lab | by_exercise | by_reading | by_worksheet | by_hw | by_test | by_exam | by_test_and_exam ]" << std::endl;
       exit(1);
     }
   }

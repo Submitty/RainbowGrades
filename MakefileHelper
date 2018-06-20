@@ -137,6 +137,9 @@ exam: compile
 reading: compile
 	./process_grades.out by_reading
 
+worksheet: compile
+	./process_grades.out by_worksheet
+
 project: compile
 	./process_grades.out by_project
 

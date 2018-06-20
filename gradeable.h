@@ -9,7 +9,7 @@
 enum class GRADEABLE_ENUM { 
   HOMEWORK, ASSIGNMENT, PROBLEM_SET,
     QUIZ, TEST, EXAM, 
-    EXERCISE, LECTURE_EXERCISE, READING, LAB, RECITATION,
+    EXERCISE, LECTURE_EXERCISE, READING, WORKSHEET, LAB, RECITATION,
     PROJECT, PARTICIPATION, NOTE,
     NONE };
 
@@ -24,6 +24,7 @@ inline std::string gradeable_to_string(const GRADEABLE_ENUM &g) {
   if (g == GRADEABLE_ENUM::EXERCISE)         { return "EXERCISE"; }
   if (g == GRADEABLE_ENUM::LECTURE_EXERCISE) { return "LECTURE_EXERCISE"; }
   if (g == GRADEABLE_ENUM::READING)          { return "READING"; }
+  if (g == GRADEABLE_ENUM::WORKSHEET)        { return "WORKSHEET"; }
   if (g == GRADEABLE_ENUM::LAB)              { return "LAB"; }
   if (g == GRADEABLE_ENUM::RECITATION)       { return "RECITATION"; }
   if (g == GRADEABLE_ENUM::PROJECT)          { return "PROJECT"; }
