@@ -134,8 +134,11 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
     if(!id.empty()){
-      nonzero_sum += GRADEABLES[g].getItemMaximum(id);
-      nonzero_count++;
+      float m = GRADEABLES[g].getItemMaximum(id);
+      if(m > 0){
+        nonzero_sum += m;
+        nonzero_count++;
+      }
     }    
   }
 
@@ -181,10 +184,6 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float sm = scores[i].scale_max;
     float my_max = std::max(m,sm);
     if (p < 0) {
-      //Skip any non-contributing gradeable
-      /*if (my_max <= 0){
-        continue;
-      }*/
       assert(my_max > 0);
       if (sum_max > 0) {
         p = std::max(m,sm) / sum_max;
