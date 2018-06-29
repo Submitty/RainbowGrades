@@ -129,6 +129,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
 
   // collect the scores in a vector
   std::vector<score_object> scores;
+  bool nonzero_gradeable = false;
   for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
     float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
@@ -136,6 +137,14 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float p = GRADEABLES[g].getItemPercentage(id);
     float sm = GRADEABLES[g].getScaleMaximum(id);
     scores.push_back(score_object(s,m,p,sm));
+    if (m > 0){
+      nonzero_gradeable = true;
+    }
+  }
+
+  //If there are no gradeables with a max >0, bucket is 0% anyway
+  if(!nonzero_gradeable){
+    return 0.0;
   }
 
   // sort the scores (smallest first)
@@ -160,7 +169,10 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float sm = scores[i].scale_max;
     float my_max = std::max(m,sm);
     if (p < 0) {
-      assert (my_max > 0);
+      //Skip any non-contributing gradeable
+      if (my_max <= 0){
+        continue;
+      }
       if (sum_max > 0) {
         p = std::max(m,sm) / sum_max;
       } else {

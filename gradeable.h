@@ -111,7 +111,9 @@ public:
     return released.find(id)->second;
   }
   float getItemMaximum(const std::string &id) const {
-    assert (maximums.find(id) != maximums.end());
+    if (maximums.find(id) == maximums.end()){
+      return 0;
+    }
     return maximums.find(id)->second;
   }
   float getScaleMaximum(const std::string &id) const {
