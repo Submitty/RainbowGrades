@@ -138,7 +138,8 @@ std::vector<std::string> MESSAGES;
 std::ofstream priority_stream("priority.txt");
 std::ofstream late_days_stream("late_days.txt");
 
-void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message);
+//void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message);
+void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::json &special_message);
 
 //====================================================================
 
@@ -1539,17 +1540,17 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
 
     nlohmann::json mj;
 
-    std::string file2 = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + "_message.html";
+    //std::string file2 = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + "_message.html";
     std::string file2_json = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + "_message.json";
-    std::ofstream ostr2(file2.c_str());
+    //std::ofstream ostr2(file2.c_str());
     std::ofstream ostr2_json(file2_json.c_str());
 
-    mj["username"] = students[S]->getUserName();
+    /*mj["username"] = students[S]->getUserName();
     mj["building"] = "DCC";
     mj["room"] = "308";
     mj["zone"] = "A";
 
-    ostr2_json << mj.dump(4);
+    ostr2_json << mj.dump(4);*/
     
 
 #if 0
@@ -1575,7 +1576,10 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
       special_message = *special_message_itr;
     }
 
-    PrintExamRoomAndZoneTable(ostr2,students[S],special_message);
+    //PrintExamRoomAndZoneTable(ostr2,students[S],special_message);
+    PrintExamRoomAndZoneTable(mj,students[S],special_message);
+
+    ostr2_json << mj.dump(4);
 
     int prev = students[S]->getAllowedLateDays(0);
 
