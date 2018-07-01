@@ -329,6 +329,8 @@ void colorit(std::ostream &ostr,
 //void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message) {
 void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::json &special_message) {
 
+  Student *s_tmp = s;
+
   if (special_message.size() > 0) {
     
     /*ostr << "<table border=1 cellpadding=5 cellspacing=0 style=\"background-color:#ddffdd; width:auto;\">\n";
@@ -364,15 +366,17 @@ void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::j
     std::string filename = files.value(std::to_string(which),"");
     assert (filename != "");
 
-    mj["special_message"]["filename"] = title;
+    mj["special_message"]["filename"] = filename;
+    mj["special_message"]["description"] = description;
     /*ostr << "  <tr><td><a href=\"" << filename << "\" download=\"provided_files.zip\">" << description << "</a></td></tr>\n";
     ostr << "</table>\n";
     ostr << "</tr></td>\n";
     ostr << "</table>\n";*/
+
+    s = s_tmp; //Reset the student pointer in case exam seating needs it.
   }
 
   // ==============================================================
-
 
   if ( DISPLAY_EXAM_SEATING == false) return;
 
