@@ -127,12 +127,36 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     return lowest_test_counts_half_pct();
   }
 
+  //Do one pass to get the defined item scores
+  float nonzero_sum = 0;
+  int nonzero_count = 0;
+  for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
+    float s = getGradeableItemGrade(g,i).getValue();
+    std::string id = GRADEABLES[g].getID(i);
+    if(!id.empty()){
+      float m = GRADEABLES[g].getItemMaximum(id);
+      if(m > 0){
+        nonzero_sum += m;
+        nonzero_count++;
+      }
+    }    
+  }
+
+  //If there are no gradeables with a max >0, bucket is 0% anyway
+  //XXX: Not sure if this is going to break totally extra-credit categories. Test this.
+  if(nonzero_count == 0){
+    return 0.0;
+  }
+
   // collect the scores in a vector
   std::vector<score_object> scores;
   for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
     float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
-    float m = GRADEABLES[g].getItemMaximum(id);
+    float m = nonzero_sum/nonzero_count;
+    if(!id.empty()){
+      m = GRADEABLES[g].getItemMaximum(id);
+    }
     float p = GRADEABLES[g].getItemPercentage(id);
     float sm = GRADEABLES[g].getScaleMaximum(id);
     scores.push_back(score_object(s,m,p,sm));
@@ -160,7 +184,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float sm = scores[i].scale_max;
     float my_max = std::max(m,sm);
     if (p < 0) {
-      assert (my_max > 0);
+      assert(my_max > 0);
       if (sum_max > 0) {
         p = std::max(m,sm) / sum_max;
       } else {

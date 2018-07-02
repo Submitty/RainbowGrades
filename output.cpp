@@ -326,13 +326,16 @@ void colorit(std::ostream &ostr,
 
 // ==========================================================
 
-void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message) {
+//void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message) {
+void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::json &special_message) {
+
+  Student *s_tmp = s;
 
   if (special_message.size() > 0) {
     
-    ostr << "<table border=1 cellpadding=5 cellspacing=0 style=\"background-color:#ddffdd; width:auto;\">\n";
+    /*ostr << "<table border=1 cellpadding=5 cellspacing=0 style=\"background-color:#ddffdd; width:auto;\">\n";
     ostr << "<tr><td>\n";
-    ostr << "<table border=0 cellpadding=5 cellspacing=0>\n";
+    ostr << "<table border=0 cellpadding=5 cellspacing=0>\n";*/
 
     assert (special_message.find("title") != special_message.end());
     std::string title = special_message.value("title","MISSING TITLE");
@@ -340,7 +343,8 @@ void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::
     assert (special_message.find("description") != special_message.end());
     std::string description = special_message.value("description","provided_files.zip");
 
-    ostr << "<h3>" << title << "</h3>" << std::endl;
+    //ostr << "<h3>" << title << "</h3>" << std::endl;
+    mj["special_message"]["title"] = title;
 
     assert (special_message.find("files") != special_message.end());
     nlohmann::json files = *(special_message.find("files"));
@@ -362,14 +366,17 @@ void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::
     std::string filename = files.value(std::to_string(which),"");
     assert (filename != "");
 
-    ostr << "  <tr><td><a href=\"" << filename << "\" download=\"provided_files.zip\">" << description << "</a></td></tr>\n";
+    mj["special_message"]["filename"] = filename;
+    mj["special_message"]["description"] = description;
+    /*ostr << "  <tr><td><a href=\"" << filename << "\" download=\"provided_files.zip\">" << description << "</a></td></tr>\n";
     ostr << "</table>\n";
     ostr << "</tr></td>\n";
-    ostr << "</table>\n";
+    ostr << "</table>\n";*/
+
+    s = s_tmp; //Reset the student pointer in case exam seating needs it.
   }
 
   // ==============================================================
-
 
   if ( DISPLAY_EXAM_SEATING == false) return;
 
@@ -401,7 +408,7 @@ void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::
 
 #if 1
 
-  ostr << "<table style=\"border:1px solid yellowgreen; background-color:#ddffdd; width:auto;\" >\n";
+  /*ostr << "<table style=\"border:1px solid yellowgreen; background-color:#ddffdd; width:auto;\" >\n";
   //  ostr << "<table border=\"1\" cellpadding=5 cellspacing=0 style=\"border:1px solid yellowgreen; background-color:#ddffdd;\">\n";
   ostr << "<tr><td>\n";
   ostr << "<table border=0 cellpadding=5 cellspacing=0>\n";
@@ -423,7 +430,26 @@ void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::
   }
 
 
-  ostr << "</table>\n";
+  ostr << "</table>\n";*/
+
+  mj["seating"]["title"] = GLOBAL_EXAM_TITLE;
+  mj["seating"]["date"] = GLOBAL_EXAM_DATE;
+  mj["seating"]["room"] = room;
+  mj["seating"]["zone"] = zone;
+  if (row != "N/A" && row !="") {
+    mj["seating"]["row"] = row;
+  }
+  if (seat != "N/A" && seat !="") {
+    mj["seating"]["seat"] = seat;
+  }
+
+  // It shouldn't be Rainbow Grades job to know that on the server it's zone_images/
+  // this should be done server side. Also allows server to let course specify hosting
+  // images on server or at a different location.
+  if (s->getExamZoneImage() != "") {
+    mj["seating"]["title"] = s->getExamZoneImage();
+  }
+
 
 #else
 

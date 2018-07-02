@@ -51,6 +51,13 @@ pull:
 push:
 	rsync -azP individual_summary_html/* ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/summary_html/
 
+pull_test:
+	mkdir -p raw_data/
+	rsync -azPq ${REPORTS_DIRECTORY}/all_grades/ raw_data/
+
+push_test:
+	rsync -azPq individual_summary_html/* ${REPORTS_DIRECTORY}/summary_html/
+
 flags = -g
 memory_debug : memory_flags = -m32
 
