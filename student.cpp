@@ -134,7 +134,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
     if(!id.empty()){
-      float m = GRADEABLES[g].getItemMaximum(id);
+      float m = std::max(GRADEABLES[g].getItemMaximum(id),GRADEABLES[g].getScaleMaximum(id));
       if(m > 0){
         nonzero_sum += m;
         nonzero_count++;
@@ -143,7 +143,6 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   }
 
   //If there are no gradeables with a max >0, bucket is 0% anyway
-  //XXX: Not sure if this is going to break totally extra-credit categories. Test this.
   if(nonzero_count == 0){
     return 0.0;
   }
@@ -175,6 +174,15 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     sum_max += m;
   }
 
+  float sum_scaled_max = 0;
+  for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
+    if(scores[i].max > 0){
+      continue;
+    }
+    float m = scores[i].scale_max;
+    sum_scaled_max += m;
+  }
+
   // sum the remaining (higher) scores
   float sum = 0;
   for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
@@ -189,7 +197,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
         p = std::max(m,sm) / sum_max;
       } else {
         // pure extra credit category
-        p = std::max(m,sm) / my_max;
+        p = std::max(m,sm) / sum_scaled_max;
       }
     }
     sum += p * s / my_max;
