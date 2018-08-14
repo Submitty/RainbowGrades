@@ -174,6 +174,15 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     sum_max += m;
   }
 
+  float sum_scaled_max = 0;
+  for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
+    if(scores[i].max > 0){
+      continue;
+    }
+    float m = scores[i].scale_max;
+    sum_scaled_max += m;
+  }
+
   // sum the remaining (higher) scores
   float sum = 0;
   for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
@@ -188,7 +197,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
         p = std::max(m,sm) / sum_max;
       } else {
         // pure extra credit category
-        p = std::max(m,sm) / my_max;
+        p = std::max(m,sm) / sum_scaled_max;
       }
     }
     sum += p * s / my_max;
