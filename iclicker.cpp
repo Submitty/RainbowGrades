@@ -177,7 +177,6 @@ void AddClickerScores(std::vector<Student*> &students, std::vector<std::vector<s
           LECTURE_DATE_CORRESPONDENCES[which_lecture] = date;
         }
 
-
         char line_helper[5000];
         while (istr.getline(line_helper, 5000)) {
 
@@ -191,9 +190,9 @@ void AddClickerScores(std::vector<Student*> &students, std::vector<std::vector<s
           std::string item = getItem(line, question.getColumn() - 1);
           bool participate = (item != "");
 
-          //std::cout << "ITEM " << item << " " << item.size() << std::endl;
           if (item.size() != 1) {
-            std::cout << "iclicker " << question.getFilename() << " " << question.getColumn() << std::endl;
+            //std::cout << "iclicker " << question.getFilename() << " " << question.getColumn() << std::endl;
+            continue;
           }
           assert (item.size() == 1);
 
