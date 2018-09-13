@@ -99,7 +99,9 @@ individual_summary_html all_students_summary_html:
 compile: remove_json_comments process_grades.out individual_summary_html all_students_summary_html
 
 clean:
+	rm -rf *~ *.dSYM
 	rm -f process_grades.out
+	rm -f iclicker_file_list.txt customization_no_comments.json files_json.txt
 
 src_clean: clean
 	rm -f ${json_syntax_checker.py}
@@ -115,7 +117,7 @@ overall: ${nlohmann_json_dir} ${json_syntax_checker.py} compile
 
 memory_debug: compile
 	drmemory -- ./process_grades.out by_overall
-        #	valgrind ./process_grades.out by_overall
+	#valgrind ./process_grades.out by_overall
 
 iclicker: compile
 	./process_grades.out by_iclicker
