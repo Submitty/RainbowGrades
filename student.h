@@ -110,6 +110,7 @@ public:
 
   // info about exam assignments
   const std::string& getExamRoom() const { return exam_room; }
+  const std::string& getExamBuilding() const { return exam_building; }
   const std::string& getExamZone() const { return exam_zone; }
   std::string getExamRow() const { return exam_row;}
   std::string getExamSeat() const { return exam_seat;}
@@ -152,6 +153,7 @@ public:
 
   // info about exam assignments
   void setExamRoom(const std::string &s) { exam_room = s; }
+  void setExamBuilding(const std::string &s) { exam_building = s; }
   void setExamZone(const std::string &z, const std::string &r, const std::string &s) { exam_zone=z; exam_row=r; exam_seat=s; }
   void setExamTime(const std::string &s) { exam_time = s; }
   void setExamZoneImage(const std::string &s) { exam_zone_image = s; }
@@ -231,6 +233,7 @@ private:
   std::string exam_row;
   std::string exam_seat;
   std::string exam_room;
+  std::string exam_building;
   std::string exam_time;
   std::string exam_zone_image;
 

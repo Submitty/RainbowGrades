@@ -28,6 +28,7 @@ void suggest_curves(std::vector<Student*> &students);
 
 std::string GLOBAL_recommend_id = "";
 
+std::vector<std::string> OMIT_SECTION_FROM_STATS;
 
 //====================================================================
 // DIRECTORIES & FILES
@@ -107,6 +108,7 @@ std::string GLOBAL_EXAM_TITLE = "exam title uninitialized";
 std::string GLOBAL_EXAM_DATE = "exam date uninitialized";
 std::string GLOBAL_EXAM_TIME = "exam time uninitialized";
 std::string GLOBAL_EXAM_DEFAULT_ROOM = "exam default room uninitialized";
+std::string GLOBAL_EXAM_DEFAULT_BUILDING = "exam default building uninitialized";
 std::string GLOBAL_EXAM_SEATING = "";
 std::string GLOBAL_SEATING_SPACING = "";
 std::string GLOBAL_EXAM_SEATING_COUNT = "";
@@ -209,18 +211,31 @@ bool by_name(const Student* s1, const Student* s2) {
            s1->getPreferredName() < s2->getPreferredName()));
 }
 
-//XXX: Is this going to lead to problems with section "1" vs "11" vs "2" now?
-//     Might be customizer's job to left-pad with zeros.
+std::string padifonlydigits(const std::string& s, int n) {
+  for (int i = 0; i < s.size(); i++) {
+    if (s[i] < '0' || s[i] > '9') return s;
+  }
+  if (s.size() < n) {
+    return std::string(n-s.size(),'0') + s;
+  }
+  return s;
+}
+
 bool by_section(const Student *s1, const Student *s2) {
   if (s2->getIndependentStudy() == true && s1->getIndependentStudy() == false) return false;
   if (s2->getIndependentStudy() == false && s1->getIndependentStudy() == true) return false;
-  if (s2->getSection() == "null" && s1->getSection() == "null") {
+
+  std::string S1 = s1->getSection();
+  std::string S2 = s2->getSection();
+  if (S2 == "null" && S1 == "null") {
     return by_name(s1,s2);
   }
-  if (s2->getSection() == "null") return true;
-  if (s1->getSection() == "null") return false;
-  if (s1->getSection() < s2->getSection()) return true;
-  if (s1->getSection() > s2->getSection()) return false;
+  if (S2 == "null") return true;
+  if (S1 == "null") return false;
+  S1 = padifonlydigits(S1,3);
+  S2 = padifonlydigits(S2,3);
+  if (S1 < S2) return true;
+  if (S1 > S2) return false;
     return by_name(s1,s2);
 }
 
@@ -641,6 +656,9 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
         } else if (token2 == "exam_time") {
           std::string value = itr2.value();
           GLOBAL_EXAM_TIME = value;
+        } else if (token2 == "exam_default_building") {
+          std::string value = itr2.value();
+          GLOBAL_EXAM_DEFAULT_BUILDING = value;
         } else if (token2 == "exam_default_room") {
           std::string value = itr2.value();
           GLOBAL_EXAM_DEFAULT_ROOM = value;
@@ -710,7 +728,13 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
   std::vector<std::string> displayBenchmark = j["display_benchmark"].get<std::vector<std::string> >();
   for (std::size_t i=0; i<displayBenchmark.size(); i++) {
     token = displayBenchmark[i];
-  DisplayBenchmark(token);
+    DisplayBenchmark(token);
+  }
+
+  if (j.find("omit_section_from_stats") != j.end()) {
+    for (int i = 0; i < j["omit_section_from_stats"].size(); i++) {
+      OMIT_SECTION_FROM_STATS.push_back(j["omit_section_from_stats"][i]);
+    }
   }
   
   //std::cout << "5" << std::endl;
@@ -751,6 +775,14 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
   }
   
   //std::cout << "9" << std::endl;
+}
+
+
+bool OmitSectionFromStats(const std::string &section) {
+  for (int i = 0; i < OMIT_SECTION_FROM_STATS.size(); i++) {
+    if (OMIT_SECTION_FROM_STATS[i] == section) return true;
+  }
+  return false;
 }
 
 
@@ -1101,7 +1133,7 @@ void processcustomizationfile(std::vector<Student*> &students) {
       }
     }
   } else {
-    if (token == "display" || token == "display_benchmark" || token == "benchmark_percent") {
+    if (token == "display" || token == "display_benchmark" || token == "benchmark_percent" || "omit_section_from_stats") {
       continue;
   } else if (token == "use" || token == "hackmaxprojects" || token == "benchmark_color") {
     continue;
@@ -1541,7 +1573,7 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
     nlohmann::json mj;
 
     //std::string file2 = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + "_message.html";
-    std::string file2_json = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + "_message.json";
+    std::string file2_json = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + ".json";
     //std::ofstream ostr2(file2.c_str());
     std::ofstream ostr2_json(file2_json.c_str());
 
@@ -1753,29 +1785,30 @@ void suggest_curves(std::vector<Student*> &students) {
   Student *student_average  = GetStudent(students,"AVERAGE");
   Student *student_stddev  = GetStudent(students,"STDDEV");
 
+  // LOOP OVER ALL GRADEABLES
   for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
     GRADEABLE_ENUM g = ALL_GRADEABLES[i];
 
+    // LOOP OVER ALL ITEMS IN THE GRADEABLE
     for (int item = 0; item < GRADEABLES[g].getCount(); item++) {
-      
       std::string gradeable_id = GRADEABLES[g].getID(item);
       if (gradeable_id == "") continue;
-      
+
       const std::string& gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-      
       std::cout << gradeable_to_string(g) << " " << gradeable_id << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
       std::vector<float> scores;
-      
+
+      // gather the scores from the valid (non-omitted) sections
       std::map<std::string, int> section_counts;
-      
       for (unsigned int S = 0; S < students.size(); S++) {
-        if (students[S]->getSection() != "null" && students[S]->getGradeableItemGrade(g,item).getValue() > 0) {
+        if (students[S]->getSection() != "null" &&
+            (!OmitSectionFromStats(students[S]->getSection())) &&
+            students[S]->getGradeableItemGrade(g,item).getValue() > 0) {
           scores.push_back(students[S]->getGradeableItemGrade(g,item).getValue());
           section_counts[students[S]->getSection()]++;
         }
       }
       if (scores.size() > 0) {
-        //std::cout << "   " << scores.size() << " submitted" << std::endl;
         std::sort(scores.begin(),scores.end());
         float sum = 0;
         for (unsigned int x = 0; x < scores.size(); x++) {
@@ -1783,9 +1816,7 @@ void suggest_curves(std::vector<Student*> &students) {
         }
         float average = sum / float(scores.size());
         std::cout << "    average=" << std::setprecision(2) << std::fixed << average;
-
         student_average->setGradeableItemGrade(g,item,average);
-
         sum = 0;
         for (unsigned int x = 0; x < scores.size(); x++) {
           sum+=(average-scores[x])*(average-scores[x]);
@@ -1793,17 +1824,13 @@ void suggest_curves(std::vector<Student*> &students) {
         float stddev = sqrt(sum/float(scores.size()));
         std::cout << "    stddev=" << std::setprecision(2) << std::fixed << stddev;
         student_stddev->setGradeableItemGrade(g,item,stddev);
-
         std::cout << "    suggested curve:";
-        
         std::cout << "    A- cutoff=" << scores[int(0.70*scores.size())];
         std::cout << "    B- cutoff=" << scores[int(0.45*scores.size())];
         std::cout << "    C- cutoff=" << scores[int(0.20*scores.size())];
         std::cout << "    D  cutoff=" << scores[int(0.10*scores.size())];
         std::cout << std::endl;
       }
-      
-      
       int total = 0;
       std::cout << "   ";
       for (std::map<std::string,int>::iterator itr = section_counts.begin(); itr != section_counts.end(); itr++) {

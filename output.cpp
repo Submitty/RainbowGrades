@@ -381,6 +381,7 @@ void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::j
   if ( DISPLAY_EXAM_SEATING == false) return;
 
   std::string room = GLOBAL_EXAM_DEFAULT_ROOM;
+  std::string building = GLOBAL_EXAM_DEFAULT_BUILDING;
   std::string zone = "SEE INSTRUCTOR";
   std::string time = GLOBAL_EXAM_TIME;
   std::string row = "";
@@ -394,6 +395,7 @@ void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::j
     //std::cout << "NO ROOM FOR " << s->getUserName() << std::endl;
   } else {
     room = s->getExamRoom();
+    building = s->getExamBuilding();
     zone = s->getExamZone();
     row = s->getExamRow();
     seat = s->getExamSeat();
@@ -430,26 +432,32 @@ void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::j
   }
 
 
-  ostr << "</table>\n";*/
+  // ostr << "</table>\n";*/
 
-  mj["seating"]["title"] = GLOBAL_EXAM_TITLE;
-  mj["seating"]["date"] = GLOBAL_EXAM_DATE;
-  mj["seating"]["room"] = room;
-  mj["seating"]["zone"] = zone;
+  mj["title"] = GLOBAL_EXAM_TITLE;
+  mj["date"] = GLOBAL_EXAM_DATE;
+  mj["room"] = room;
+  mj["building"] = building;
+  mj["time"] = time;
+  mj["gradeable"] = "test01";
+  mj["username"] = s->getUserName();
+  mj["zone"] = zone;
   if (row != "N/A" && row !="") {
-    mj["seating"]["row"] = row;
+    mj["row"] = row;
   }
   if (seat != "N/A" && seat !="") {
-    mj["seating"]["seat"] = seat;
+    mj["seat"] = seat;
   }
 
   // It shouldn't be Rainbow Grades job to know that on the server it's zone_images/
   // this should be done server side. Also allows server to let course specify hosting
   // images on server or at a different location.
   if (s->getExamZoneImage() != "") {
-    mj["seating"]["title"] = s->getExamZoneImage();
+    mj["title"] = s->getExamZoneImage();
   }
 
+  // might change format...
+  mj["seating"] = mj;
 
 #else
 
@@ -807,6 +815,7 @@ void start_table_output( bool for_instructor,
     if (DISPLAY_EXAM_SEATING) {
 
       std::string room = GLOBAL_EXAM_DEFAULT_ROOM;
+      std::string building = GLOBAL_EXAM_DEFAULT_BUILDING;
       std::string zone = "SEE INSTRUCTOR";
       std::string row = "";
       std::string seat = "";
@@ -814,6 +823,7 @@ void start_table_output( bool for_instructor,
 
       if (this_student->getSection() == "null") { //LastName() == "") {
         room = "";
+        building = "";
         zone = "";
         time = "";
       }
@@ -821,6 +831,7 @@ void start_table_output( bool for_instructor,
         //std::cout << "NO ROOM FOR " << this_student->getUserName() << std::endl;
       } else {
         room = this_student->getExamRoom();
+        building = this_student->getExamBuilding();
         zone = this_student->getExamZone();
         row = this_student->getExamRow();
         seat = this_student->getExamSeat();
@@ -832,7 +843,7 @@ void start_table_output( bool for_instructor,
         zone = "SEE INSTRUCTOR";
       }
 
-      table.set(myrow,counter++,TableCell("ffffff",room));
+      table.set(myrow,counter++,TableCell("ffffff",building+" "+room));
       table.set(myrow,counter++,TableCell("ffffff",zone));
       table.set(myrow,counter++,TableCell("ffffff",row));
       table.set(myrow,counter++,TableCell("ffffff",seat));
@@ -851,7 +862,8 @@ void start_table_output( bool for_instructor,
       // are omitted from the average.
       std::vector<float> vals;
       for (unsigned int S = 0; S < students.size(); S++) {
-        if (validSection(students[S]->getSection())) {
+        if (validSection(students[S]->getSection()) &&
+            (!OmitSectionFromStats(students[S]->getSection()))) {
           vals.push_back(students[S]->overall());
         }
       }
@@ -915,7 +927,8 @@ void start_table_output( bool for_instructor,
         // are omitted from the average.
         std::vector<float> vals;
         for (unsigned int S = 0; S < students.size(); S++) {
-          if (validSection(students[S]->getSection())) {
+          if (validSection(students[S]->getSection()) &&
+              (!OmitSectionFromStats(students[S]->getSection()))) {
             vals.push_back(students[S]->GradeablePercent(g));
           }
         }

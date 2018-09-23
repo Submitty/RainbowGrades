@@ -24,11 +24,12 @@ extern std::string GLOBAL_EXAM_TITLE;
 extern std::string GLOBAL_EXAM_DATE;
 extern std::string GLOBAL_EXAM_TIME;
 extern std::string GLOBAL_EXAM_DEFAULT_ROOM;
+extern std::string GLOBAL_EXAM_DEFAULT_BUILDING;
 
 extern float GLOBAL_MIN_OVERALL_FOR_ZONE_ASSIGNMENT;
 
 extern std::vector<std::string> MESSAGES;
-
+extern std::vector<std::string> OMIT_SECTION_FROM_STATS;
 
 // ==========================================================
 extern Student* PERFECT_STUDENT_POINTER;
@@ -63,6 +64,6 @@ extern float MAX_ICLICKER_TOTAL;
 // PROTOTYPES 
 
 bool validSection(std::string section);
-
+bool OmitSectionFromStats(const std::string &section);
 
 #endif // __CONSTANTS_H__
