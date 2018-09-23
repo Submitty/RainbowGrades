@@ -117,11 +117,11 @@ int CountLefties(std::vector<Student*> &students,const std::string& lefty_file, 
       //std::cout << "LEFTY " << user << std::endl;
       s->setLefty();
       if (s->getExamRoom() != "") {
-        std::cout << "ALREADY ASSIGNED ROOM " << user << std::endl;
+        //std::cout << "ALREADY ASSIGNED ROOM " << user << std::endl;
       } else if (s->overall() < GLOBAL_MIN_OVERALL_FOR_ZONE_ASSIGNMENT) {
-        std::cout << "NOT ASSIGNING LEFTY " << user << std::endl; 
+        //std::cout << "NOT ASSIGNING LEFTY " << user << std::endl;
       } else {
-        std::cout << "NEED SEAT FOR LEFTY " << user << std::endl;
+        //std::cout << "NEED SEAT FOR LEFTY " << user << std::endl;
         count++;
       }
     }
@@ -297,6 +297,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
             std::cerr << "ERROR! this zone '" << zone << "' is full (max:" << itr->second.max << ")" << std::endl;
             exit(1);
           }
+          std::cout << itr->second.building << " " << building << std::endl;
           assert (itr->second.building == building);
           assert (itr->second.room == room);
           bool success = itr->second.take_seat(row,seat);
@@ -307,7 +308,8 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
           }
           
           existing_assignments++;
-          s->setExamRoom(building+std::string(" ")+room);
+          s->setExamRoom(room);
+          s->setExamBuilding(building);
           s->setExamZone(zone,row,seat);
           s->setExamZoneImage(itr->second.image_url);
           if (time != "") {
@@ -365,6 +367,9 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
       not_reg++;
     } else if (s->overall() < GLOBAL_MIN_OVERALL_FOR_ZONE_ASSIGNMENT) {
       low_overall_grade++;
+    } else if (OmitSectionFromStats(s->getSection())) {
+      std::cout << "SKIP SECTION " << s->getSection() << " USER " << s->getUserName() << std::endl;
+      low_overall_grade++;
     } else {
 
       if (s->getLefty()) {
@@ -373,7 +378,8 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
         }
         assert (next_lefty_za < (int)randomized_lefty_available.size());
         ZoneInfo &next_zi = zones.find(randomized_lefty_available[next_lefty_za])->second;
-        s->setExamRoom(next_zi.building+std::string(" ")+next_zi.room);
+        s->setExamRoom(next_zi.room);
+        s->setExamBuilding(next_zi.building);
         std::string row,seat;
         //std::cout << "ASSIGN student " << s->getUserName() << std::endl;
         next_zi.assign_seat(row,seat,s->getLefty());
@@ -387,7 +393,8 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
         }
         assert (next_nonlefty_za < (int)randomized_nonlefty_available.size());
         ZoneInfo &next_zi = zones.find(randomized_nonlefty_available[next_nonlefty_za])->second;
-        s->setExamRoom(next_zi.building+std::string(" ")+next_zi.room);
+        s->setExamRoom(next_zi.room);
+        s->setExamRoom(next_zi.building);
         std::string row,seat;
         //std::cout << "ASSIGN student " << s->getUserName() << std::endl;
         next_zi.assign_seat(row,seat,s->getLefty());
@@ -435,6 +442,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
       else
         ostr_zone_assignments << std::setw(12) << std::left << "" << " ";
 
+      ostr_zone_assignments << std::setw(10) << std::left << s->getExamBuilding()  << " ";
       ostr_zone_assignments << std::setw(10) << std::left << s->getExamRoom()  << " ";
       ostr_zone_assignments << std::setw(10) << std::left << s->getExamZone()  << " ";
       ostr_zone_assignments << std::setw(10) << std::left << s->getExamRow()  << " ";
