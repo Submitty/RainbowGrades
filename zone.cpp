@@ -394,7 +394,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
         assert (next_nonlefty_za < (int)randomized_nonlefty_available.size());
         ZoneInfo &next_zi = zones.find(randomized_nonlefty_available[next_nonlefty_za])->second;
         s->setExamRoom(next_zi.room);
-        s->setExamRoom(next_zi.building);
+        s->setExamBuilding(next_zi.building);
         std::string row,seat;
         //std::cout << "ASSIGN student " << s->getUserName() << std::endl;
         next_zi.assign_seat(row,seat,s->getLefty());
