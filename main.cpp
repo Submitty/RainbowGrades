@@ -15,6 +15,7 @@ std::string GLOBAL_sort_order;
 
 
 int GLOBAL_ACTIVE_TEST_ZONE = 0;
+std::string GLOBAL_ACTIVE_TEST_ID = "";
 
 #include "student.h"
 #include "iclicker.h"
@@ -141,7 +142,7 @@ std::ofstream priority_stream("priority.txt");
 std::ofstream late_days_stream("late_days.txt");
 
 //void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message);
-void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::json &special_message);
+void PrintExamRoomAndZoneTable(const std::string &id, nlohmann::json &mj, Student *s, const nlohmann::json &special_message);
 
 //====================================================================
 
@@ -208,7 +209,8 @@ private:
 bool by_name(const Student* s1, const Student* s2) {
   return (s1->getLastName() < s2->getLastName() ||
           (s1->getLastName() == s2->getLastName() &&
-           s1->getPreferredName() < s2->getPreferredName()));
+           s1->getFirstName() < s2->getFirstName()));
+  // should sort by legal name presumably (for data entry)
 }
 
 std::string padifonlydigits(const std::string& s, int n) {
@@ -643,6 +645,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     if (active == 1) {
 
       GLOBAL_ACTIVE_TEST_ZONE = k;
+      GLOBAL_ACTIVE_TEST_ID = grade_id["id"];
 
         for (nlohmann::json::iterator itr2 = (exam_data).begin(); itr2 != (exam_data).end(); itr2++) {
           std::string token2 = itr2.key();
@@ -813,24 +816,24 @@ void MakeRosterFile(std::vector<Student*> &students) {
 
 #if 0
     ostr 
-      << std::left << std::setw(15) << students[i]->getLastName() 
-      << std::left << std::setw(13) << students[i]->getPreferredName() 
+      << std::left << std::setw(15) << students[i]->getPreferredLastName()
+      << std::left << std::setw(13) << students[i]->getPreferredFirstName()
       << std::left << std::setw(12) << students[i]->getUserName()
       << std::left << std::setw(12) << room
       << std::left << std::setw(10) << zone
       << std::endl;
 
     ostr 
-      << students[i]->getLastName() << ","
-      << students[i]->getPreferredName() << ","
+      << students[i]->getPreferredLastName() << ","
+      << students[i]->getPreferredFirstName() << ","
       << students[i]->getUserName() << std::endl;
 
 #else
 
     ostr 
       << students[i]->getSection()   << "\t"
-      << students[i]->getLastName()     << "\t"
-      << students[i]->getPreferredName() << "\t"
+      << students[i]->getPreferredLastName()     << "\t"
+      << students[i]->getPreferredFirstName() << "\t"
       << students[i]->getUserName()  << "\t"
       //<< foo 
       << std::endl;
@@ -1216,12 +1219,16 @@ void load_student_grades(std::vector<Student*> &students) {
       s->setUserName(j[token].get<std::string>());
     } else if (token == "legal_first_name") {
       s->setLegalFirstName(j[token].get<std::string>());
+    } else if (token == "legal_last_name") {
+      s->setLegalLastName(j[token].get<std::string>());
     } else if (token == "preferred_first_name") {
-                  if (!j[token].is_null()) {
-                    s->setPreferredFirstName(j[token].get<std::string>());
-                  }
-                } else if (token == "last_name") {
-      s->setLastName(j[token].get<std::string>());
+      if (!j[token].is_null()) {
+        s->setPreferredFirstName(j[token].get<std::string>());
+      }
+    } else if (token == "preferred_last_name") {
+      if (!j[token].is_null()) {
+        s->setPreferredLastName(j[token].get<std::string>());
+      }
     } else if (token == "last_update") {
       s->setLastUpdate(j[token].get<std::string>());
     } else if (token == "registration_section") {
@@ -1590,8 +1597,8 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
       ostr2 << "<h3>PRIORITY HELP QUEUE</h3>" << std::endl;
       priority_stream << std::left << std::setw(15) << students[S]->getSection()
                       << std::left << std::setw(15) << students[S]->getUserName() 
-                      << std::left << std::setw(15) << students[S]->getPreferredName() 
-                      << std::left << std::setw(15) << students[S]->getLastName() << std::endl;
+                      << std::left << std::setw(15) << students[S]->getPreferredFirstName()
+                      << std::left << std::setw(15) << students[S]->getPreferredLastName() << std::endl;
       
       
     }
@@ -1609,7 +1616,7 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
     }
 
     //PrintExamRoomAndZoneTable(ostr2,students[S],special_message);
-    PrintExamRoomAndZoneTable(mj,students[S],special_message);
+    PrintExamRoomAndZoneTable(GLOBAL_ACTIVE_TEST_ID, mj,students[S],special_message);
 
     ostr2_json << mj.dump(4);
 

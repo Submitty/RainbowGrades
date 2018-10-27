@@ -327,7 +327,7 @@ void colorit(std::ostream &ostr,
 // ==========================================================
 
 //void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message) {
-void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::json &special_message) {
+void PrintExamRoomAndZoneTable(const std::string &g_id, nlohmann::json &mj, Student *s, const nlohmann::json &special_message) {
 
   Student *s_tmp = s;
 
@@ -439,7 +439,7 @@ void PrintExamRoomAndZoneTable(nlohmann::json &mj, Student *s, const nlohmann::j
   mj["room"] = room;
   mj["building"] = building;
   mj["time"] = time;
-  mj["gradeable"] = "test01";
+  mj["gradeable"] = g_id;
   mj["username"] = s->getUserName();
   mj["zone"] = zone;
   if (row != "N/A" && row !="") {
@@ -595,11 +595,12 @@ void start_table_output( bool for_instructor,
     table.set(0,counter++,TableCell("ffffff","notes"));
   }
   student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME"));
-  int last_name_counter=counter; table.set(0,counter++,TableCell("ffffff","LAST"));
-
   if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
+    table.set(0,counter++,TableCell("ffffff","LAST (LEGAL)"));
     table.set(0,counter++,TableCell("ffffff","FIRST (LEGAL)"));
   }
+  int last_name_counter=counter;
+  table.set(0,counter++,TableCell("ffffff","LAST"));
   student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","FIRST"));
   student_data.push_back(last_name_counter);
   student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
@@ -804,11 +805,12 @@ void start_table_output( bool for_instructor,
     //counter+=3;
     assert (default_color.size()==6);
     table.set(myrow,counter++,TableCell(default_color,this_student->getUserName()));
-    table.set(myrow,counter++,TableCell(default_color,this_student->getLastName()));
     if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
+      table.set(myrow,counter++,TableCell(default_color,this_student->getLastName()));
       table.set(myrow,counter++,TableCell(default_color,this_student->getFirstName()));
     }
-    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredName()));
+    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredLastName()));
+    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredFirstName()));
     table.set(myrow,counter++,TableCell(grey_divider));
 
 

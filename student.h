@@ -77,8 +77,9 @@ public:
   // personal data
   const std::string& getUserName()      const { return username; }
   const std::string& getFirstName()     const { return legal_first; }
-  const std::string& getPreferredName() const { if (preferred_first != "") return preferred_first; return legal_first; }
-  const std::string& getLastName()      const { return last; }
+  const std::string& getPreferredFirstName() const { if (preferred_first != "") return preferred_first; return legal_first; }
+  const std::string& getLastName()      const { return legal_last; }
+  const std::string& getPreferredLastName()      const { if (preferred_last != "") return preferred_last; return legal_last; }
   const std::string& getLastUpdate()    const { return lastUpdate; }
   bool getLefty() const { return lefty; }
   
@@ -129,7 +130,8 @@ public:
   void setUserName(const std::string &s)      { username=s; }
   void setLegalFirstName(const std::string &s)     { legal_first=s; }
   void setPreferredFirstName(const std::string &s) { preferred_first=s.substr(0,10);  }
-  void setLastName(const std::string &s)      { last=s; }
+  void setPreferredLastName(const std::string &s) { preferred_last=s.substr(0,10);  }
+  void setLegalLastName(const std::string &s)      { legal_last=s; }
   void setLefty() { lefty = true; }
   void setLastUpdate(const std::string &s)    { lastUpdate = s; }
 
@@ -198,7 +200,8 @@ private:
   std::string username;
   std::string legal_first;
   std::string preferred_first;
-  std::string last;
+  std::string legal_last;
+  std::string preferred_last;
   bool lefty;
   
   std::string lastUpdate;

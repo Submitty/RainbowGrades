@@ -429,8 +429,8 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
       
       if (s->getLastName() == "") continue;
 
-      std::string f = s->getPreferredName();
-      std::string l = s->getLastName();
+      std::string f = s->getPreferredFirstName();
+      std::string l = s->getPreferredLastName();
       std::replace( f.begin(), f.end(), ' ', '_');
       std::replace( l.begin(), l.end(), ' ', '_');
 
