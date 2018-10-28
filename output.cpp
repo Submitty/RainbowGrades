@@ -897,7 +897,7 @@ void start_table_output( bool for_instructor,
         table.set(myrow, counter++, TableCell(color, this_student->getRank(), "", 0, CELL_CONTENTS_VISIBLE, "right"));
       }
       else{
-        table.set(myrow, counter++, TableCell(color, "", "", 0, CELL_CONTENTS_VISIBLE, "right"));
+        table.set(myrow, counter++, TableCell("ffffff", "", "", 0, CELL_CONTENTS_VISIBLE, "right"));
       }
     }
     table.set(myrow,counter++,TableCell(grey_divider));

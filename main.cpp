@@ -1860,17 +1860,12 @@ void assign_ranks(std::vector<Student*> &students){
   bool found_first = false; //Track if we've found a valid initial score for Rank #1
   int sharing_rank = 1;
 
-
   for (unsigned int stu= 0; stu < students.size(); stu++) {
     Student *this_student = students[stu];
     if (validSection(this_student->getSection())) {
-      this_student->setRank(myrank);
-      std::cout << "My rank: " << myrank << " overall score: " << this_student->overall() << std::endl;
       if(prev_score != this_student->overall()){
-          std::cout << "Prev score: " << prev_score << " Overall score: " << this_student->overall() << std::endl;
           prev_score = this_student->overall();
           if(!found_first) {
-              sharing_rank++; //Need to increment once while finding the initial valid student
               found_first = true;
           }
           else{
@@ -1881,9 +1876,7 @@ void assign_ranks(std::vector<Student*> &students){
       else{
           sharing_rank++;
       }
-    }
-    else{
-        std::cout << "Student " << this_student->getUserName() << " not in valid section, index " << this_student->getSection() << std::endl;
+      this_student->setRank(myrank);
     }
   }
 
