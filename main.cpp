@@ -26,6 +26,7 @@ std::string GLOBAL_ACTIVE_TEST_ID = "";
 // defined in iclicker.cpp
 std::string ReadQuoted(std::istream &istr);
 void suggest_curves(std::vector<Student*> &students);
+void assign_ranks(std::vector<Student*> &students);
 
 std::string GLOBAL_recommend_id = "";
 
@@ -131,6 +132,7 @@ bool DISPLAY_GRADE_SUMMARY = false;
 bool DISPLAY_GRADE_DETAILS = false;
 bool DISPLAY_ICLICKER = false;
 bool DISPLAY_LATE_DAYS = false;
+bool DISPLAY_RANK_TO_INDIVIDUAL = false;
 
 
 std::vector<std::string> MESSAGES;
@@ -718,7 +720,8 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
       DISPLAY_GRADE_DETAILS = true;
     } else if (token == "iclicker") {
       DISPLAY_ICLICKER = true;
-    
+    } else if (token == "display_rank_to_individual"){
+      DISPLAY_RANK_TO_INDIVIDUAL = true;
     } else {
       std::cout << "OOPS " << token << std::endl;
       exit(0);
@@ -1693,6 +1696,7 @@ int main(int argc, char* argv[]) {
   // ======================================================================
   // SORT
   std::sort(students.begin(),students.end(),by_overall);
+  assign_ranks(students);
 
 
   if (GLOBAL_sort_order == std::string("by_overall")) {
@@ -1847,6 +1851,35 @@ void suggest_curves(std::vector<Student*> &students) {
       std::cout << "  TOTAL = " << total << std::endl;
     }
   }
+}
+
+//Adds a global ranking to all students in the course regardless of sort method
+void assign_ranks(std::vector<Student*> &students){
+  int myrank = 1;
+  float prev_score = 0.0;
+  bool found_first = false; //Track if we've found a valid initial score for Rank #1
+  int sharing_rank = 1;
+
+  for (unsigned int stu= 0; stu < students.size(); stu++) {
+    Student *this_student = students[stu];
+    if (validSection(this_student->getSection())) {
+      if(prev_score != this_student->overall()){
+          prev_score = this_student->overall();
+          if(!found_first) {
+              found_first = true;
+          }
+          else{
+              myrank+=sharing_rank;
+              sharing_rank = 1;
+          }
+      }
+      else{
+          sharing_rank++;
+      }
+      this_student->setRank(myrank);
+    }
+  }
+
 }
 
 // =============================================================================================
