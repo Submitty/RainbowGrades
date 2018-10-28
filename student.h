@@ -117,6 +117,7 @@ public:
   std::string getExamSeat() const { return exam_seat;}
   const std::string& getExamTime() const { return exam_time; }
   const std::string& getExamZoneImage() const { return exam_zone_image; }
+  int getRank() const { return rank; }
 
   // per student notes
   const std::string& getRecommendation()          const { return ta_recommendation; }
@@ -152,6 +153,7 @@ public:
   void setAcademicIntegrityForm() { academic_integrity_form = true; }
   void setParticipation(int x) { participation = x; }
   void setUnderstanding(int x) { understanding = x; }
+  void setRank(int x) { rank = x; }
 
   // info about exam assignments
   void setExamRoom(const std::string &s) { exam_room = s; }
@@ -222,6 +224,7 @@ private:
   std::vector<std::string> zones;
   float moss_penalty;
   float cached_hw;
+  int rank;
 
   // other grade-like data
   std::vector<std::string> remote_id;
