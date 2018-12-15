@@ -518,9 +518,8 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     if(itr != one_gradeable_type.end()){
       //Verify that we have as many weights as the count in the bucket
       nlohmann::json weight_array =  one_gradeable_type["sorted_weights"];
-      assert(weight_array.size() == count && "NUMBER OF SORTED WEIGHTS DOES NOT MATCH COUNT IN GRADEABLE TYPE");
+      assert(weight_array.size() == count && "NUMBER OF SORTED WEIGHTS DOES NOT MATCH COUNT IN GRADEABLE CATEGORY");
 
-      //TODO: Buster finish this!
       //Extract the array of weights
       float scaled_weights_sum = 0.0;
       float prev_weight;
@@ -540,13 +539,13 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
       }
 
       //Verify that weights sum to close to the bucket percentage
-      assert(fabs(scaled_weights_sum - gradeable_total_percent) < 0.001 && "SCALED WEIGHTS SHOULD SUM TO GRADEABLE TYPE TOTAL PERCENTAGE");
+      assert(fabs(scaled_weights_sum - gradeable_total_percent) < 0.001 && "SCALED WEIGHTS SHOULD SUM TO GRADEABLE CATEGORY TOTAL PERCENTAGE");
     }
 
     // Set remove lowest for gradeable
     int num = one_gradeable_type.value("remove_lowest", 0);
     assert (num == 0 || (num >= 0 && num < GRADEABLES[g].getCount()));
-    assert ((num == 0 || !GRADEABLES[g].hasSortedWeight()) && "CANNOT USE remove_lowest AND sorted_weights SIMULTANEOUSLY");
+    assert ((num == 0 || !GRADEABLES[g].hasSortedWeight()) && "CANNOT USE remove_lowest AND sorted_weights IN THE SAME GRADEABLE CATEGORY");
     GRADEABLES[g].setRemoveLowest(num);
     ALL_GRADEABLES.push_back(g);
   }
@@ -634,6 +633,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
         GRADEABLES[g].setScaleMaximum(token_key,scale_maximum);
       }
       if (grade_id.find("percent") != grade_id.end()) {
+        assert(!GRADEABLES[g].hasSortedWeight() && "GRADE CATEGORY HAS sorted_weights FIELD WHICH WOULD OVERRIDE GRADEABLE-SPECIFIC percent FIELD");
         float item_percentage = grade_id.value("percent",-1.0);
         assert (item_percentage >= 0 && item_percentage <= 1.0);
         GRADEABLES[g].setItemPercentage(token_key,item_percentage);

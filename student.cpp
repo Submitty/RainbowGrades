@@ -195,6 +195,9 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
       assert(my_max > 0);
       if (sum_max > 0) {
         p = std::max(m,sm) / sum_max;
+        if(GRADEABLES[g].hasSortedWeight()){
+          p = GRADEABLES[g].getSortedWeight(i);
+        }
       } else {
         // pure extra credit category
         p = std::max(m,sm) / sum_scaled_max;
@@ -203,7 +206,12 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     sum += p * s / my_max;
   }
 
-  return 100*GRADEABLES[g].getPercent()*sum;
+  if(GRADEABLES[g].hasSortedWeight()){
+      return 100*sum;
+  }
+  else {
+      return 100 * GRADEABLES[g].getPercent() * sum;
+  }
 }
 
 
