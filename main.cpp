@@ -215,8 +215,8 @@ bool by_name(const Student* s1, const Student* s2) {
   // should sort by legal name presumably (for data entry)
 }
 
-std::string padifonlydigits(const std::string& s, int n) {
-  for (int i = 0; i < s.size(); i++) {
+std::string padifonlydigits(const std::string& s, unsigned int n) {
+  for (std::string::size_type i = 0; i < s.size(); i++) {
     if (s[i] < '0' || s[i] > '9') return s;
   }
   if (s.size() < n) {
@@ -491,7 +491,8 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     assert (gradeable_total_percent >= 0);
     sum_of_percents += gradeable_total_percent;
 
-    int count = one_gradeable_type.value("count",-1);
+    int parse_count = one_gradeable_type.value("count",-1);
+    unsigned int count = 0;
 
     nlohmann::json ids_list = one_gradeable_type["ids"];
     for (unsigned int k = 0; k < ids_list.size(); k++) {
@@ -499,14 +500,14 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
       std::string gradeable_id = ids.value("id","");
       assert (gradeable_id != "");
     }
-    if (count == -1) {
+    if (parse_count == -1) {
       count = ids_list.size();
     }
-    //If we ever have more than INT_MAX ids, this will wrap.
-    //Needed to resolve int vs uint comparison and this is preferable since
-    //presumably the json library is spitting out an int and the customization.json
-    //also assumes int.
-    assert (int(ids_list.size()) <= count);
+    else{
+      count = parse_count;
+    }
+
+    assert (ids_list.size() <= count);
 
     Gradeable answer (count,gradeable_total_percent); //,m);
     GRADEABLES.insert(std::make_pair(g,answer));
@@ -633,7 +634,8 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
         GRADEABLES[g].setScaleMaximum(token_key,scale_maximum);
       }
       if (grade_id.find("percent") != grade_id.end()) {
-        assert(!GRADEABLES[g].hasSortedWeight() && "GRADE CATEGORY HAS sorted_weights FIELD WHICH WOULD OVERRIDE GRADEABLE-SPECIFIC percent FIELD");
+        assert(!GRADEABLES[g].hasSortedWeight() &&
+               "GRADE CATEGORY HAS sorted_weights FIELD WHICH WOULD OVERRIDE GRADEABLE-SPECIFIC percent FIELD");
         float item_percentage = grade_id.value("percent",-1.0);
         assert (item_percentage >= 0 && item_percentage <= 1.0);
         GRADEABLES[g].setItemPercentage(token_key,item_percentage);
@@ -769,7 +771,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
   }
 
   if (j.find("omit_section_from_stats") != j.end()) {
-    for (int i = 0; i < j["omit_section_from_stats"].size(); i++) {
+    for (unsigned int i = 0; i < j["omit_section_from_stats"].size(); i++) {
       OMIT_SECTION_FROM_STATS.push_back(j["omit_section_from_stats"][i]);
     }
   }
@@ -816,7 +818,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
 
 
 bool OmitSectionFromStats(const std::string &section) {
-  for (int i = 0; i < OMIT_SECTION_FROM_STATS.size(); i++) {
+  for (std::vector<std::string>::size_type i = 0; i < OMIT_SECTION_FROM_STATS.size(); i++) {
     if (OMIT_SECTION_FROM_STATS[i] == section) return true;
   }
   return false;
@@ -1405,10 +1407,10 @@ void load_student_grades(std::vector<Student*> &students) {
   std::string recommendation;
   if (participation_gradeable_id != "") {
     std::vector<nlohmann::json> notes = j["Note"];
-    for (int x = 0; x < notes.size(); x++) {
+    for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == participation_gradeable_id) {
         nlohmann::json scores = notes[x]["component_scores"];
-        for (int y = 0; y < scores.size(); y++) {
+        for (unsigned int y = 0; y < scores.size(); y++) {
           if (scores[y].find(participation_component) != scores[y].end()) {
             participation = scores[y][participation_component].get<float>();
           }
@@ -1418,10 +1420,10 @@ void load_student_grades(std::vector<Student*> &students) {
   }
   if (understanding_gradeable_id != "") {
     std::vector<nlohmann::json> notes = j["Note"];
-    for (int x = 0; x < notes.size(); x++) {
+    for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == understanding_gradeable_id) {
         nlohmann::json scores = notes[x]["component_scores"];
-        for (int y = 0; y < scores.size(); y++) {
+        for (unsigned int y = 0; y < scores.size(); y++) {
           if (scores[y].find(understanding_component) != scores[y].end()) {
             understanding = scores[y][understanding_component].get<float>();
           }
@@ -1431,10 +1433,10 @@ void load_student_grades(std::vector<Student*> &students) {
   }
   if (recommendation_gradeable_id != "") {
     std::vector<nlohmann::json> notes = j["Note"];
-    for (int x = 0; x < notes.size(); x++) {
+    for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == recommendation_gradeable_id) {
         nlohmann::json values = notes[x]["text"];
-        for (int y = 0; y < values.size(); y++) {
+        for (unsigned int y = 0; y < values.size(); y++) {
           if (values[y].find(recommendation_text) != values[y].end()) {
             if (values[y][recommendation_text].is_string()) {
               recommendation = values[y][recommendation_text].get<std::string>();
@@ -1472,7 +1474,7 @@ void load_student_grades(std::vector<Student*> &students) {
         std::string token = itr.key();
 
         if (itr.value().is_array()) {
-          for (int e = 0; e < itr.value().size(); e++) {
+          for (unsigned int e = 0; e < itr.value().size(); e++) {
             if (!itr.value()[e].is_object()) continue;
             if (itr.value()[e].value("id","") == original_id) {
               original_autograde = itr.value()[e].value("autograding_score",0.0);

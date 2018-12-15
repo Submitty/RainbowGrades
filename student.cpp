@@ -131,7 +131,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   float nonzero_sum = 0;
   int nonzero_count = 0;
   for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
-    float s = getGradeableItemGrade(g,i).getValue();
+    //float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
     if(!id.empty()){
       float m = std::max(GRADEABLES[g].getItemMaximum(id),GRADEABLES[g].getScaleMaximum(id));
