@@ -535,7 +535,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
         GRADEABLES[g].addSortedWeight(weight);
 
         if(k>0){
-          assert(prev_weight >= weight && "SORTED WEIGHTS MUST BE IN DECREASING ORDER");
+          assert(prev_weight <= weight && "SORTED WEIGHTS MUST BE IN INCREASING ORDER");
         }
       }
 
@@ -546,6 +546,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     // Set remove lowest for gradeable
     int num = one_gradeable_type.value("remove_lowest", 0);
     assert (num == 0 || (num >= 0 && num < GRADEABLES[g].getCount()));
+    assert ((num == 0 || !GRADEABLES[g].hasSortedWeight()) && "CANNOT USE remove_lowest AND sorted_weights SIMULTANEOUSLY");
     GRADEABLES[g].setRemoveLowest(num);
     ALL_GRADEABLES.push_back(g);
   }
