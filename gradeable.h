@@ -37,7 +37,7 @@ inline std::string gradeable_to_string(const GRADEABLE_ENUM &g) {
 
 inline std::string spacify(const std::string &s) {
   std::string tmp = "";
-  for (int i = 0; i < s.size(); i++) {
+  for (std::string::size_type i = 0; i < s.size(); i++) {
     tmp += std::string(1,s[i]) + " ";
   }
   return tmp;
@@ -133,6 +133,15 @@ public:
     return clamps.find(id)->second;
   }
 
+  float getSortedWeight(unsigned int position){
+      assert(position < sorted_weights.size());
+      return sorted_weights[position];
+  }
+
+  bool hasSortedWeight(){
+      return !sorted_weights.empty();
+  }
+
   // MODIFIERS
   void setRemoveLowest(int r) { remove_lowest=r; }
 
@@ -188,6 +197,10 @@ public:
     autograde_replacement_percentages[id] = autograde_replacement_percentage;
   }
 
+  void addSortedWeight(float weight){
+      sorted_weights.push_back(weight);
+  }
+
 private:
 
   // REPRESENTATION
@@ -198,6 +211,7 @@ private:
   std::map<std::string,float> maximums;
   std::map<std::string,float> scale_maximums;
   std::map<std::string,float> item_percentages;
+  std::vector<float> sorted_weights;
   std::map<std::string,float> clamps;
   std::map<std::string,bool> released;
   std::map<std::string,std::string> original_ids;
