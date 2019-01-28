@@ -615,6 +615,9 @@ void start_table_output( bool for_instructor,
   }
 
   student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","OVERALL"));
+  if(DISPLAY_RANK_TO_INDIVIDUAL) {
+      student_data.push_back(counter);  table.set(0, counter++, TableCell("ffffff", "RANK"));
+  }
   student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
 
   if (DISPLAY_FINAL_GRADE) {
@@ -731,7 +734,7 @@ void start_table_output( bool for_instructor,
   SelectBenchmarks(select_students,students,sp,sa,sb,sc,sd);
 
 
-  int myrank = 1;
+  int myposition = 1;
   int myrow = 1;
   std::string last_section = "";
   for (unsigned int stu= 0; stu < students.size(); stu++) {
@@ -760,13 +763,13 @@ void start_table_output( bool for_instructor,
       //std::cout << " WHO? " << this_student->getUserName() << std::endl;
       student_correspondences[myrow] = this_student->getUserName();
       if (GLOBAL_sort_order == "by_section" && this_student->getSection() != last_section) {
-        myrank=1;
+        myposition=1;
         last_section = this_student->getSection();
       }
       if (validSection(this_student->getSection())) {
         assert (default_color.size()==6);
-        table.set(myrow,counter++,TableCell(default_color,std::to_string(myrank)));
-        myrank++;
+        table.set(myrow,counter++,TableCell(default_color,std::to_string(myposition)));
+        myposition++;
       } else {
         assert (default_color.size()==6);
         table.set(myrow,counter++,TableCell(default_color,""));
@@ -889,6 +892,14 @@ void start_table_output( bool for_instructor,
     if (this_student == STDDEV_STUDENT_POINTER) color="ffffff";
     assert (color.size()==6);
     table.set(myrow,counter++,TableCell(color,grade,2));
+    if(DISPLAY_RANK_TO_INDIVIDUAL) {
+      if(validSection(this_student->getSection())) {
+        table.set(myrow, counter++, TableCell(color, this_student->getRank(), "", 0, CELL_CONTENTS_VISIBLE, "right"));
+      }
+      else{
+        table.set(myrow, counter++, TableCell("ffffff", "", "", 0, CELL_CONTENTS_VISIBLE, "right"));
+      }
+    }
     table.set(myrow,counter++,TableCell(grey_divider));
 
 

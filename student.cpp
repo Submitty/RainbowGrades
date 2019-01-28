@@ -131,7 +131,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   float nonzero_sum = 0;
   int nonzero_count = 0;
   for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
-    float s = getGradeableItemGrade(g,i).getValue();
+    //float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
     if(!id.empty()){
       float m = std::max(GRADEABLES[g].getItemMaximum(id),GRADEABLES[g].getScaleMaximum(id));
@@ -195,6 +195,9 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
       assert(my_max > 0);
       if (sum_max > 0) {
         p = std::max(m,sm) / sum_max;
+        if(GRADEABLES[g].hasSortedWeight()){
+          p = GRADEABLES[g].getSortedWeight(i);
+        }
       } else {
         // pure extra credit category
         p = std::max(m,sm) / sum_scaled_max;
@@ -203,7 +206,12 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     sum += p * s / my_max;
   }
 
-  return 100*GRADEABLES[g].getPercent()*sum;
+  if(GRADEABLES[g].hasSortedWeight()){
+      return 100*sum;
+  }
+  else {
+      return 100 * GRADEABLES[g].getPercent() * sum;
+  }
 }
 
 

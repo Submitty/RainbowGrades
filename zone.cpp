@@ -203,7 +203,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
           all_seats.push_back(seat);
         }
         bool skip = false;
-        for (int i = 0; i < all_seats.size(); i++) {
+        for (std::vector<std::string>::size_type i = 0; i < all_seats.size(); i++) {
           seat = all_seats[i];
           //std::cout << "SEAT " << seat << std::endl;
           if (seat.back() == 'X') {

@@ -26,6 +26,7 @@ std::string GLOBAL_ACTIVE_TEST_ID = "";
 // defined in iclicker.cpp
 std::string ReadQuoted(std::istream &istr);
 void suggest_curves(std::vector<Student*> &students);
+void assign_ranks(std::vector<Student*> &students);
 
 std::string GLOBAL_recommend_id = "";
 
@@ -131,6 +132,7 @@ bool DISPLAY_GRADE_SUMMARY = false;
 bool DISPLAY_GRADE_DETAILS = false;
 bool DISPLAY_ICLICKER = false;
 bool DISPLAY_LATE_DAYS = false;
+bool DISPLAY_RANK_TO_INDIVIDUAL = false;
 
 
 std::vector<std::string> MESSAGES;
@@ -213,8 +215,8 @@ bool by_name(const Student* s1, const Student* s2) {
   // should sort by legal name presumably (for data entry)
 }
 
-std::string padifonlydigits(const std::string& s, int n) {
-  for (int i = 0; i < s.size(); i++) {
+std::string padifonlydigits(const std::string& s, unsigned int n) {
+  for (std::string::size_type i = 0; i < s.size(); i++) {
     if (s[i] < '0' || s[i] > '9') return s;
   }
   if (s.size() < n) {
@@ -489,7 +491,8 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     assert (gradeable_total_percent >= 0);
     sum_of_percents += gradeable_total_percent;
 
-    int count = one_gradeable_type.value("count",-1);
+    int parse_count = one_gradeable_type.value("count",-1);
+    unsigned int count = 0;
 
     nlohmann::json ids_list = one_gradeable_type["ids"];
     for (unsigned int k = 0; k < ids_list.size(); k++) {
@@ -497,23 +500,53 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
       std::string gradeable_id = ids.value("id","");
       assert (gradeable_id != "");
     }
-    if (count == -1) {
+    if (parse_count == -1) {
       count = ids_list.size();
     }
-    //If we ever have more than INT_MAX ids, this will wrap.
-    //Needed to resolve int vs uint comparison and this is preferable since
-    //presumably the json library is spitting out an int and the customization.json
-    //also assumes int.
-    assert (int(ids_list.size()) <= count);
+    else{
+      count = parse_count;
+    }
+
+    assert (ids_list.size() <= count);
 
     Gradeable answer (count,gradeable_total_percent); //,m);
     GRADEABLES.insert(std::make_pair(g,answer));
     assert (GRADEABLES[g].getCount() >= 0);
     assert (GRADEABLES[g].getPercent() >= 0.0 && GRADEABLES[g].getPercent() <= 1.0);
-  
+
+    //SORTED WEIGHTS
+    itr = one_gradeable_type.find("sorted_weights");
+    if(itr != one_gradeable_type.end()){
+      //Verify that we have as many weights as the count in the bucket
+      nlohmann::json weight_array =  one_gradeable_type["sorted_weights"];
+      assert(weight_array.size() == count && "NUMBER OF SORTED WEIGHTS DOES NOT MATCH COUNT IN GRADEABLE CATEGORY");
+
+      //Extract the array of weights
+      float scaled_weights_sum = 0.0;
+      float prev_weight;
+      float weight;
+      for(unsigned int k=0; k < weight_array.size(); k++){
+        if(k>0){
+          prev_weight = weight;
+        }
+        nlohmann::json sorted_weight = weight_array[k];
+        weight = sorted_weight.get<float>();
+        scaled_weights_sum += weight;
+        GRADEABLES[g].addSortedWeight(weight);
+
+        if(k>0){
+          assert(prev_weight <= weight && "SORTED WEIGHTS MUST BE IN INCREASING ORDER");
+        }
+      }
+
+      //Verify that weights sum to close to the bucket percentage
+      assert(fabs(scaled_weights_sum - gradeable_total_percent) < 0.001 && "SCALED WEIGHTS SHOULD SUM TO GRADEABLE CATEGORY TOTAL PERCENTAGE");
+    }
+
     // Set remove lowest for gradeable
     int num = one_gradeable_type.value("remove_lowest", 0);
     assert (num == 0 || (num >= 0 && num < GRADEABLES[g].getCount()));
+    assert ((num == 0 || !GRADEABLES[g].hasSortedWeight()) && "CANNOT USE remove_lowest AND sorted_weights IN THE SAME GRADEABLE CATEGORY");
     GRADEABLES[g].setRemoveLowest(num);
     ALL_GRADEABLES.push_back(g);
   }
@@ -601,6 +634,8 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
         GRADEABLES[g].setScaleMaximum(token_key,scale_maximum);
       }
       if (grade_id.find("percent") != grade_id.end()) {
+        assert(!GRADEABLES[g].hasSortedWeight() &&
+               "GRADE CATEGORY HAS sorted_weights FIELD WHICH WOULD OVERRIDE GRADEABLE-SPECIFIC percent FIELD");
         float item_percentage = grade_id.value("percent",-1.0);
         assert (item_percentage >= 0 && item_percentage <= 1.0);
         GRADEABLES[g].setItemPercentage(token_key,item_percentage);
@@ -718,7 +753,8 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
       DISPLAY_GRADE_DETAILS = true;
     } else if (token == "iclicker") {
       DISPLAY_ICLICKER = true;
-    
+    } else if (token == "display_rank_to_individual"){
+      DISPLAY_RANK_TO_INDIVIDUAL = true;
     } else {
       std::cout << "OOPS " << token << std::endl;
       exit(0);
@@ -735,7 +771,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
   }
 
   if (j.find("omit_section_from_stats") != j.end()) {
-    for (int i = 0; i < j["omit_section_from_stats"].size(); i++) {
+    for (unsigned int i = 0; i < j["omit_section_from_stats"].size(); i++) {
       OMIT_SECTION_FROM_STATS.push_back(j["omit_section_from_stats"][i]);
     }
   }
@@ -782,7 +818,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
 
 
 bool OmitSectionFromStats(const std::string &section) {
-  for (int i = 0; i < OMIT_SECTION_FROM_STATS.size(); i++) {
+  for (std::vector<std::string>::size_type i = 0; i < OMIT_SECTION_FROM_STATS.size(); i++) {
     if (OMIT_SECTION_FROM_STATS[i] == section) return true;
   }
   return false;
@@ -1371,26 +1407,25 @@ void load_student_grades(std::vector<Student*> &students) {
   std::string recommendation;
   if (participation_gradeable_id != "") {
     std::vector<nlohmann::json> notes = j["Note"];
-    for (int x = 0; x < notes.size(); x++) {
+    for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == participation_gradeable_id) {
-        nlohmann::json scores = notes[x]["components"];
-         for (int y = 0; y < scores.size(); y++) {
-           if (scores[y]["title"] == participation_component) {
-             participation = scores[y]["score"].get<float>();
-           }
-         }
+        nlohmann::json scores = notes[x]["component_scores"];
+        for (unsigned int y = 0; y < scores.size(); y++) {
+          if (scores[y].find(participation_component) != scores[y].end()) {
+            participation = scores[y][participation_component].get<float>();
+          }
+        }
       }
     }
   }
   if (understanding_gradeable_id != "") {
     std::vector<nlohmann::json> notes = j["Note"];
-    for (int x = 0; x < notes.size(); x++) {
+    for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == understanding_gradeable_id) {
-        nlohmann::json scores = notes[x]["components"];
-        for (int y = 0; y < scores.size(); y++) {
-          if (scores[y]["title"] == understanding_component) {
-            //std::cout << scores[y] << std::endl;
-            understanding = scores[y]["score"].get<float>();
+        nlohmann::json scores = notes[x]["component_scores"];
+        for (unsigned int y = 0; y < scores.size(); y++) {
+          if (scores[y].find(understanding_component) != scores[y].end()) {
+            understanding = scores[y][understanding_component].get<float>();
           }
         }
       }
@@ -1398,8 +1433,9 @@ void load_student_grades(std::vector<Student*> &students) {
   }
   if (recommendation_gradeable_id != "") {
     std::vector<nlohmann::json> notes = j["Note"];
-    for (int x = 0; x < notes.size(); x++) {
+    for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == recommendation_gradeable_id) {
+<<<<<<< HEAD
         nlohmann::json values = notes[x]["components"];
         for (int y = 0; y < values.size(); y++) {
           if (values[y]["title"] == recommendation_text) {
@@ -1416,6 +1452,16 @@ void load_student_grades(std::vector<Student*> &students) {
             //} else {
             //std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
               //}
+=======
+        nlohmann::json values = notes[x]["text"];
+        for (unsigned int y = 0; y < values.size(); y++) {
+          if (values[y].find(recommendation_text) != values[y].end()) {
+            if (values[y][recommendation_text].is_string()) {
+              recommendation = values[y][recommendation_text].get<std::string>();
+            } else {
+              std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
+            }
+>>>>>>> 5956b5beb959673cd1540cb148974b091f5c8cb7
           }
         }
       }
@@ -1447,7 +1493,7 @@ void load_student_grades(std::vector<Student*> &students) {
         std::string token = itr.key();
 
         if (itr.value().is_array()) {
-          for (int e = 0; e < itr.value().size(); e++) {
+          for (unsigned int e = 0; e < itr.value().size(); e++) {
             if (!itr.value()[e].is_object()) continue;
             if (itr.value()[e].value("id","") == original_id) {
               original_autograde = itr.value()[e].value("autograding_score",0.0);
@@ -1702,6 +1748,7 @@ int main(int argc, char* argv[]) {
   // ======================================================================
   // SORT
   std::sort(students.begin(),students.end(),by_overall);
+  assign_ranks(students);
 
 
   if (GLOBAL_sort_order == std::string("by_overall")) {
@@ -1856,6 +1903,35 @@ void suggest_curves(std::vector<Student*> &students) {
       std::cout << "  TOTAL = " << total << std::endl;
     }
   }
+}
+
+//Adds a global ranking to all students in the course regardless of sort method
+void assign_ranks(std::vector<Student*> &students){
+  int myrank = 1;
+  float prev_score = 0.0;
+  bool found_first = false; //Track if we've found a valid initial score for Rank #1
+  int sharing_rank = 1;
+
+  for (unsigned int stu= 0; stu < students.size(); stu++) {
+    Student *this_student = students[stu];
+    if (validSection(this_student->getSection())) {
+      if(prev_score != this_student->overall()){
+          prev_score = this_student->overall();
+          if(!found_first) {
+              found_first = true;
+          }
+          else{
+              myrank+=sharing_rank;
+              sharing_rank = 1;
+          }
+      }
+      else{
+          sharing_rank++;
+      }
+      this_student->setRank(myrank);
+    }
+  }
+
 }
 
 // =============================================================================================
