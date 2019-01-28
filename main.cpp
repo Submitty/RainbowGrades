@@ -1435,24 +1435,6 @@ void load_student_grades(std::vector<Student*> &students) {
     std::vector<nlohmann::json> notes = j["Note"];
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == recommendation_gradeable_id) {
-<<<<<<< HEAD
-        nlohmann::json values = notes[x]["components"];
-        for (int y = 0; y < values.size(); y++) {
-          if (values[y]["title"] == recommendation_text) {
-            //if (values[y][recommendation_text].is_string()) {
-            recommendation += values[y]["comment"].get<std::string>();
-            //} else {
-            //std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
-            //}
-          }
-          if (values[y]["title"] == "Other") {
-            //if (values[y][recommendation_text].is_string()) {
-            std::string other = values[y]["comment"].get<std::string>();
-            if (other != "") { recommendation += "<br><em>" + other + "</em>"; }
-            //} else {
-            //std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
-              //}
-=======
         nlohmann::json values = notes[x]["text"];
         for (unsigned int y = 0; y < values.size(); y++) {
           if (values[y].find(recommendation_text) != values[y].end()) {
@@ -1461,7 +1443,6 @@ void load_student_grades(std::vector<Student*> &students) {
             } else {
               std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
             }
->>>>>>> 5956b5beb959673cd1540cb148974b091f5c8cb7
           }
         }
       }
