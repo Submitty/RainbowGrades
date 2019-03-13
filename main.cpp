@@ -1321,6 +1321,9 @@ void load_student_grades(std::vector<Student*> &students) {
                   }
 
                   std::string other_note = "";
+                  std::string labeled_notes = "";
+                  bool multiple_columns = false;
+
                   nlohmann::json::iterator itr3 = itr2->find("components");
                   if (itr3 != itr2->end()) {
                     for (std::size_t i = 0; i < itr3->size(); i++) {
@@ -1334,10 +1337,20 @@ void load_student_grades(std::vector<Student*> &students) {
                         component_title = std::to_string((*itr3)[i].value("title",0));
                       }
                       std::string component_comment = (*itr3)[i].value("comment","");
-                      if (component_title == "Notes" && component_comment != "") {
-                        other_note += " " + component_comment;
+                      if (component_comment != "") {
+                        if (other_note != "") {
+                          other_note += " ";
+                          labeled_notes += " ; ";
+                          multiple_columns = true;
+                        }
+                        other_note += component_comment;
+                        labeled_notes += component_title + "=\"" + component_comment + "\"";
                       }  
                     }
+                  }
+
+                  if (multiple_columns) {
+                    other_note = labeled_notes;
                   }
                   
       // Search through the gradeable categories as needed to find where this item belongs
