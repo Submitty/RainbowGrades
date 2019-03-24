@@ -408,8 +408,6 @@ void PrintExamRoomAndZoneTable(const std::string &g_id, nlohmann::json &mj, Stud
   }
 
 
-#if 1
-
   /*ostr << "<table style=\"border:1px solid yellowgreen; background-color:#ddffdd; width:auto;\" >\n";
   //  ostr << "<table border=\"1\" cellpadding=5 cellspacing=0 style=\"border:1px solid yellowgreen; background-color:#ddffdd;\">\n";
   ostr << "<tr><td>\n";
@@ -458,40 +456,6 @@ void PrintExamRoomAndZoneTable(const std::string &g_id, nlohmann::json &mj, Stud
 
   // might change format...
   mj["seating"] = mj;
-
-#else
-
-
-  ostr << "<table border=1 cellpadding=5 cellspacing=0 style=\"background-color:#ddffdd; width:auto;\">\n";
-  ostr << "<tr><td>\n";
-  ostr << "<table border=0 cellpadding=5 cellspacing=0>\n";
-  ostr << "  <tr><td colspan=2>" << GLOBAL_EXAM_TITLE << "</td></tr>\n";
-  //  ostr << "  <tr><td>" << GLOBAL_EXAM_DATE << "</td><td align=center>" << time << "</td></tr>\n";
-  //ostr << "  <tr><td>Your room assignment: </td><td align=center>" << room << "</td></tr>\n";
-
-  
-
-
-  if (zone == "SEE INSTRUCTOR") {
-    zone = "10";
-  }
-
-  std::string foo = "http://www.cs.rpi.edu/academics/courses/fall15/csci1200/hw/10_pokemon/";
-
-  ostr << "  <tr><td>Your list assignment:                </td><td align=left><a target=_top href=\"" << foo << "List"                         << zone << ".txt\">List"                         << zone << ".txt</a></td></tr>\n";
-  ostr << "  <tr><td>Small Input:                         </td><td align=left><a target=_top href=\"" << foo << "PokedexSmall"                 << zone << ".txt\">PokedexSmall"                 << zone << ".txt</a></td></tr>\n";
-  ostr << "  <tr><td>Small Input Obfuscate:               </td><td align=left><a target=_top href=\"" << foo << "PokedexSmallObfuscate"        << zone << ".txt\">PokedexSmallObfuscate"        << zone << ".txt</a></td></tr>\n";
-  ostr << "  <tr><td>Small Output Obfuscate:              </td><td align=left><a target=_top href=\"" << foo << "OutputSmallObfuscate"         << zone << ".txt\">OutputSmallObfuscate"         << zone << ".txt</a></td></tr>\n";
-  ostr << "  <tr><td>Small Output Obfuscate w/ Breeding:  </td><td align=left><a target=_top href=\"" << foo << "OutputSmallObfuscateBreeding" << zone << ".txt\">OutputSmallObfuscateBreeding" << zone << ".txt</a></td></tr>\n";
-
-  ostr << "</table>\n";
-  ostr << "</tr></td>\n";
-  ostr << "</table>\n";
-
-
-
-#endif
-
 
   std::string x1 = s->getExamZone();
   std::string x2 = s->getZone(GLOBAL_ACTIVE_TEST_ZONE);
