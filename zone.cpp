@@ -371,7 +371,9 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
       std::cout << "SKIP SECTION " << s->getSection() << " USER " << s->getUserName() << std::endl;
       low_overall_grade++;
     } else {
-
+    if(s->getExamTime().empty()){
+        s->setExamTime(GLOBAL_EXAM_TIME);
+    }
       if (s->getLefty()) {
         if (next_lefty_za >= (int)randomized_lefty_available.size()) {
           std::cout << "OOPS!  we ran out of lefty exam seating" << std::endl;
@@ -437,10 +439,11 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
       ostr_zone_assignments << std::setw(20) << std::left << l  << " ";
       ostr_zone_assignments << std::setw(15) << std::left << f << " ";
       ostr_zone_assignments << std::setw(12) << std::left << s->getUserName()  << " ";
-      if (s->getSection() != "null")
+      /*if (s->getSection() != "null")
         ostr_zone_assignments << std::setw(12) << std::left << s->getSection()  << " ";
       else
-        ostr_zone_assignments << std::setw(12) << std::left << "" << " ";
+        ostr_zone_assignments << std::setw(12) << std::left << "" << " ";*/
+    ostr_zone_assignments << std::setw(12) << std::left << s->getSection()  << " ";
 
       ostr_zone_assignments << std::setw(10) << std::left << s->getExamBuilding()  << " ";
       ostr_zone_assignments << std::setw(10) << std::left << s->getExamRoom()  << " ";
