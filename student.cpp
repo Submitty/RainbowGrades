@@ -221,6 +221,7 @@ float Student::adjusted_test(int i) const {
   assert (i >= 0 && i <  GRADEABLES[GRADEABLE_ENUM::TEST].getCount());
   float a = getGradeableItemGrade(GRADEABLE_ENUM::TEST,i).getValue();
   float b;
+  if(a == 0) return a; //Don't allow students to improve on a missing test
   if (i+1 < GRADEABLES[GRADEABLE_ENUM::TEST].getCount()) {
     b = getGradeableItemGrade(GRADEABLE_ENUM::TEST,i+1).getValue();
   } else {
