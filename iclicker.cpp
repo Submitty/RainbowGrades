@@ -33,10 +33,11 @@ Date dateFromFilename(const std::string& filename_with_directory) {
     filename = filename.substr(pos+1,filename.size()-pos-1);
   }
 
-  assert (filename.size() == 15);
+  assert (filename.size() >= 15);
   assert (filename[0] == 'L');
   //  assert (filename[7] == '_');
-  assert (filename.substr(11,4) == ".csv");
+  //assert (filename.substr(11,4) == ".csv");
+  assert (filename.substr(filename.size()-4,4) == ".csv");
 
   Date answer;
 
