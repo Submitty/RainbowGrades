@@ -1422,10 +1422,10 @@ void load_student_grades(std::vector<Student*> &students) {
     std::vector<nlohmann::json> notes = j["Note"];
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == participation_gradeable_id) {
-        nlohmann::json scores = notes[x]["component_scores"];
+        nlohmann::json scores = notes[x]["components"];
         for (unsigned int y = 0; y < scores.size(); y++) {
-          if (scores[y].find(participation_component) != scores[y].end()) {
-            participation = scores[y][participation_component].get<float>();
+          if (scores[y]["title"] == participation_component) {
+            participation = scores[y]["score"].get<float>();
           }
         }
       }
@@ -1435,10 +1435,10 @@ void load_student_grades(std::vector<Student*> &students) {
     std::vector<nlohmann::json> notes = j["Note"];
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == understanding_gradeable_id) {
-        nlohmann::json scores = notes[x]["component_scores"];
+        nlohmann::json scores = notes[x]["components"];
         for (unsigned int y = 0; y < scores.size(); y++) {
-          if (scores[y].find(understanding_component) != scores[y].end()) {
-            understanding = scores[y][understanding_component].get<float>();
+          if (scores[y]["title"] == understanding_component) {
+            understanding = scores[y]["score"].get<float>();
           }
         }
       }
@@ -1448,11 +1448,11 @@ void load_student_grades(std::vector<Student*> &students) {
     std::vector<nlohmann::json> notes = j["Note"];
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == recommendation_gradeable_id) {
-        nlohmann::json values = notes[x]["text"];
+        nlohmann::json values = notes[x]["components"];
         for (unsigned int y = 0; y < values.size(); y++) {
-          if (values[y].find(recommendation_text) != values[y].end()) {
-            if (values[y][recommendation_text].is_string()) {
-              recommendation = values[y][recommendation_text].get<std::string>();
+          if (values[y]["title"] == recommendation_text) {
+            if (values[y]["comment"].is_string()) {
+              recommendation = values[y]["comment"].get<std::string>();
             } else {
               std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
             }

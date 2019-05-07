@@ -49,7 +49,7 @@ pull:
 	rsync -azP ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/all_grades/ raw_data/
 
 push:
-	rsync -azP individual_summary_html/* ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/summary_html/
+	rsync -azPW individual_summary_html/* ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/summary_html/
 
 pull_test:
 	mkdir -p raw_data/
