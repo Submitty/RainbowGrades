@@ -1,5 +1,6 @@
 #include "student.h"
 
+extern std::map<GRADEABLE_ENUM,float> OVERALL_FAIL_CUTOFFS;
 const std::string GradeColor(const std::string &grade);
 
 // =============================================================================================
@@ -371,9 +372,11 @@ std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
   }
 
 
-  // some criteria that might indicate automatica failure of course
+  // some criteria that might indicate automatic failure of course
   // (instructor can override with manual grade)
-  int failed_lab   = (GradeablePercent(GRADEABLE_ENUM::LAB)       < 1.01 * lowest_d->GradeablePercent(GRADEABLE_ENUM::LAB)       ) ? true : false;
+
+  //Old (pre Su2019) DS method
+  /*int failed_lab   = (GradeablePercent(GRADEABLE_ENUM::LAB)       < 1.01 * lowest_d->GradeablePercent(GRADEABLE_ENUM::LAB)       ) ? true : false;
   int failed_hw    = (GradeablePercent(GRADEABLE_ENUM::HOMEWORK)  < 0.95 * lowest_d->GradeablePercent(GRADEABLE_ENUM::HOMEWORK)  ) ? true : false;
   int failed_testA = (GradeablePercent(GRADEABLE_ENUM::TEST)      < 0.90 * lowest_d->GradeablePercent(GRADEABLE_ENUM::TEST)      ) ? true : false;
   int failed_testB = (GradeablePercent(GRADEABLE_ENUM::EXAM)      < 0.90 * lowest_d->GradeablePercent(GRADEABLE_ENUM::EXAM)      ) ? true : false;
@@ -387,8 +390,19 @@ std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
 
     //((Student*)this)->other_note += "SHOULD AUTO FAIL";
     return "F";
+  }*/
+
+
+
+  for(std::map<GRADEABLE_ENUM,float>::const_iterator it=OVERALL_FAIL_CUTOFFS.begin(); it != OVERALL_FAIL_CUTOFFS.end(); it++){
+      if(GradeablePercent(it->first)/100.0 < GRADEABLES[it->first].getPercent() * it->second){
+          /*std::cerr << "Failing student " << this->getUserName() << " due to low " << gradeable_to_string(it->first)
+                    << " grade of " << GradeablePercent(it->first)/100.0 << " < "
+                    << GRADEABLES[it->first].getPercent() * it->second << " max is "
+                    << GRADEABLES[it->first].getPercent() << std::endl;*/
+          return "F";
+      }
   }
-  
 
   // otherwise apply the cutoffs
   if (over >= CUTOFFS["A"])  return "A";

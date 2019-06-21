@@ -45,7 +45,6 @@ extern int QUIZ_NORMALIZE_AND_DROP;
 extern std::map<std::string,std::string> sectionNames;
 extern std::map<std::string,std::string> sectionColors;
 
-
 extern std::map<std::string,float> CUTOFFS;
 extern std::map<Grade,int> grade_counts;
 extern std::map<Grade,float> grade_avg;
