@@ -63,6 +63,7 @@ std::vector<std::string> ICLICKER_QUESTION_NAMES;
 float MAX_ICLICKER_TOTAL;
 
 std::map<std::string,float> CUTOFFS;
+std::map<GRADEABLE_ENUM,float> OVERALL_FAIL_CUTOFFS;
 
 std::map<Grade,int> grade_counts;
 std::map<Grade,float> grade_avg;
@@ -549,6 +550,11 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     assert ((num == 0 || !GRADEABLES[g].hasSortedWeight()) && "CANNOT USE remove_lowest AND sorted_weights IN THE SAME GRADEABLE CATEGORY");
     GRADEABLES[g].setRemoveLowest(num);
     ALL_GRADEABLES.push_back(g);
+
+    //Parse out the min grade required for passing in this category
+    float overall_cutoff = one_gradeable_type.value("overall_cutoff", 0.0);
+    assert(0.0 <= overall_cutoff && overall_cutoff <= 1.0);
+    OVERALL_FAIL_CUTOFFS.insert(std::make_pair(g,overall_cutoff));
   }
   
   // Set Benchmark Percent
