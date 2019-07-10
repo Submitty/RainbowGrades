@@ -24,9 +24,6 @@ ifndef REPORTS_DIRECTORY
 $(error Variable REPORTS_DIRECTORY not set)
 endif
 
-GRADING_DIRECTORY := $(RAINBOW_GRADES_DIRECTORY)/../grading
-
-
 nlohmann_json_dir=${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann/json
 
 ${nlohmann_json_dir}:
@@ -36,10 +33,7 @@ ${nlohmann_json_dir}:
 
 
 # Grab this file from the main Submitty repo
-json_syntax_checker.py = ${RAINBOW_GRADES_DIRECTORY}/../misc_tools/json_syntax_checker.py
-${json_syntax_checker.py}:
-	mkdir -p ${RAINBOW_GRADES_DIRECTORY}/../misc_tools/
-	wget https://raw.githubusercontent.com/Submitty/Submitty/master/grading/json_syntax_checker.py -O ${json_syntax_checker.py}
+json_syntax_checker.py = ${RAINBOW_GRADES_DIRECTORY}/../Submitty/grading/json_syntax_checker.py
 
 
 # =============================================================================
