@@ -24,6 +24,7 @@
 #include "constants_and_globals.h"
 
 extern std::string OUTPUT_FILE;
+extern std::string OUTPUT_CSV_FILE;
 extern std::string ALL_STUDENTS_OUTPUT_DIRECTORY;
 
 extern Student* AVERAGE_STUDENT_POINTER;
@@ -537,7 +538,7 @@ void SelectBenchmarks(std::vector<int> &select_students, const std::vector<Stude
 
 void start_table_output( bool for_instructor,
                          const std::vector<Student*> &students, int rank, int month, int day, int year,
-                         Student *sp, Student *sa, Student *sb, Student *sc, Student *sd) {
+                         Student *sp, Student *sa, Student *sb, Student *sc, Student *sd, bool csv_mode) {
 
   std::vector<int> all_students;
   std::vector<int> select_students;
@@ -743,7 +744,17 @@ void start_table_output( bool for_instructor,
     
     std::string section_color = default_color;
     std::string section_label = "";
-    colorit_section2(this_student->getSection(),section_color,section_label);
+    if(!csv_mode) {
+        colorit_section2(this_student->getSection(), section_color, section_label);
+    }
+    else{
+        if (validSection(this_student->getSection())) {
+            section_label = sectionNames[this_student->getSection()];
+            section_color = sectionColors[section_label];
+            std::stringstream ss;
+            section_label = this_student->getSection() + " (" + section_label + ")";
+        }
+    }
     assert (section_color.size()==6);
     table.set(myrow,counter++,TableCell(section_color,section_label));
 
@@ -761,10 +772,16 @@ void start_table_output( bool for_instructor,
       }
       std::string other_note = this_student->getOtherNote();
       std::string recommendation = this_student->getRecommendation();
-      std::string THING =
-        "<font color=\"ff0000\">"+notes+"</font> " +
-        "<font color=\"0000ff\">"+other_note+"</font> " +
-        "<font color=\"00bb00\">"+recommendation+"</font>";
+      std::string THING;
+      if(!csv_mode) {
+          THING =
+                  "<font color=\"ff0000\">" + notes + "</font> " +
+                  "<font color=\"0000ff\">" + other_note + "</font> " +
+                  "<font color=\"00bb00\">" + recommendation + "</font>";
+      }
+      else{
+          THING = notes + "," + other_note + "," + recommendation;
+      }
       assert (default_color.size()==6);
       table.set(myrow,counter++,TableCell(default_color,THING));
     }
@@ -1072,15 +1089,28 @@ void start_table_output( bool for_instructor,
     all_students.push_back(i);
   }
 
-  std::cout << "WRITE ALL.html" << std::endl;
-  std::ofstream ostr2(OUTPUT_FILE);
+  //TODO: Refactor since now we pass in csv_mode, the only part that needs the if statement is the WRITE ALL.xxx
+  if(!csv_mode) {
+      std::cout << "WRITE ALL.html" << std::endl;
+      std::ofstream ostr2(OUTPUT_FILE);
 
-  GLOBAL_instructor_output = true;
-  table.output(ostr2, all_students,instructor_data);
+      GLOBAL_instructor_output = true;
+      table.output(ostr2, all_students, instructor_data, csv_mode);
 
-  end_table(ostr2,true,NULL);
-  ostr2.close();
-  
+      end_table(ostr2, true, NULL);
+      ostr2.close();
+  }
+  else {
+      std::cout << "WRITE ALL.csv" << std::endl;
+      std::ofstream ostr2(OUTPUT_CSV_FILE);
+
+      GLOBAL_instructor_output = true;
+      table.output(ostr2, all_students, instructor_data, csv_mode);
+
+      //end_table(ostr2, true, NULL);
+      ostr2.close();
+  }
+
   std::stringstream ss;
   ss << ALL_STUDENTS_OUTPUT_DIRECTORY << "output_" << month << "_" << day << "_" << year << ".html";
    
@@ -1104,7 +1134,7 @@ void start_table_output( bool for_instructor,
     }
     GLOBAL_instructor_output = false;
 
-    table.output(ostr3, select_students,student_data,true,true,last_update);
+    table.output(ostr3, select_students,student_data, false,true,true,last_update);
 
     end_table(ostr3,false,s);
   }

@@ -37,6 +37,7 @@ std::vector<std::string> OMIT_SECTION_FROM_STATS;
 
 std::string ICLICKER_ROSTER_FILE              = "./iclicker_Roster.txt";
 std::string OUTPUT_FILE                       = "./output.html";
+std::string OUTPUT_CSV_FILE                   = "./output.csv";
 std::string CUSTOMIZATION_FILE                = "./customization_no_comments.json";
 
 std::string RAW_DATA_DIRECTORY                = "./raw_data/";
@@ -1556,7 +1557,7 @@ void start_table_open_file(bool full_details,
 
 void start_table_output(bool full_details,
                         const std::vector<Student*> &students, int S, int month, int day, int year,
-                        Student *sp, Student *sa, Student *sb, Student *sc, Student *sd);
+                        Student *sp, Student *sa, Student *sb, Student *sc, Student *sd, bool csv_mode);
 
 void end_table(std::ofstream &ostr,  bool full_details, Student *s);
 
@@ -1598,7 +1599,10 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
   int year = now2->tm_year+1900;
 
   start_table_open_file(true,students,-1,month,day,year,GRADEABLE_ENUM::NONE);
-  start_table_output(true,students,-1,month,day,year, sp,sa,sb,sc,sd);
+  start_table_output(true,students,-1,month,day,year, sp,sa,sb,sc,sd,false);
+
+    start_table_open_file(true,students,-1,month,day,year,GRADEABLE_ENUM::NONE);
+    start_table_output(true,students,-1,month,day,year, sp,sa,sb,sc,sd,true);
 
   int next_rank = 1;
   //int last_section = -1;

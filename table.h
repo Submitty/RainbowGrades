@@ -18,6 +18,7 @@ public:
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="left" , int s=1, int r=0);
   TableCell(const std::string& c         , float              d   , int precision, const std::string& n="", int ldu=0,
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0);
+  std::string make_cell_string() const;
 
   std::string color;
   std::string data;
@@ -57,6 +58,7 @@ public:
   void output(std::ostream& ostr,
               std::vector<int> which_students,
               std::vector<int> which_data,
+              bool csv_mode=false,
               bool transpose=false,
               bool show_details=false,
               std::string last_update="") const;
