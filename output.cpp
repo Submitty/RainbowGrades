@@ -780,7 +780,7 @@ void start_table_output( bool for_instructor,
                   "<font color=\"00bb00\">" + recommendation + "</font>";
       }
       else{
-          THING = notes + "," + other_note + "," + recommendation;
+          THING = notes + " " + other_note + " " + recommendation;
       }
       assert (default_color.size()==6);
       table.set(myrow,counter++,TableCell(default_color,THING));

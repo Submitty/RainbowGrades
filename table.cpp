@@ -8,6 +8,24 @@ bool GLOBAL_instructor_output = false;
 
 bool global_details = false;
 
+// XXX: For now not sanitizing \ since RFC4180 only specifies double quote as an escape
+//      i.e. """ is a field with one double quote as the value.
+//      In practice many other escape techniques are used, but we'll see how far this gets us
+//      and we can always add the \ into the sanitization list if users want it.
+//      Also ' is not part of RFC4180 so not stripping those for now either. Probably going
+//      to result in some strange behavior in some spreadsheet apps, need user testing.
+//      We could relax the stripping, allow commas, and ensure all output uses double quotes
+//      to wrap all fields. However, this would make using a text editor to read/edit the CSV painful.
+bool CSVSanitizeHelper(const char c){
+    return c == '"' || c == ',' || c == '\n' || c == '\r';
+}
+
+std::string CSVSanitizeString(const std::string& s){
+    std::string ret(s);
+    ret.erase(std::remove_if(ret.begin(), ret.end(), CSVSanitizeHelper), ret.end());
+    return ret;
+}
+
 TableCell::TableCell(const std::string& c, const std::string& d, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
   assert (c.size() == 6);
@@ -115,7 +133,7 @@ std::string TableCell::make_cell_string() const{
             std::cerr << "Printing note: " << mynote << std::endl;
         }
     }
-    return ret;
+    return CSVSanitizeString(ret);
 }
 
 

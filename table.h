@@ -3,10 +3,15 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 extern bool GLOBAL_instructor_output;
 
 enum CELL_CONTENTS_STATUS { CELL_CONTENTS_VISIBLE, CELL_CONTENTS_HIDDEN, CELL_CONTENTS_VISIBLE_STUDENT, CELL_CONTENTS_VISIBLE_INSTRUCTOR, CELL_CONTENTS_NO_DETAILS };
+
+//Helper function for sanitization
+bool CSVSanitizeHelper(const char c);
+std::string CSVSanitizeString(const std::string& s);
 
 class TableCell {
 public:
