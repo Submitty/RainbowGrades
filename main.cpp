@@ -43,6 +43,7 @@ std::string CUSTOMIZATION_FILE                = "./customization_no_comments.jso
 std::string RAW_DATA_DIRECTORY                = "./raw_data/";
 std::string INDIVIDUAL_FILES_OUTPUT_DIRECTORY = "./individual_summary_html/";
 std::string ALL_STUDENTS_OUTPUT_DIRECTORY     = "./all_students_summary_html/";
+std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV     = "./all_students_summary_csv/";
 
 nlohmann::json GLOBAL_CUSTOMIZATION_JSON;
 

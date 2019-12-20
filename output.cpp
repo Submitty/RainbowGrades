@@ -26,6 +26,7 @@
 extern std::string OUTPUT_FILE;
 extern std::string OUTPUT_CSV_FILE;
 extern std::string ALL_STUDENTS_OUTPUT_DIRECTORY;
+extern std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV;
 
 extern Student* AVERAGE_STUDENT_POINTER;
 extern Student* STDDEV_STUDENT_POINTER;
@@ -1089,34 +1090,40 @@ void start_table_output( bool for_instructor,
     all_students.push_back(i);
   }
 
-  //TODO: Refactor since now we pass in csv_mode, the only part that needs the if statement is the WRITE ALL.xxx
   if(!csv_mode) {
       std::cout << "WRITE ALL.html" << std::endl;
-      std::ofstream ostr2(OUTPUT_FILE);
+      std::ofstream ostr_html(OUTPUT_FILE);
 
       GLOBAL_instructor_output = true;
-      table.output(ostr2, all_students, instructor_data, csv_mode);
+      table.output(ostr_html, all_students, instructor_data, csv_mode);
 
-      end_table(ostr2, true, NULL);
-      ostr2.close();
+      end_table(ostr_html, true, NULL);
+      ostr_html.close();
   }
   else {
       std::cout << "WRITE ALL.csv" << std::endl;
-      std::ofstream ostr2(OUTPUT_CSV_FILE);
+      std::ofstream ostr_csv(OUTPUT_CSV_FILE);
 
       GLOBAL_instructor_output = true;
-      table.output(ostr2, all_students, instructor_data, csv_mode);
+      table.output(ostr_csv, all_students, instructor_data, csv_mode);
 
-      //end_table(ostr2, true, NULL);
-      ostr2.close();
+      ostr_csv.close();
   }
 
   std::stringstream ss;
-  ss << ALL_STUDENTS_OUTPUT_DIRECTORY << "output_" << month << "_" << day << "_" << year << ".html";
-   
-  std::string command = "cp -f output.html " + ss.str();
-  std::cout << "RUN COMMAND " << command << std::endl;
-  system(command.c_str());
+
+  if(!csv_mode) {
+      ss << ALL_STUDENTS_OUTPUT_DIRECTORY << "output_" << month << "_" << day << "_" << year << ".html";
+      std::string command = "cp -f output.html " + ss.str();
+      std::cout << "RUN COMMAND " << command << std::endl;
+      system(command.c_str());
+  }
+  else{
+      ss << ALL_STUDENTS_OUTPUT_DIRECTORY_CSV << "output_" << month << "_" << day << "_" << year << ".csv";
+      std::string command = "cp -f output.csv " + ss.str();
+      std::cout << "RUN COMMAND " << command << std::endl;
+      system(command.c_str());
+  }
   
 
   for (std::map<int,std::string>::iterator itr = student_correspondences.begin();
