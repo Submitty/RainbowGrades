@@ -686,7 +686,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     if (active == 1) {
 
       GLOBAL_ACTIVE_TEST_ZONE = k;
-      GLOBAL_ACTIVE_TEST_ID = grade_id["id"];
+      GLOBAL_ACTIVE_TEST_ID = grade_id["id"].get<std::string>();
 
         for (nlohmann::json::iterator itr2 = (exam_data).begin(); itr2 != (exam_data).end(); itr2++) {
           std::string token2 = itr2.key();
@@ -792,7 +792,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
   for (nlohmann::json::iterator itr = benchmarkColor.begin(); itr != benchmarkColor.end(); itr++) {
     token = itr.key();
   std::string color;
-  color = itr.value();
+  color = itr.value().get<std::string>();
   
   SetBenchmarkColor(token,color);
   }
@@ -1064,7 +1064,7 @@ void processcustomizationfile(std::vector<Student*> &students) {
         GLOBAL_earned_late_days.push_back(tmp);
     }
   } else if (token == "iclicker_ids") {
-    iclicker_remotes_filename = itr.value();
+    iclicker_remotes_filename = itr.value().get<std::string>();
   } else if (token == "iclicker") {
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
       std::string temp = itr2.key();
@@ -1170,7 +1170,7 @@ void processcustomizationfile(std::vector<Student*> &students) {
     for (nlohmann::json::iterator itr2 = bonusJson.begin(); itr2 != bonusJson.end(); itr2++) {
       std::string bonus = itr2.key();
       BONUS_WHICH_LECTURE = std::stoi(bonus);
-      BONUS_FILE = j[token][bonus];
+      BONUS_FILE = j[token][bonus].get<std::string>();
         std::cout << "BONUS LATE DAYS" << std::endl;
       
       if (BONUS_FILE != "") {
