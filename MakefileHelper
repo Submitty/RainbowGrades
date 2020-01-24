@@ -87,10 +87,10 @@ process_grades.out: \
 	${RAINBOW_GRADES_DIRECTORY}/benchmark.cpp
 	g++ -Wall ${flags} ${memory_flags} ${json_include} $^ -g -o $@
 
-individual_summary_html all_students_summary_html:
+individual_summary_html all_students_summary_csv all_students_summary_html:
 	mkdir -p $@
 
-compile: remove_json_comments process_grades.out individual_summary_html all_students_summary_html
+compile: remove_json_comments process_grades.out individual_summary_html all_students_summary_html all_students_summary_csv
 
 clean:
 	rm -rf *~ *.dSYM

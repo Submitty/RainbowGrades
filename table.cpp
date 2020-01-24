@@ -8,6 +8,24 @@ bool GLOBAL_instructor_output = false;
 
 bool global_details = false;
 
+// XXX: For now not sanitizing \ since RFC4180 only specifies double quote as an escape
+//      i.e. """ is a field with one double quote as the value.
+//      In practice many other escape techniques are used, but we'll see how far this gets us
+//      and we can always add the \ into the sanitization list if users want it.
+//      Also ' is not part of RFC4180 so not stripping those for now either. Probably going
+//      to result in some strange behavior in some spreadsheet apps, need user testing.
+//      We could relax the stripping, allow commas, and ensure all output uses double quotes
+//      to wrap all fields. However, this would make using a text editor to read/edit the CSV painful.
+bool CSVSanitizeHelper(const char c){
+    return c == '"' || c == ',' || c == '\n' || c == '\r';
+}
+
+std::string CSVSanitizeString(const std::string& s){
+    std::string ret(s);
+    ret.erase(std::remove_if(ret.begin(), ret.end(), CSVSanitizeHelper), ret.end());
+    return ret;
+}
+
 TableCell::TableCell(const std::string& c, const std::string& d, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
   assert (c.size() == 6);
@@ -94,11 +112,36 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   return ostr;
 }
 
+std::string TableCell::make_cell_string() const{
+    std::string ret;
+    std::string mynote = this->getNote();
+    if ((this->data == "" && mynote=="")
+        || this->visible==CELL_CONTENTS_HIDDEN
+        || (this->visible==CELL_CONTENTS_VISIBLE_INSTRUCTOR && GLOBAL_instructor_output == false)
+        || (this->visible==CELL_CONTENTS_VISIBLE_STUDENT    && GLOBAL_instructor_output == true)) {
+        //ret += "\n"; //Empty cell
+    } else {
+        ret += this->data;
+        if (this->late_days_used > 0) {
+            if (this->late_days_used > 3) { ret += " (" + std::to_string(this->late_days_used) + "*)"; }
+            else { ret += " " + std::string(this->late_days_used,'*'); }
+        }
+        if (mynote.length() > 0 &&
+            mynote != " " &&
+            global_details) {
+            ret += mynote;
+            std::cerr << "Printing note: " << mynote << std::endl;
+        }
+    }
+    return CSVSanitizeString(ret);
+}
+
 
 
 void Table::output(std::ostream& ostr,
                    std::vector<int> which_students,
                    std::vector<int> which_data,
+                   bool csv_mode,
                    bool transpose,
                    bool show_details,
                    std::string last_update) const {
@@ -106,35 +149,39 @@ void Table::output(std::ostream& ostr,
   global_details = show_details;
   //global_details = true;
 
-  ostr << "<style>\n";
-  ostr << ".rotate {\n";
-  ostr << "             filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */\n";
-  ostr << "         -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)\"; /* IE8 */\n";
-  ostr << "     -moz-transform: rotate(-90.0deg);  /* FF3.5+ */\n";
-  ostr << "      -ms-transform: rotate(-90.0deg);  /* IE9+ */\n";
-  ostr << "       -o-transform: rotate(-90.0deg);  /* Opera 10.5 */\n";
-  ostr << "  -webkit-transform: rotate(-90.0deg);  /* Safari 3.1+, Chrome */\n";
-  ostr << "          transform: rotate(-90.0deg);  /* Standard */\n";
-  ostr << " display:block;\n";
-  ostr << " position:absolute;\n";
-  ostr << " right:-50%;\n";
-  ostr << "}\n";
-  ostr << "</style>\n";
+  if(!csv_mode) {
+      ostr << "<style>\n";
+      ostr << ".rotate {\n";
+      ostr << "             filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */\n";
+      ostr << "         -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)\"; /* IE8 */\n";
+      ostr << "     -moz-transform: rotate(-90.0deg);  /* FF3.5+ */\n";
+      ostr << "      -ms-transform: rotate(-90.0deg);  /* IE9+ */\n";
+      ostr << "       -o-transform: rotate(-90.0deg);  /* Opera 10.5 */\n";
+      ostr << "  -webkit-transform: rotate(-90.0deg);  /* Safari 3.1+, Chrome */\n";
+      ostr << "          transform: rotate(-90.0deg);  /* Standard */\n";
+      ostr << " display:block;\n";
+      ostr << " position:absolute;\n";
+      ostr << " right:-50%;\n";
+      ostr << "}\n";
+      ostr << "</style>\n";
+  }
 
 
   // -------------------------------------------------------------------------------
   // PRINT INSTRUCTOR SUPPLIED MESSAGES
-  for (unsigned int i = 0; i < MESSAGES.size(); i++) {
-    ostr << "" << MESSAGES[i] << "<br>\n";
-  }
-  if (last_update != "") {
-    ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
-  }
-  ostr << "&nbsp;<br>\n";
+  if(!csv_mode) {
+      for (unsigned int i = 0; i < MESSAGES.size(); i++) {
+          ostr << "" << MESSAGES[i] << "<br>\n";
+      }
+      if (last_update != "") {
+          ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
+      }
+      ostr << "&nbsp;<br>\n";
 
 
-  ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa;\">\n";
-  //  ostr << "<table border=0 cellpadding=3 cellspacing=2 style=\"background-color:#aaaaaa\">\n";
+      ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa;\">\n";
+      //  ostr << "<table border=0 cellpadding=3 cellspacing=2 style=\"background-color:#aaaaaa\">\n";
+  }
   
   if (transpose) {
     for (std::vector<int>::iterator c = which_data.begin(); c != which_data.end(); c++) {
@@ -145,14 +192,34 @@ void Table::output(std::ostream& ostr,
       ostr << "</tr>\n";
     }
   } else {
-    for (std::vector<int>::iterator r = which_students.begin(); r != which_students.end(); r++) {
-      ostr << "<tr>\n";
-      for (std::vector<int>::iterator c = which_data.begin(); c != which_data.end(); c++) {
-        ostr << cells[*r][*c] << "\n";
+      //CSV only runs in transpose = false
+      if(!csv_mode){
+          for (std::vector<int>::iterator r = which_students.begin(); r != which_students.end(); r++) {
+              ostr << "<tr>\n";
+              for (std::vector<int>::iterator c = which_data.begin(); c != which_data.end(); c++) {
+                  ostr << cells[*r][*c] << "\n";
+              }
+              ostr << "</tr>\n";
+          }
       }
-      ostr << "</tr>\n";
-    }
+      else{
+          for (std::vector<int>::iterator r = which_students.begin(); r != which_students.end(); r++) {
+              bool first_cell = true;
+              for (std::vector<int>::iterator c = which_data.begin(); c != which_data.end(); c++) {
+                  if(first_cell){
+                      first_cell = false;
+                  }
+                  else{
+                      ostr << ",";
+                  }
+                  ostr << cells[*r][*c].make_cell_string();
+              }
+              ostr << "\n";
+          }
+      }
   } 
-   
-  ostr << "</table>" << std::endl;
+
+  if(!csv_mode) {
+      ostr << "</table>" << std::endl;
+  }
 }
