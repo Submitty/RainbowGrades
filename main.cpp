@@ -791,10 +791,10 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
   nlohmann::json benchmarkColor = j["benchmark_color"];
   for (nlohmann::json::iterator itr = benchmarkColor.begin(); itr != benchmarkColor.end(); itr++) {
     token = itr.key();
-  std::string color;
-  color = itr.value().get<std::string>();
-  
-  SetBenchmarkColor(token,color);
+    std::string color;
+    color = itr.value().get<std::string>();
+    
+    SetBenchmarkColor(token,color);
   }
   
   //std::cout << "7" << std::endl;
