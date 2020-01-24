@@ -621,6 +621,9 @@ void start_table_output( bool for_instructor,
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
           //gradeable_name = spacify(gradeable_name);
         }
+        if (gradeable_name == "")
+          gradeable_name = "<em><font color=\"aaaaaa\">future "
+            + tolower(gradeable_to_string(g)) + "</font></em>";
         table.set(0,counter++,TableCell("ffffff",gradeable_name));
       }
       if (g != GRADEABLE_ENUM::NOTE) {
