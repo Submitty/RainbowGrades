@@ -252,7 +252,7 @@ bool by_iclicker(const Student* s1, const Student* s2) {
 
 
 // sorting function for letter grades
-bool operator< (const Grade &a, const Grade &b) {  
+bool operator< (const Grade &a, const Grade &b) {
   if (a.value == b.value) return false;
 
   if (a.value == "A") return true;
@@ -329,7 +329,8 @@ bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value
 //====================================================================
 
 
-void preprocesscustomizationfile(std::vector<Student*> &students) {  
+void preprocesscustomizationfile(const std::string &now_string,
+                                 std::vector<Student*> &students) {
   /*
   std::ifstream istr(CUSTOMIZATION_FILE.c_str());
   assert (istr);
@@ -605,6 +606,7 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
     for (unsigned int k = 0; k < ids_list.size(); k++) {
       nlohmann::json grade_id = ids_list[k];
       std::string token_key = grade_id.value("id","");
+      //std::cout << token_key << std::endl;
       assert (token_key != "");
 
       int which = GRADEABLES[g].setCorrespondence(token_key);
@@ -631,7 +633,19 @@ void preprocesscustomizationfile(std::vector<Student*> &students) {
       d_score = std::min(c_score,d_score);
 
       bool released = grade_id.value("released",true);
-      GRADEABLES[g].setReleased(token_key,released);
+      std::string release_date = grade_id.value("release_date","");
+      if (release_date != "") {
+        //std::cout << "RELEASE DATE " << release_date << std::endl;
+        if (release_date < now_string) {
+          //std::cout << "RELEASED!" << std::endl;
+          GRADEABLES[g].setReleased(token_key,true);
+        } else {
+          //std::cout << "not released" << std::endl;
+          GRADEABLES[g].setReleased(token_key,false);
+        }
+      } else {
+        GRADEABLES[g].setReleased(token_key,released);
+      }
 
       float maximum = grade_id.value("max",0);
       GRADEABLES[g].setMaximum(token_key,maximum);
@@ -899,7 +913,8 @@ void load_student_grades(std::vector<Student*> &students);
 
 void load_bonus_late_day(std::vector<Student*> &students, int which_lecture, std::string bonus_late_day_file);
 
-void processcustomizationfile(std::vector<Student*> &students) {
+void processcustomizationfile(const std::string &now_string,
+                              std::vector<Student*> &students) {
 
 
   std::ifstream istr(CUSTOMIZATION_FILE.c_str());
@@ -921,7 +936,7 @@ void processcustomizationfile(std::vector<Student*> &students) {
   SetBenchmarkColor("lowest_d"   ,"ff0000"); // red
   SetBenchmarkColor("failing"    ,"c80000"); // dark red
   
-  preprocesscustomizationfile(students);
+  preprocesscustomizationfile(now_string,students);
   
   load_student_grades(students);
 
@@ -1570,7 +1585,8 @@ void end_table(std::ofstream &ostr,  bool full_details, Student *s);
 
 
 
-void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_order) {
+void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_order,
+                   int year, int month, int day) {
 
   Student *sp = GetStudent(students,"PERFECT");
   Student *student_average = GetStudent(students,"AVERAGE");
@@ -1592,12 +1608,7 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
   command = "rm -f " + OUTPUT_FILE + " " + INDIVIDUAL_FILES_OUTPUT_DIRECTORY + "*json";
   system(command.c_str());
 
-  // get todays date;
-  time_t now = time(0);  
-  struct tm * now2 = localtime( & now );
-  int month = now2->tm_mon+1;
-  int day = now2->tm_mday;
-  int year = now2->tm_year+1900;
+
 
   start_table_open_file(true,students,-1,month,day,year,GRADEABLE_ENUM::NONE);
   start_table_output(true,students,-1,month,day,year, sp,sa,sb,sc,sd,false);
@@ -1732,11 +1743,32 @@ void load_bonus_late_day(std::vector<Student*> &students,
 
 }
 
+void initialize_time(std::string &now_string, int &year, int &month, int &day) {
+
+  // get todays date;
+  time_t now = time(0);
+  struct tm * now2 = localtime( & now );
+  month = now2->tm_mon+1;
+  day = now2->tm_mday;
+  year = now2->tm_year+1900;
+
+  char now_string_buffer[80];
+  strftime(now_string_buffer,sizeof(now_string_buffer),"%Y-%m-%d %H:%M:%S%z",now2);
+  now_string = std::string(now_string_buffer);
+
+  //std::cout << "NOW STRING " << now_string << std::endl;
+
+}
 
 
 int main(int argc, char* argv[]) {
 
   //std::string sort_order = "by_overall";
+
+  std::string now_string;
+  int year, month, day;
+
+  initialize_time(now_string, year, month, day);
 
   if (argc > 1) {
     assert (argc == 2);
@@ -1744,7 +1776,7 @@ int main(int argc, char* argv[]) {
   }
 
   std::vector<Student*> students;  
-  processcustomizationfile(students);
+  processcustomizationfile(now_string,students);
 
   // ======================================================================
   // SUGGEST CURVES
@@ -1843,7 +1875,7 @@ int main(int argc, char* argv[]) {
   // ======================================================================
   // OUTPUT
 
-  output_helper(students,GLOBAL_sort_order);
+  output_helper(students,GLOBAL_sort_order, year, month, day);
 
 }
 
