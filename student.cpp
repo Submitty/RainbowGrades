@@ -110,8 +110,6 @@ bool operator<(const score_object &a, const score_object &b) {
 
 float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   if (GRADEABLES[g].getCount() == 0) return 0;
-  //if (GRADEABLES[g].getMaximum() == 0) return 0;
-  //assert (GRADEABLES[g].getMaximum() > 0);
   assert (GRADEABLES[g].getPercent() >= 0);
 
   // special rules for tests
@@ -154,7 +152,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
     float m = nonzero_sum/nonzero_count;
-    if(!id.empty()){
+    if(!id.empty() && GRADEABLES[g].isReleased(id)){
       m = GRADEABLES[g].getItemMaximum(id);
     }
     float p = GRADEABLES[g].getItemPercentage(id);
@@ -192,8 +190,8 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float p = scores[i].percentage;
     float sm = scores[i].scale_max;
     float my_max = std::max(m,sm);
+
     if (p < 0) {
-      assert(my_max > 0);
       if (sum_max > 0) {
         p = std::max(m,sm) / sum_max;
         if(GRADEABLES[g].hasSortedWeight()){
@@ -204,7 +202,9 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
         p = std::max(m,sm) / sum_scaled_max;
       }
     }
-    sum += p * s / my_max;
+    if (my_max > 0) {
+      sum += p * s / my_max;
+    }
   }
 
   if(GRADEABLES[g].hasSortedWeight()){
