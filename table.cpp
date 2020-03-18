@@ -112,7 +112,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   return ostr;
 }
 
-std::string TableCell::make_cell_string() const{
+std::string TableCell::make_cell_string(bool csv_mode) const{
     std::string ret;
     std::string mynote = this->getNote();
     if ((this->data == "" && mynote=="")
@@ -122,7 +122,7 @@ std::string TableCell::make_cell_string() const{
         //ret += "\n"; //Empty cell
     } else {
         ret += this->data;
-        if (this->late_days_used > 0) {
+        if (this->late_days_used > 0 && csv_mode == false) {
             if (this->late_days_used > 3) { ret += " (" + std::to_string(this->late_days_used) + "*)"; }
             else { ret += " " + std::string(this->late_days_used,'*'); }
         }
@@ -212,7 +212,7 @@ void Table::output(std::ostream& ostr,
                   else{
                       ostr << ",";
                   }
-                  ostr << cells[*r][*c].make_cell_string();
+                  ostr << cells[*r][*c].make_cell_string(csv_mode);
               }
               ostr << "\n";
           }
