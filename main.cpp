@@ -210,12 +210,17 @@ private:
 
 // FOR OTHER THINGS
 
+std::string lowerCase(std::string str) {
+   for(unsigned int i=0;i<str.length();i++){
+      str[i] = std::tolower(str[i]);
+   }
+   return str;
+}
 
 bool by_name(const Student* s1, const Student* s2) {
-  return (s1->getLastName() < s2->getLastName() ||
-          (s1->getLastName() == s2->getLastName() &&
-           s1->getFirstName() < s2->getFirstName()));
-  // should sort by legal name presumably (for data entry)
+  return (lowerCase(s1->getPreferredLastName()) < lowerCase(s2->getPreferredLastName()) ||
+          (lowerCase(s1->getPreferredLastName()) == lowerCase(s2->getPreferredLastName()) &&
+           lowerCase(s1->getPreferredFirstName()) < lowerCase(s2->getPreferredFirstName())));
 }
 
 std::string padifonlydigits(const std::string& s, unsigned int n) {
