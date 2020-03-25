@@ -554,6 +554,16 @@ void preprocesscustomizationfile(const std::string &now_string,
     GRADEABLES[g].setRemoveLowest(num);
     ALL_GRADEABLES.push_back(g);
 
+    // Used to clamp extra credit. For example, if there are 3 gradeables of a category, each worth 1/2
+    // percentage of a total score, a student could earn 1.5x the value for the gradeable category.
+    // We can clamp that by setting max_score_percentage to a value less than 1.5.
+    nlohmann::json::iterator max_percent_itr = one_gradeable_type.find("max_score_percentage");
+    float max_score_percentage = -1;
+    if (max_percent_itr != one_gradeable_type.end()){
+        max_score_percentage = max_percent_itr->get<float>();
+    }
+    GRADEABLES[g].setMaxScorePercentage(max_score_percentage);
+
     //Parse out the min grade required for passing in this category
     float overall_cutoff = one_gradeable_type.value("overall_cutoff", 0.0);
     assert(0.0 <= overall_cutoff && overall_cutoff <= 1.0);
