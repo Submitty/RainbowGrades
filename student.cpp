@@ -207,17 +207,12 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     }
   }
 
-  if(GRADEABLES[g].hasSortedWeight()){
-      return 100*sum;
+  float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum;
+  float max_score_percentage = GRADEABLES[g].getMaxScorePercentage();
+  if (max_score_percentage > 0) {
+    percentage = std::min(percentage, max_score_percentage);
   }
-  else {
-      float percentage = GRADEABLES[g].getPercent() * sum;
-      float max_score_percentage = GRADEABLES[g].getMaxScorePercentage();
-      if (max_score_percentage > 0) {
-        percentage = std::min(percentage, max_score_percentage);
-      }
-      return 100 * percentage;
-  }
+  return 100 * percentage;
 }
 
 
