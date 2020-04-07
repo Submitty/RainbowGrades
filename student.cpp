@@ -207,12 +207,12 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     }
   }
 
-  if(GRADEABLES[g].hasSortedWeight()){
-      return 100*sum;
+  float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum;
+  float percentage_upper_clamp = GRADEABLES[g].getBucketPercentageUpperClamp();
+  if (percentage_upper_clamp > 0) {
+    percentage = std::min(percentage, percentage_upper_clamp);
   }
-  else {
-      return 100 * GRADEABLES[g].getPercent() * sum;
-  }
+  return 100 * percentage;
 }
 
 

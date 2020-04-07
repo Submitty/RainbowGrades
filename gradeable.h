@@ -65,6 +65,7 @@ public:
   // ACCESSORS
   int getCount() const { return count; }
   float getPercent() const { return percent; }
+  float getBucketPercentageUpperClamp() const { return this->bucket_percentage_upper_clamp; }
   float getMaximum() const { 
     if (maximums.size() == 0) return 0;
     assert (maximums.size() > 0);
@@ -162,6 +163,12 @@ public:
     return index;
   }
 
+  // Set the max percentage that can be received for a gradeable type.
+  // If the value is less than 0, it should be ignored.
+  void setBucketPercentageUpperClamp(float bucket_percentage_upper_clamp) {
+    this->bucket_percentage_upper_clamp = bucket_percentage_upper_clamp;
+  }
+
   void setCorrespondenceName(const std::string& id, const std::string& name) {
     assert (hasCorrespondence(id));
     assert (correspondences[id].second == "");
@@ -215,6 +222,7 @@ private:
   int count;
   float percent;
   int remove_lowest;
+  float bucket_percentage_upper_clamp;
   std::map<std::string,std::pair<int,std::string> > correspondences;
   std::map<std::string,float> maximums;
   std::map<std::string,float> scale_maximums;

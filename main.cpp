@@ -559,6 +559,16 @@ void preprocesscustomizationfile(const std::string &now_string,
     GRADEABLES[g].setRemoveLowest(num);
     ALL_GRADEABLES.push_back(g);
 
+    // Used to clamp extra credit. For example, if there are 3 gradeables of a category, each worth 1/2
+    // percentage of a total score, a student could earn 1.5x the value for the gradeable category.
+    // We can clamp that by setting bucket_percentage_upper_clamp to a value less than 1.5.
+    nlohmann::json::iterator upper_clamp_itr = one_gradeable_type.find("bucket_percentage_upper_clamp");
+    float bucket_percentage_upper_clamp = -1;
+    if (upper_clamp_itr != one_gradeable_type.end()){
+        bucket_percentage_upper_clamp = upper_clamp_itr->get<float>();
+    }
+    GRADEABLES[g].setBucketPercentageUpperClamp(bucket_percentage_upper_clamp);
+
     //Parse out the min grade required for passing in this category
     float overall_cutoff = one_gradeable_type.value("overall_cutoff", 0.0);
     assert(0.0 <= overall_cutoff && overall_cutoff <= 1.0);
