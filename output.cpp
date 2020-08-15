@@ -72,6 +72,7 @@ const std::string GradeColor(const std::string &grade) {
 // ==========================================================
 
 float compute_average(const std::vector<float> &vals) {
+  if (vals.size() == 0) return 0;
   assert (vals.size() > 0);
   float total = 0;
   for (std::size_t i = 0; i < vals.size(); i++) {
@@ -82,6 +83,7 @@ float compute_average(const std::vector<float> &vals) {
 
 
 float compute_stddev(const std::vector<float> &vals, float average) {
+  if (vals.size() == 0) return 0;
   assert (vals.size() > 0);
   float total = 0;
   for (std::size_t i = 0; i < vals.size(); i++) {
