@@ -1776,6 +1776,35 @@ void initialize_time(std::string &now_string, int &year, int &month, int &day) {
 }
 
 
+void loadAllowedLateDays(std::vector<Student*> &students) {
+  std::ifstream istr("polls/late_days.csv");
+  if (!istr.good()) return;
+  std::string s;
+  while (istr >> s) {
+    int x = s.find(',');
+    std::string username = s.substr(0,x);
+    s = s.substr(x+1,100);
+
+    x = s.find(',');
+    std::string date = s.substr(0,x);
+    s = s.substr(x+1,100);
+
+    int allowed = std::stoi(s);
+
+    //std::cout << "foo " << s << " ---  " << username << " -  " <<date << " -  " << allowed <<std::endl;
+
+    for (int i = 0; i < students.size(); i++) {
+      Student* s = students[i];
+      if (s->getUserName() == username) {
+        s->setCurrentAllowedLateDays(allowed);
+        break;
+      }
+    }
+
+  }
+}
+
+
 int main(int argc, char* argv[]) {
 
   //std::string sort_order = "by_overall";
@@ -1792,6 +1821,8 @@ int main(int argc, char* argv[]) {
 
   std::vector<Student*> students;  
   processcustomizationfile(now_string,students);
+
+  loadAllowedLateDays(students);
 
   // ======================================================================
   // SUGGEST CURVES

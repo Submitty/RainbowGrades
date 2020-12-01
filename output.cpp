@@ -160,6 +160,7 @@ std::string coloritcolor(float val,
   //check for nan
   if (val != val) return "ffffff";
   if (std::isinf(val)) return "00ff00";
+  if (std::isnan(perfect)) return "00ff00";
 
   //std::cout << "coloritcolor " << val << " " << perfect << " " << a << " " << b << " " << c << " " << d << std::endl;
   assert (perfect >= a &&
@@ -1163,8 +1164,17 @@ void start_table_output( bool for_instructor,
 
 void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
 
+  ostr << "<p>* = 1 late day used</p>" << std::endl;
 
-    ostr << "<p>* = 1 late day used</p>" << std::endl;
+  if (s != NULL) {
+    std::ifstream istr("polls/student_files/"+s->getUserName()+".html");
+    if (istr.good()) {
+      std::string tmp_s;
+      while (getline(istr,tmp_s)) {
+        ostr << tmp_s;
+      }
+    }
+  }
 
   if (GLOBAL_instructor_output == false &&
       DISPLAY_ICLICKER) {
