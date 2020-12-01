@@ -1320,7 +1320,12 @@ void load_student_grades(std::vector<Student*> &students) {
             a = "null";
           }
           s->setSection(a);
-
+    } else if (token == "rotating_section") {
+      int a = -1;
+      if (!j[token].is_null()) {
+        a = j[token].get<int>();
+      }
+      s->setRotatingSection(a);
     } else if (token == "default_allowed_late_days") {
                   int value = 0;
                   if (!j[token].is_null()) {
@@ -1776,6 +1781,35 @@ void initialize_time(std::string &now_string, int &year, int &month, int &day) {
 }
 
 
+void loadAllowedLateDays(std::vector<Student*> &students) {
+  std::ifstream istr("polls/late_days.csv");
+  if (!istr.good()) return;
+  std::string s;
+  while (istr >> s) {
+    int x = s.find(',');
+    std::string username = s.substr(0,x);
+    s = s.substr(x+1,100);
+
+    x = s.find(',');
+    std::string date = s.substr(0,x);
+    s = s.substr(x+1,100);
+
+    int allowed = std::stoi(s);
+
+    //std::cout << "foo " << s << " ---  " << username << " -  " <<date << " -  " << allowed <<std::endl;
+
+    for (int i = 0; i < students.size(); i++) {
+      Student* s = students[i];
+      if (s->getUserName() == username) {
+        s->setCurrentAllowedLateDays(allowed);
+        break;
+      }
+    }
+
+  }
+}
+
+
 int main(int argc, char* argv[]) {
 
   //std::string sort_order = "by_overall";
@@ -1792,6 +1826,8 @@ int main(int argc, char* argv[]) {
 
   std::vector<Student*> students;  
   processcustomizationfile(now_string,students);
+
+  loadAllowedLateDays(students);
 
   // ======================================================================
   // SUGGEST CURVES

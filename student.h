@@ -85,6 +85,7 @@ public:
   
   // registration status
   const std::string& getSection()           const { return section; }
+  int getRotatingSection()   const { return rotating_section; }
   bool getAudit()            const { return audit; }
   bool getWithdraw()         const { return withdraw; }
   bool getIndependentStudy() const { return independentstudy; }
@@ -138,6 +139,7 @@ public:
 
   // registration status
   void setSection(std::string x) { section = x; }
+  void setRotatingSection(int x) { rotating_section = x; }
   void setAudit() { audit = true; }
   void setWithdraw() { withdraw = true; }
   void setIndependentStudy() { independentstudy = true; }
@@ -213,6 +215,7 @@ private:
 
     // registration status
   std::string section;
+  int rotating_section;
   bool audit;
   bool withdraw;
   bool independentstudy;
