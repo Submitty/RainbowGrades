@@ -29,6 +29,7 @@ Student::Student() {
   }
   // (iclicker defaults to empty map)
 
+  rotating_section = -1;
   zones = std::vector<std::string>(GRADEABLES[GRADEABLE_ENUM::TEST].getCount(),"");
   moss_penalty = 0;
   cached_hw = -1;

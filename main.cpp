@@ -1320,7 +1320,12 @@ void load_student_grades(std::vector<Student*> &students) {
             a = "null";
           }
           s->setSection(a);
-
+    } else if (token == "rotating_section") {
+      int a = -1;
+      if (!j[token].is_null()) {
+        a = j[token].get<int>();
+      }
+      s->setRotatingSection(a);
     } else if (token == "default_allowed_late_days") {
                   int value = 0;
                   if (!j[token].is_null()) {
