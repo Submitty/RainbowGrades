@@ -107,8 +107,8 @@ public:
   // other grade-like data
   const std::vector<std::string>& getRemoteID() const { return remote_id; }
   bool getAcademicIntegrityForm()  const { return academic_integrity_form; }
-  int getParticipation()           const { return participation; }
-  int getUnderstanding()           const { return understanding; }
+  float getParticipation()           const { return participation; }
+  float getUnderstanding()           const { return understanding; }
 
   // info about exam assignments
   const std::string& getExamRoom() const { return exam_room; }
@@ -153,8 +153,8 @@ public:
   // other grade-like data
   void setRemoteID(const std::string& r_id) { remote_id.push_back(r_id); }
   void setAcademicIntegrityForm() { academic_integrity_form = true; }
-  void setParticipation(int x) { participation = x; }
-  void setUnderstanding(int x) { understanding = x; }
+  void setParticipation(float x) { participation = x; }
+  void setUnderstanding(float x) { understanding = x; }
   void setRank(int x) { rank = x; }
 
   // info about exam assignments
@@ -232,8 +232,8 @@ private:
   // other grade-like data
   std::vector<std::string> remote_id;
   bool academic_integrity_form;
-  int participation;
-  int understanding;
+  float participation;
+  float understanding;
 
   std::vector<int> bonus_late_days_which_lecture;
 
