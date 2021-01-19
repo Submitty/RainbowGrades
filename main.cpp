@@ -1511,7 +1511,7 @@ void load_student_grades(std::vector<Student*> &students) {
     }
   }
   if (u_count > 0) { understanding /= float(u_count); }
-    
+
   for (auto j2 = recommendation_text_json.begin(); j2 < recommendation_text_json.end(); j2++) {
     std::string recommendation_gradeable_id = (*j2)["id"];
     std::string recommendation_text = (*j2)["text"];
@@ -1530,9 +1530,8 @@ void load_student_grades(std::vector<Student*> &students) {
         }
       }
     }
-
   }
-  
+
   s->setParticipation(participation);
   s->setUnderstanding(understanding);
   if (recommendation != "") {

@@ -430,10 +430,6 @@ void Student::mossify(const std::string &gradeable, float penalty) {
                                  CUTOFFS["B"]-CUTOFFS["C"] +
                                  CUTOFFS["C"]-CUTOFFS["D"]) / 3.0;
 
-
-  
-  
-  
   if (!GRADEABLES[GRADEABLE_ENUM::HOMEWORK].hasCorrespondence(gradeable)) {
     std::cerr << "WARNING -- NO GRADEABLE TO MOSSIFY" << std::endl;
   } else {
@@ -443,7 +439,7 @@ void Student::mossify(const std::string &gradeable, float penalty) {
     }
     setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
   }
-  
+
   // the penalty is positive
   // but it will be multiplied by a negative and added to the total;
   assert (penalty >= 0);
@@ -453,7 +449,7 @@ void Student::mossify(const std::string &gradeable, float penalty) {
 
   std::stringstream foo;
   foo << std::setprecision(2) << std::fixed << penalty;
-  
+
   addWarning("[PLAGIARISM " + gradeable + " " + foo.str() + "]<br>");
 }
 
