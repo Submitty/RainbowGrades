@@ -1265,27 +1265,15 @@ void load_student_grades(std::vector<Student*> &students) {
   nlohmann::json participation_json;
   nlohmann::json understanding_json;
   nlohmann::json recommendation_text_json;
-  //std::string participation_gradeable_id = "";
-  //std::string participation_component = "";
-  //std::string understanding_gradeable_id = "";
-  //std::string understanding_component = "";
-  //std::string recommendation_gradeable_id = "";
-  //std::string recommendation_text = "";
 
   if (customization_j.find("participation") != customization_j.end()) {
     participation_json = customization_j["participation"];
-    //participation_gradeable_id = customization_j["participation"]["id"].get<std::string>();
-    //participation_component = customization_j["participation"]["component"].get<std::string>();
   }
   if (customization_j.find("understanding") != customization_j.end()) {
     understanding_json = customization_j["understanding"];
-    //understanding_gradeable_id = customization_j["understanding"]["id"].get<std::string>();
-    //understanding_component = customization_j["understanding"]["component"].get<std::string>();
   }
   if (customization_j.find("recommendation") != customization_j.end()) {
     recommendation_text_json = customization_j["recommendation"];
-    //recommendation_gradeable_id = customization_j["recommendation"]["id"].get<std::string>();
-    //recommendation_text = customization_j["recommendation"]["text"].get<std::string>();
   }
 
   for (nlohmann::json::iterator itr = j.begin(); itr != j.end(); itr++) {
