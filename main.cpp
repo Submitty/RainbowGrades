@@ -10,6 +10,7 @@
 #include <ctime>
 #include <cmath>
 #include "benchmark.h"
+#include "submini_polls.h"
 
 std::string GLOBAL_sort_order;
 
@@ -40,7 +41,7 @@ std::string OUTPUT_FILE                       = "./output.html";
 std::string OUTPUT_CSV_FILE                   = "./output.csv";
 std::string CUSTOMIZATION_FILE                = "./customization_no_comments.json";
 
-std::string RAW_DATA_DIRECTORY                = "./raw_data/";
+std::string RAW_DATA_DIRECTORY                = "./raw_data/all_grades/";
 std::string INDIVIDUAL_FILES_OUTPUT_DIRECTORY = "./individual_summary_html/";
 std::string ALL_STUDENTS_OUTPUT_DIRECTORY     = "./all_students_summary_html/";
 std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV     = "./all_students_summary_csv/";
@@ -458,7 +459,7 @@ void preprocesscustomizationfile(const std::string &now_string,
   std::ifstream istr(CUSTOMIZATION_FILE.c_str());
   assert (istr.good());
   nlohmann::json j = nlohmann::json::parse(istr);
-  
+
   std::string token;
   float p_score,a_score,b_score,c_score,d_score;
   
@@ -969,7 +970,7 @@ void processcustomizationfile(const std::string &now_string,
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
     std::string section = itr2.key();
     std::string section_name = itr2.value();
-    std::cout << "MAKE ASSOCIATION " << section << " " << section_name << std::endl;
+    //std::cout << "MAKE ASSOCIATION " << section << " " << section_name << std::endl;
     //assert (!validSection(section));
     sectionNames[section] = section_name;
     if (sectionColors.find(section_name) == sectionColors.end()) {
@@ -1841,6 +1842,9 @@ int main(int argc, char* argv[]) {
 
   std::vector<Student*> students;  
   processcustomizationfile(now_string,students);
+
+  LoadPolls(students);
+  SavePollReports(students);
 
   loadAllowedLateDays(students);
 
