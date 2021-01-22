@@ -430,13 +430,15 @@ void Student::mossify(const std::string &gradeable, float penalty) {
                                  CUTOFFS["B"]-CUTOFFS["C"] +
                                  CUTOFFS["C"]-CUTOFFS["D"]) / 3.0;
 
-  assert (GRADEABLES[GRADEABLE_ENUM::HOMEWORK].hasCorrespondence(gradeable));
-  int which = GRADEABLES[GRADEABLE_ENUM::HOMEWORK].getCorrespondence(gradeable).first;
-
-  if (!(getGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which).getValue() > 0)) {
-    std::cerr << "WARNING:  the grade for this homework is already 0, moss penalty error?" << std::endl;
+  if (!GRADEABLES[GRADEABLE_ENUM::HOMEWORK].hasCorrespondence(gradeable)) {
+    std::cerr << "WARNING -- NO GRADEABLE TO MOSSIFY" << std::endl;
+  } else {
+    int which = GRADEABLES[GRADEABLE_ENUM::HOMEWORK].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which).getValue() > 0)) {
+      std::cerr << "WARNING:  the grade for this homework is already 0, moss penalty error?" << std::endl;
+    }
+    setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
   }
-  setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
 
   // the penalty is positive
   // but it will be multiplied by a negative and added to the total;
@@ -445,7 +447,10 @@ void Student::mossify(const std::string &gradeable, float penalty) {
   moss_penalty += -0.0000001;
   moss_penalty += -average_letter_grade * penalty;
 
-  addWarning("[MOSS PENALTY " + std::to_string(penalty) + "]");
+  std::stringstream foo;
+  foo << std::setprecision(2) << std::fixed << penalty;
+
+  addWarning("[PLAGIARISM " + gradeable + " " + foo.str() + "]<br>");
 }
 
 

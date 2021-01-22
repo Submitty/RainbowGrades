@@ -1167,7 +1167,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   ostr << "<p>* = 1 late day used</p>" << std::endl;
 
   if (s != NULL) {
-    std::ifstream istr("polls/student_files/"+s->getUserName()+".html");
+    std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");
     if (istr.good()) {
       std::string tmp_s;
       while (getline(istr,tmp_s)) {

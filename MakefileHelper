@@ -36,14 +36,14 @@ ${nlohmann_json_dir}:
 
 pull:
 	mkdir -p raw_data/
-	rsync -azP ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/all_grades/ raw_data/
+	rsync -azP ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/ raw_data/
 
 push:
 	rsync -azP individual_summary_html/* ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/summary_html/
 
 pull_test:
 	mkdir -p raw_data/
-	rsync -azPq ${REPORTS_DIRECTORY}/all_grades/ raw_data/
+	rsync -azPq ${REPORTS_DIRECTORY}/ raw_data/
 
 push_test:
 	rsync -azPq individual_summary_html/* ${REPORTS_DIRECTORY}/summary_html/
@@ -80,7 +80,8 @@ process_grades.out: \
 	${RAINBOW_GRADES_DIRECTORY}/student.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/iclicker.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/zone.cpp \
-	${RAINBOW_GRADES_DIRECTORY}/benchmark.cpp
+	${RAINBOW_GRADES_DIRECTORY}/benchmark.cpp \
+	${RAINBOW_GRADES_DIRECTORY}/submini_polls.cpp
 	g++ -Wall ${flags} ${memory_flags} ${json_include} $^ -g -o $@
 
 individual_summary_html all_students_summary_csv all_students_summary_html:

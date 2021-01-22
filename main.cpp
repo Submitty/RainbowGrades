@@ -10,6 +10,7 @@
 #include <ctime>
 #include <cmath>
 #include "benchmark.h"
+#include "submini_polls.h"
 
 std::string GLOBAL_sort_order;
 
@@ -40,7 +41,7 @@ std::string OUTPUT_FILE                       = "./output.html";
 std::string OUTPUT_CSV_FILE                   = "./output.csv";
 std::string CUSTOMIZATION_FILE                = "./customization_no_comments.json";
 
-std::string RAW_DATA_DIRECTORY                = "./raw_data/";
+std::string RAW_DATA_DIRECTORY                = "./raw_data/all_grades/";
 std::string INDIVIDUAL_FILES_OUTPUT_DIRECTORY = "./individual_summary_html/";
 std::string ALL_STUDENTS_OUTPUT_DIRECTORY     = "./all_students_summary_html/";
 std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV     = "./all_students_summary_csv/";
@@ -458,7 +459,7 @@ void preprocesscustomizationfile(const std::string &now_string,
   std::ifstream istr(CUSTOMIZATION_FILE.c_str());
   assert (istr.good());
   nlohmann::json j = nlohmann::json::parse(istr);
-  
+
   std::string token;
   float p_score,a_score,b_score,c_score,d_score;
   
@@ -969,7 +970,7 @@ void processcustomizationfile(const std::string &now_string,
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
     std::string section = itr2.key();
     std::string section_name = itr2.value();
-    std::cout << "MAKE ASSOCIATION " << section << " " << section_name << std::endl;
+    //std::cout << "MAKE ASSOCIATION " << section << " " << section_name << std::endl;
     //assert (!validSection(section));
     sectionNames[section] = section_name;
     if (sectionColors.find(section_name) == sectionColors.end()) {
@@ -1262,24 +1263,18 @@ void load_student_grades(std::vector<Student*> &students) {
   assert (customization_istr.good());
   nlohmann::json customization_j = nlohmann::json::parse(customization_istr);
 
-  std::string participation_gradeable_id = "";
-  std::string participation_component = "";
-  std::string understanding_gradeable_id = "";
-  std::string understanding_component = "";
-  std::string recommendation_gradeable_id = "";
-  std::string recommendation_text = "";
+  nlohmann::json participation_json;
+  nlohmann::json understanding_json;
+  nlohmann::json recommendation_text_json;
 
   if (customization_j.find("participation") != customization_j.end()) {
-    participation_gradeable_id = customization_j["participation"]["id"].get<std::string>();
-    participation_component = customization_j["participation"]["component"].get<std::string>();
+    participation_json = customization_j["participation"];
   }
   if (customization_j.find("understanding") != customization_j.end()) {
-    understanding_gradeable_id = customization_j["understanding"]["id"].get<std::string>();
-    understanding_component = customization_j["understanding"]["component"].get<std::string>();
+    understanding_json = customization_j["understanding"];
   }
   if (customization_j.find("recommendation") != customization_j.end()) {
-    recommendation_gradeable_id = customization_j["recommendation"]["id"].get<std::string>();
-    recommendation_text = customization_j["recommendation"]["text"].get<std::string>();
+    recommendation_text_json = customization_j["recommendation"];
   }
 
   for (nlohmann::json::iterator itr = j.begin(); itr != j.end(); itr++) {
@@ -1461,33 +1456,54 @@ void load_student_grades(std::vector<Student*> &students) {
   float participation = 0;
   float understanding = 0;
   std::string recommendation;
-  if (participation_gradeable_id != "") {
+
+  int p_count = 0;
+  for (auto j2 = participation_json.begin(); j2 < participation_json.end(); j2++) {
+    std::string participation_gradeable_id = (*j2)["id"];
+    std::string participation_component = (*j2)["component"];
     std::vector<nlohmann::json> notes = j["Note"];
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == participation_gradeable_id) {
         nlohmann::json scores = notes[x]["components"];
         for (unsigned int y = 0; y < scores.size(); y++) {
           if (scores[y]["title"] == participation_component) {
-            participation = scores[y]["score"].get<float>();
+            float p = scores[y]["score"].get<float>();
+            if (p > 0) {
+              participation+=p;
+              p_count ++;
+            }
           }
         }
       }
     }
   }
-  if (understanding_gradeable_id != "") {
+  if (p_count > 0) { participation /= float(p_count); }
+
+  int u_count = 0;
+  for (auto j2 = understanding_json.begin(); j2 < understanding_json.end(); j2++) {
+    std::string understanding_gradeable_id = (*j2)["id"];
+    std::string understanding_component = (*j2)["component"];
     std::vector<nlohmann::json> notes = j["Note"];
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == understanding_gradeable_id) {
         nlohmann::json scores = notes[x]["components"];
         for (unsigned int y = 0; y < scores.size(); y++) {
           if (scores[y]["title"] == understanding_component) {
-            understanding = scores[y]["score"].get<float>();
+            float u = scores[y]["score"].get<float>();
+            if (u > 0) {
+              understanding+=u;
+              u_count ++;
+            }
           }
         }
       }
     }
   }
-  if (recommendation_gradeable_id != "") {
+  if (u_count > 0) { understanding /= float(u_count); }
+
+  for (auto j2 = recommendation_text_json.begin(); j2 < recommendation_text_json.end(); j2++) {
+    std::string recommendation_gradeable_id = (*j2)["id"];
+    std::string recommendation_text = (*j2)["text"];
     std::vector<nlohmann::json> notes = j["Note"];
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == recommendation_gradeable_id) {
@@ -1495,7 +1511,7 @@ void load_student_grades(std::vector<Student*> &students) {
         for (unsigned int y = 0; y < values.size(); y++) {
           if (values[y]["title"] == recommendation_text) {
             if (values[y]["comment"].is_string()) {
-              recommendation = values[y]["comment"].get<std::string>();
+              recommendation += "<br>[" + std::to_string(x) + "] " + values[y]["comment"].get<std::string>();
             } else {
               std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
             }
@@ -1826,6 +1842,9 @@ int main(int argc, char* argv[]) {
 
   std::vector<Student*> students;  
   processcustomizationfile(now_string,students);
+
+  LoadPolls(students);
+  SavePollReports(students);
 
   loadAllowedLateDays(students);
 
