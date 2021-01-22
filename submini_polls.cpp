@@ -85,16 +85,16 @@ void LoadPolls(const std::vector<Student*> &students) {
   // ----------------------------------------------------------------------------
   // prepare a structure with the core poll information (name & correct responses)
 
-  std::ifstream data_file("raw_data/polls/poll_data_summary.json");
-  assert (data_file.good());
+  std::ifstream data_file("raw_data/polls/poll_questions.json");
+  if (!data_file.good()) return;
   nlohmann::json j_data = nlohmann::json::parse(data_file);
 
   for (nlohmann::json::iterator itr = j_data.begin(); itr != j_data.end(); itr++) {
-    int poll_id = std::stoi(itr.key());
+    int poll_id = itr->find("id")->get<int>();
     assert (poll_id >= 0);
     std::string poll_name = itr->find("name")->get<std::string>();
     std::string release_date = itr->find("release_date")->get<std::string>();
-    std::string status = "ended";
+    std::string status = itr->find("status")->get<std::string>();
     assert (status == "ended" || status == "closed" || status == "open");
 
     int lecture,which;
@@ -112,7 +112,7 @@ void LoadPolls(const std::vector<Student*> &students) {
   // ----------------------------------------------------------------------------
   // load and store the responses from each student for each poll
 
-  std::ifstream responses_file("raw_data/polls/poll_responses_summary.json");
+  std::ifstream responses_file("raw_data/polls/poll_responses.json");
   assert (responses_file.good());
   nlohmann::json j_responses = nlohmann::json::parse(responses_file);
 
@@ -155,9 +155,8 @@ void LoadPolls(const std::vector<Student*> &students) {
 // into their individual rainbow grades report).
 // 
 void SavePollReports(const std::vector<Student*> &students) {
-
   std::ofstream late_days_ostr("late_days.csv");
-
+  if (GLOBAL_lectures.size() == 0) return;
   system ("mkdir -p student_poll_reports");
   
   for (std::map<std::string,std::map<int,LectureResult> >::iterator s = GLOBAL_students.begin();
