@@ -32,10 +32,6 @@ ${nlohmann_json_dir}:
 	unzip -o ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip -d ${nlohmann_json_dir}
 
 
-# Grab this file from the main Submitty repo
-json_syntax_checker.py = ${RAINBOW_GRADES_DIRECTORY}/../Submitty/grading/json_syntax_checker.py
-
-
 # =============================================================================
 
 pull:
@@ -73,7 +69,7 @@ json_include = -I${nlohmann_json_dir}/include/
 
 remove_json_comments: customization.json
 	cpp -xc++ $< | sed -e '/^#/d' > customization_no_comments.json
-	python3 ${json_syntax_checker.py} customization_no_comments.json
+	python3 -m json.tool customization_no_comments.json > /dev/null
 	grep '{"file":' customization_no_comments.json > iclicker_file_list.txt || true
 	python3 ${RAINBOW_GRADES_DIRECTORY}/parsexml.py iclicker_file_list.txt
 
