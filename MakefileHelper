@@ -47,7 +47,7 @@ push:
 
 pull_test:
 	mkdir -p raw_data/
-	rsync -azPq ${REPORTS_DIRECTORY}/all_grades/ raw_data/
+	rsync -azPq ${REPORTS_DIRECTORY}/ raw_data/
 
 push_test:
 	rsync -azPq individual_summary_html/* ${REPORTS_DIRECTORY}/summary_html/
