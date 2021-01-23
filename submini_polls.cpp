@@ -13,18 +13,15 @@
 #include "submini_polls.h"
 
 
-std::map<std::string,std::map<int,LectureResult> > GLOBAL_students;
-std::map<int,std::pair<int,int> > GLOBAL_poll_id_map;
-std::map<int,std::map<int,Poll> > GLOBAL_lectures;
+std::map<std::string,std::map<std::string,LectureResult> > GLOBAL_students;
+std::map<int,std::pair<std::string,int> > GLOBAL_poll_id_map;
+std::map<std::string,std::map<int,Poll> > GLOBAL_lectures;
 
 
-// Parse the poll name -- we expect a strict format to determine the
-// lecture and which lecture and number.
-void parse_name (const std::string &name, int &lecture, int &which) {
-  std::stringstream ss(name);
-  char ch;
-  ss >> lecture >> ch >> which;
-  assert (ch == '.');
+// Polls are organized into buckets by date
+void group_polls_by_date(int poll_id, const std::string &date, std::string &lecture, int &which) {
+  which = poll_id;
+  lecture = date;
 }
 
 
@@ -79,7 +76,7 @@ void LoadPolls(const std::vector<Student*> &students) {
     std::string tmp = students[i]->getUserName();
     std::string section = students[i]->getSection();
     if (section == "null") continue;
-    GLOBAL_students.insert(std::make_pair(tmp,std::map<int,LectureResult>()));
+    GLOBAL_students.insert(std::make_pair(tmp,std::map<std::string,LectureResult>()));
   }
 
   // ----------------------------------------------------------------------------
@@ -97,8 +94,10 @@ void LoadPolls(const std::vector<Student*> &students) {
     std::string status = itr->find("status")->get<std::string>();
     assert (status == "ended" || status == "closed" || status == "open");
 
-    int lecture,which;
-    parse_name(poll_name,lecture,which);
+    std::string lecture;
+    int which;
+    group_polls_by_date(poll_id,release_date,lecture,which);
+    //std::cout << "POLL " << lecture << " " << which << std::endl;
     GLOBAL_lectures[lecture][which] = Poll(which,poll_name,release_date);
     GLOBAL_poll_id_map[poll_id] = std::make_pair(lecture,which);
 
@@ -120,7 +119,7 @@ void LoadPolls(const std::vector<Student*> &students) {
     int poll_id = itr->find("id")->get<int>();
     assert (poll_id >= 0);
     const typename nlohmann::json &tmp = (*itr)["responses"];
-    std::pair<int,int> w = GLOBAL_poll_id_map[poll_id];
+    std::pair<std::string,int> w = GLOBAL_poll_id_map[poll_id];
 
     for (nlohmann::json::const_iterator itr2 = tmp.begin(); itr2 != tmp.end(); itr2++) {
       std::string username = itr2.key();
@@ -142,9 +141,9 @@ void LoadPolls(const std::vector<Student*> &students) {
     }
   }
   
-  for (std::map<int,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
-    for (int i = 0; i < it->second.size(); i++) {
-      std::cout << it->second[i+1] << std::endl;
+  for (std::map<std::string,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
+    for (std::map<int,Poll>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+      std::cout << "print it " << it2->second << std::endl;
     }
   }
 }
@@ -159,7 +158,7 @@ void SavePollReports(const std::vector<Student*> &students) {
   if (GLOBAL_lectures.size() == 0) return;
   system ("mkdir -p student_poll_reports");
   
-  for (std::map<std::string,std::map<int,LectureResult> >::iterator s = GLOBAL_students.begin();
+  for (std::map<std::string,std::map<std::string,LectureResult> >::iterator s = GLOBAL_students.begin();
        s != GLOBAL_students.end(); s++) {
 
     std::string username = s->first;
@@ -174,9 +173,9 @@ void SavePollReports(const std::vector<Student*> &students) {
     float total = 0;
 
     int prev_total = 0;
-    for (std::map<int,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
+    for (std::map<std::string,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
       int num = it->second.size();
-      int lect = it->first;
+      std::string lect = it->first;
       int correct = s->second[lect].correct;
       int wrong = s->second[lect].wrong;
       total += correct;
@@ -188,18 +187,8 @@ void SavePollReports(const std::vector<Student*> &students) {
       std::string THING = "";
       if (earnedlatetoday(prev_total,total)) {
         late_days++;
-        if (lect != 20) {
-          late_days_ostr << username << "," << foo << "," << late_days << "\r" << std::endl;
-        }
-        THING = "EARNED LATE DAY #" + std::to_string(late_days) + " on " + foo;
-      }
-      
-      // BONUS LATE DAY
-      if (lect == 20) {
-        late_days++;
         late_days_ostr << username << "," << foo << "," << late_days << "\r" << std::endl;
-        if (THING != "") THING += "<br>";
-        THING += "LATE DAY #" + std::to_string(late_days) + " - BONUS LATE DAY";
+        THING = "EARNED LATE DAY #" + std::to_string(late_days) + " on " + foo;
       }
       
       prev_total = total;
