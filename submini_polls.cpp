@@ -140,6 +140,17 @@ void LoadPolls(const std::vector<Student*> &students) {
       }
     }
   }
+
+  //Update the correct and incorrect counts for each student
+  for (int i = 0; i < students.size(); i++) {
+    std::string tmp = students[i]->getUserName();
+    std::string section = students[i]->getSection();
+    if (section == "null") continue;
+    for(std::map<std::string, LectureResult>::const_iterator it = GLOBAL_students[tmp].begin(); it != GLOBAL_students[tmp].end(); it++){
+      students[i]->incrementPollsCorrect((it->second).correct);
+      students[i]->incrementPollsIncorrect((it->second).wrong);
+    }
+  }
   
   for (std::map<std::string,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
     for (std::map<int,Poll>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++) {

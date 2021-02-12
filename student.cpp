@@ -21,6 +21,8 @@ Student::Student() {
 
   default_allowed_late_days = 0;
   current_allowed_late_days = 0;
+  polls_correct = 0;
+  polls_incorrect = 0;
 
   // grade data
   for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) { 
@@ -28,6 +30,7 @@ Student::Student() {
     all_item_grades[g]   = std::vector<ItemGrade>(GRADEABLES[g].getCount(),ItemGrade(0));
   }
   // (iclicker defaults to empty map)
+  earn_late_days_from_polls = true; //TODO: Change this to false, make customization.json option
 
   rotating_section = -1;
   zones = std::vector<std::string>(GRADEABLES[GRADEABLE_ENUM::TEST].getCount(),"");
@@ -311,17 +314,22 @@ float Student::lowest_test_counts_half_pct() const {
 
 int Student::getAllowedLateDays(int which_lecture) const {
   if (getSection() == "null") return 0;
-  
+
   //int answer = 2;
 
   int answer = default_allowed_late_days;
-  
+
   // average 4 questions per lecture 2-28 ~= 112 clicker questions
   //   30 questions => 3 late days
   //   60 questions => 4 late days
   //   90 qustions  => 5 late days
-  
-  float total = getIClickerTotal(which_lecture,0);
+
+  //float total = getIClickerTotal(which_lecture,0);
+  float total = 0;
+  //TODO: Condition may need to change to use a global depending on how we do it in customization.json
+  if(earn_late_days_from_polls){
+    total = getPollPoints();
+  }
   
   for (unsigned int i = 0; i < GLOBAL_earned_late_days.size(); i++) {
     if (total >= GLOBAL_earned_late_days[i]) {
@@ -492,7 +500,18 @@ std::string Student::getZone(int i) const {
   assert (i >= 0 && i < GRADEABLES[GRADEABLE_ENUM::TEST].getCount()); return zones[i]; 
 }
 
+int Student::getPollsCorrect() const{
+  return polls_correct;
+}
 
+int Student::getPollsIncorrect() const{
+  return polls_incorrect;
+}
+
+//TODO: In the future if we allow custom correct/incorrect weights, this calculation will need changing
+float Student::getPollPoints() const {
+  return float(getPollsCorrect()) + 0.5 * float(getPollsIncorrect());
+}
 
 // =============================================================================================
 
@@ -540,6 +559,14 @@ std::pair<std::string,iclicker_answer_enum> Student::getIClickerAnswer(const std
   std::string tmp(1,x);
   iclicker_answer_enum val = itr->second.second;
   return std::make_pair(tmp,val);
+}
+
+void Student::incrementPollsCorrect(unsigned int amount=1){
+  polls_correct += amount;
+}
+
+void Student::incrementPollsIncorrect(unsigned int amount=1){
+  polls_incorrect += amount;
 }
 
 // =============================================================================================
