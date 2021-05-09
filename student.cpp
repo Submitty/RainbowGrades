@@ -106,7 +106,17 @@ public:
 };
 
 bool operator<(const score_object &a, const score_object &b) {
-  return a.score < b.score;
+  float s1 = a.score;
+  float m1 = a.max;
+  float p1 = a.percentage;
+  float sm1 = a.scale_max;
+  float my_max1 = std::max(m1,sm1);
+  float s2 = b.score;
+  float m2 = b.max;
+  float p2 = b.percentage;
+  float sm2 = b.scale_max;
+  float my_max2 = std::max(m2,sm2);
+  return p1 * s1 / my_max1 < p2 * s2 / my_max2;
 }
 
 float Student::GradeablePercent(GRADEABLE_ENUM g) const {
