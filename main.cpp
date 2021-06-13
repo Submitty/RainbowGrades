@@ -663,11 +663,11 @@ void preprocesscustomizationfile(const std::string &now_string,
         GRADEABLES[g].setReleased(token_key,released);
       }
 
-      float maximum = grade_id.value("max",0);
+      float maximum = grade_id.value("max",0.0);
       GRADEABLES[g].setMaximum(token_key,maximum);
 
       if (grade_id.find("scale_max") != grade_id.end()) {
-        float scale_maximum = grade_id.value("scale_max",0);
+        float scale_maximum = grade_id.value("scale_max",0.0);
         assert (scale_maximum > 0);
         GRADEABLES[g].setScaleMaximum(token_key,scale_maximum);
       }

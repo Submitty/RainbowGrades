@@ -143,7 +143,7 @@ void LoadPolls(const std::vector<Student*> &students) {
   
   for (std::map<std::string,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
     for (std::map<int,Poll>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-      std::cout << "print it " << it2->second << std::endl;
+      //std::cout << "print it " << it2->second << std::endl;
     }
   }
 }
