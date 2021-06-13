@@ -69,7 +69,7 @@ public:
   float getMaximum() const { 
     if (maximums.size() == 0) return 0;
     assert (maximums.size() > 0);
-    int max_sum = 0;
+    float max_sum = 0;
     for (std::map<std::string,float>::const_iterator itr = maximums.begin();
          itr != maximums.end(); itr++) {
       max_sum += itr->second;
