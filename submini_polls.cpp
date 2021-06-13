@@ -54,10 +54,25 @@ bool earnedlatetoday(int prev, int today) {
 
 std::string convert_date(const std::string &date) {
   std::stringstream ss(date);
-  int year, month, day;
+  int x,y,z;
   char ch,ch2;
-  ss >> year >> ch >> month >> ch2 >> day;
-  assert (ch == '-' && ch2 == '-');
+  ss >> x >> ch >> y >> ch2 >> z;
+  int year, month, day;
+  if (ch == '-' && ch2 == '-') {
+    // old format
+    year = x;
+    month = y;
+    day = z;
+  } else {
+    assert (ch == '/' && ch2 == '/');
+    // new format
+    month = x;
+    day = y;
+    year = z;
+  }
+  assert (year > 2000);
+  assert (month >= 1 && month <= 12);
+  assert (day >= 1 && day <= 31);
   std::stringstream out;
   out << std::setw(2) << std::setfill('0') << month << "-"
       << std::setw(2) << std::setfill('0') << day << "-" << year;
