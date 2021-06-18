@@ -155,7 +155,7 @@ void LoadPolls(const std::vector<Student*> &students) {
       std::map<int,Poll>::iterator itr3 = GLOBAL_lectures[w.first].find(w.second);
       assert (itr3 != GLOBAL_lectures[w.first].end());
       const std::vector<int> &c_options = itr3->second.getCorrectOptions();
-      const std::vector<int> &i_options = itr3->second.getIncorrectOptions();
+      const std::vector<int> &w_options = itr3->second.getWrongOptions();
       const std::string &question_type = itr3->second.getType();
       
       // count the number of correct & incorrect choices
@@ -167,8 +167,8 @@ void LoadPolls(const std::vector<Student*> &students) {
         if (c_itr != itr3->second.getCorrectOptions().end()) {
           correct_choices++;
         } else {
-          std::vector<int>::const_iterator i_itr = std::find(i_options.begin(),i_options.end(),r);
-          assert (i_itr != itr3->second.getIncorrectOptions.end());
+          std::vector<int>::const_iterator w_itr = std::find(w_options.begin(),w_options.end(),r);
+          //assert (w_itr != itr3->second.getWrongOptions().end());
           incorrect_choices++;
         }
       }
@@ -185,7 +185,7 @@ void LoadPolls(const std::vector<Student*> &students) {
         full_credit = (correct_choices == 1);
       } else if (question_type == "single-response-survey") {
         assert (c_options.size() >= 1);
-        assert (i_options.size() == 0);
+        assert (w_options.size() == 0);
         assert (correct_choices <= 1);
         assert (incorrect_choices == 0);
         full_credit = (correct_choices == 1);
@@ -197,7 +197,7 @@ void LoadPolls(const std::vector<Student*> &students) {
         full_credit = (incorrect_choices == 0 && correct_choices >= 1);
       } else if (question_type == "multiple-response-survey") {
         assert (c_options.size() >= 1);
-        assert (i_options.size() == 0);
+        assert (w_options.size() == 0);
         assert (incorrect_choices == 0);
         full_credit = (correct_choices >= 1);
       } else {
