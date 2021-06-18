@@ -12,7 +12,6 @@
 #include "student.h"
 #include "submini_polls.h"
 
-
 std::map<std::string,std::map<std::string,LectureResult> > GLOBAL_students;
 std::map<int,std::pair<std::string,int> > GLOBAL_poll_id_map;
 std::map<std::string,std::map<int,Poll> > GLOBAL_lectures;
@@ -27,16 +26,16 @@ void group_polls_by_date(int poll_id, const std::string &date, std::string &lect
 
 // Helper function to print debug information about the poll
 std::ostream& operator<<(std::ostream& ostr, const Poll &p) {
-  if (p.correct_options.size() == 0) {
-    std::cerr << "ERROR WITH " << p.name << std::endl;
+  if (p.getCorrectOptions().size() == 0) {
+    std::cerr << "ERROR WITH " << p.getName() << std::endl;
   }
-  assert (p.correct_options.size() > 0);
+  assert (p.getCorrectOptions().size() > 0);
   ostr << "  "
        << std::left
-       << std::setw(40) << p.name << " "
-       << std::setw(15) << p.release_date << " "
-       << p.correct_options.size() << " " << p.wrong_options.size() << "   "
-       << std::right << std::setw(3) << p.correct_click << " " << std::setw(3) << p.wrong_click;
+       << std::setw(40) << p.getName() << " "
+       << std::setw(15) << p.getDate() << " "
+       << p.getCorrectOptions().size() << " " << p.getWrongOptions().size() << "   "
+       << std::right << std::setw(3) << p.getCorrectClicks() << " " << std::setw(3) << p.getWrongClicks();
   return ostr;
 }
 
@@ -106,20 +105,24 @@ void LoadPolls(const std::vector<Student*> &students) {
     assert (poll_id >= 0);
     std::string poll_name = itr->find("name")->get<std::string>();
     std::string release_date = itr->find("release_date")->get<std::string>();
+    std::string question_type = "single-response-multiple-correct";
+    nlohmann::json::iterator itr2 = itr->find("question_type");
+    if (itr2 != itr->end()) question_type = itr2->get<std::string>();
     std::string status = itr->find("status")->get<std::string>();
     assert (status == "ended" || status == "closed" || status == "open");
 
     std::string lecture;
     int which;
     group_polls_by_date(poll_id,release_date,lecture,which);
-    //std::cout << "POLL " << lecture << " " << which << std::endl;
-    GLOBAL_lectures[lecture][which] = Poll(which,poll_name,release_date);
+    GLOBAL_lectures[lecture].insert(std::make_pair(which,Poll(which,poll_name,release_date,question_type)));
     GLOBAL_poll_id_map[poll_id] = std::make_pair(lecture,which);
 
     const typename nlohmann::json &tmp = (*itr)["correct_responses"];
     for (nlohmann::json::const_iterator itr2 = tmp.begin(); itr2 != tmp.end(); itr2++) {
       int option_id = itr2->get<int>();
-      GLOBAL_lectures[lecture][which].correct_options.push_back(option_id);
+      std::map<int,Poll>::iterator itr3 = GLOBAL_lectures[lecture].find(which);
+      assert (itr3 != GLOBAL_lectures[lecture].end());
+      itr3->second.addCorrectOption(option_id);
     }
   }
 
@@ -138,19 +141,75 @@ void LoadPolls(const std::vector<Student*> &students) {
 
     for (nlohmann::json::const_iterator itr2 = tmp.begin(); itr2 != tmp.end(); itr2++) {
       std::string username = itr2.key();
-      int r = itr2->get<int>();
 
-      const std::vector<int> &c_options = GLOBAL_lectures[w.first][w.second].correct_options;
-      std::vector<int>::const_iterator c_itr = std::find(c_options.begin(),c_options.end(),r);
-      bool correct = c_itr != GLOBAL_lectures[w.first][w.second].correct_options.end();
+      // student response will now always be an array
+      std::vector<int> student_responses;
+      if ((*itr2).is_array()) {
+        student_responses = itr2->get<std::vector<int> >();
+      } else {
+        // backwards compatible -- previously only one response was allowed
+        int response = itr2->get<int>();
+        student_responses.push_back(response);
+      }
 
-      Poll &p = GLOBAL_lectures[w.first][w.second];
+      std::map<int,Poll>::iterator itr3 = GLOBAL_lectures[w.first].find(w.second);
+      assert (itr3 != GLOBAL_lectures[w.first].end());
+      const std::vector<int> &c_options = itr3->second.getCorrectOptions();
+      const std::vector<int> &w_options = itr3->second.getWrongOptions();
+      const std::string &question_type = itr3->second.getType();
       
-      if (correct) {
-        p.correct_click++;
+      // count the number of correct & incorrect choices
+      int incorrect_choices = 0;
+      int correct_choices = 0;
+      for (int i = 0; i < student_responses.size(); i++) {
+        int r = student_responses[i];
+        std::vector<int>::const_iterator c_itr = std::find(c_options.begin(),c_options.end(),r);
+        if (c_itr != itr3->second.getCorrectOptions().end()) {
+          correct_choices++;
+        } else {
+          std::vector<int>::const_iterator w_itr = std::find(w_options.begin(),w_options.end(),r);
+          //assert (w_itr != itr3->second.getWrongOptions().end());
+          incorrect_choices++;
+        }
+      }
+
+      // "grade" the response to this question, depending on the question type
+      bool full_credit = false;
+      if (question_type == "single-response-single-correct") {
+        assert (c_options.size() == 1);
+        assert (correct_choices+incorrect_choices <= 1);
+        full_credit = (correct_choices == 1);
+      } else if (question_type == "single-response-multiple-correct") {
+        assert (c_options.size() >= 1);
+        assert (correct_choices+incorrect_choices <= 1);
+        full_credit = (correct_choices == 1);
+      } else if (question_type == "single-response-survey") {
+        assert (c_options.size() >= 1);
+        assert (w_options.size() == 0);
+        assert (correct_choices <= 1);
+        assert (incorrect_choices == 0);
+        full_credit = (correct_choices == 1);
+      } else if (question_type == "multiple-response-exact") {
+        assert (c_options.size() >= 1);
+        full_credit = (incorrect_choices == 0 && correct_choices == c_options.size());
+      } else if (question_type == "multiple-response-flexible") {
+        assert (c_options.size() >= 1);
+        full_credit = (incorrect_choices == 0 && correct_choices >= 1);
+      } else if (question_type == "multiple-response-survey") {
+        assert (c_options.size() >= 1);
+        assert (w_options.size() == 0);
+        assert (incorrect_choices == 0);
+        full_credit = (correct_choices >= 1);
+      } else {
+        std::cout << "OOPS: unknown question type '" << question_type << "'" << std::endl;
+        assert (0);
+      }
+
+      if (full_credit) {
+        itr3->second.incrCorrectClicks();
         GLOBAL_students[username][w.first].correct++;
       } else {
-        p.wrong_click++;
+        itr3->second.incrWrongClicks();
         GLOBAL_students[username][w.first].wrong++;
       }
     }
@@ -164,12 +223,6 @@ void LoadPolls(const std::vector<Student*> &students) {
     for(std::map<std::string, LectureResult>::const_iterator it = GLOBAL_students[tmp].begin(); it != GLOBAL_students[tmp].end(); it++){
       students[i]->incrementPollsCorrect((it->second).correct);
       students[i]->incrementPollsIncorrect((it->second).wrong);
-    }
-  }
-  
-  for (std::map<std::string,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
-    for (std::map<int,Poll>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-      //std::cout << "print it " << it2->second << std::endl;
     }
   }
 }
@@ -208,7 +261,7 @@ void SavePollReports(const std::vector<Student*> &students) {
       total += 0.5 * wrong;
       Poll p = it->second.begin()->second;
 
-      std::string foo = convert_date(p.release_date);
+      std::string foo = convert_date(p.getDate());
       
       std::string THING = "";
       if (earnedlatetoday(prev_total,total)) {
