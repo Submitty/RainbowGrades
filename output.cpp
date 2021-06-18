@@ -651,6 +651,14 @@ void start_table_output( bool for_instructor,
     }
 
     if (DISPLAY_LATE_DAYS) {
+      //Polls headers
+      //TODO: This should be a separate setting/if-block if we allow courses to use polls without adding late days
+      table.set(0,counter++,TableCell("ffffff","TOTAL POLL POINTS"));
+      table.set(0,counter++,TableCell("ffffff","TOTAL POLLS ANSWERED"));
+      table.set(0,counter++,TableCell("ffffff","CORRECT POLLS"));
+      table.set(0,counter++,TableCell("ffffff","INCORRECT POLLS"));
+
+      //Late days headers
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED LATE DAYS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","USED LATE DAYS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
@@ -1009,6 +1017,18 @@ void start_table_output( bool for_instructor,
         // LATE DAYS
         if (this_student->getLastName() != "") {
           int allowed = this_student->getAllowedLateDays(100);
+          int polls_correct = this_student->getPollsCorrect();
+          int polls_incorrect = this_student->getPollsIncorrect();
+          int total_polls = polls_correct + polls_incorrect;
+
+          //total poll points, total answered polls, correct, incorrect
+          //TODO: Add coloring?
+          color="ffffff"; // default_color;
+          table.set(myrow,counter++,TableCell(color,this_student->getPollPoints(),1,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          table.set(myrow,counter++,TableCell(color,total_polls,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          table.set(myrow,counter++,TableCell(color,polls_correct,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          table.set(myrow,counter++,TableCell(color,polls_incorrect,"",0,CELL_CONTENTS_VISIBLE,"right"));
+
           std::string color = coloritcolor(allowed,5,4,3,2,2);
           table.set(myrow,counter++,TableCell(color,allowed,"",0,CELL_CONTENTS_VISIBLE,"right"));
           int used = this_student->getUsedLateDays();
@@ -1016,6 +1036,10 @@ void start_table_output( bool for_instructor,
           table.set(myrow,counter++,TableCell(color,used,"",0,CELL_CONTENTS_VISIBLE,"right"));
         } else {
           color="ffffff"; // default_color;
+          table.set(myrow,counter++,TableCell(color,""));
+          table.set(myrow,counter++,TableCell(color,""));
+          table.set(myrow,counter++,TableCell(color,""));
+          table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
         }
@@ -1179,7 +1203,8 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   if (GLOBAL_instructor_output == false &&
       DISPLAY_ICLICKER) {
 
-    ostr << "<p><b>IClicker Legend:</b><br> &nbsp;&nbsp; CORRECT(green)=1.0 <br> &nbsp;&nbsp; INCORRECT(red)=0.5 <br>&nbsp;&nbsp; POLL(yellow)=1.0 <br> &nbsp;&nbsp; NO ANSWER(white)=0.0<br>" << std::endl;
+    //ostr << "<p><b>IClicker Legend:</b><br> &nbsp;&nbsp; CORRECT(green)=1.0 <br> &nbsp;&nbsp; INCORRECT(red)=0.5 <br>&nbsp;&nbsp; POLL(yellow)=1.0 <br> &nbsp;&nbsp; NO ANSWER(white)=0.0<br>" << std::endl;
+    ostr << "<p><b>Lecture Poll Scoring:</b><br> &nbsp;&nbsp; CORRECT=1.0 <br> &nbsp;&nbsp; INCORRECT=0.5 <br> &nbsp;&nbsp; NO ANSWER=0.0<br>" << std::endl;
     if (s != NULL) {
       ostr << "<b>Initial number of allowed late days: </b>" << s->getDefaultAllowedLateDays() <<  "<br>" << std::endl;
     }
