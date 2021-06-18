@@ -93,6 +93,9 @@ public:
   const ItemGrade& getGradeableItemGrade(GRADEABLE_ENUM g, int i) const;
   std::string getZone(int i) const;
   int getAllowedLateDays(int which_lecture) const;
+  int getPollsCorrect() const;
+  int getPollsIncorrect() const;
+  float getPollPoints() const;
   int getUsedLateDays() const;
   float getMossPenalty() const { return moss_penalty; }
 
@@ -181,6 +184,8 @@ public:
     return (getIClickerRecent() >= ICLICKER_PRIORITY * float (ICLICKER_RECENT));  
   }
   std::pair<std::string,iclicker_answer_enum>  getIClickerAnswer(const std::string& which_question) const;
+  void incrementPollsCorrect(unsigned int amount);
+  void incrementPollsIncorrect(unsigned int amount);
 
 
   // HELPER FUNCTIONS
@@ -250,6 +255,11 @@ private:
   std::string other_note;
   std::string manual_grade;
   std::vector<std::string> early_warnings;
+
+  // Polls and late days
+  int polls_correct;
+  int polls_incorrect;
+  bool earn_late_days_from_polls;
 };
 
 //====================================================================
