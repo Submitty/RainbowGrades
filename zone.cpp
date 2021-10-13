@@ -1,6 +1,7 @@
 #include <fstream>
 #include <map>
 #include <iomanip>
+#include <set>
 
 
 #include "student.h"
@@ -163,77 +164,97 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
   int lefty_desk_count = 0;
   
   std::string token;
-  istr_zone_counts >> token;
-  assert (token == "zone");
+
   while (1) {
-
     std::getline(istr_zone_counts,line);
+    if (istr_zone_counts.eof()) break;
+    //std::cout << "LINE " << line << std::endl;
+    if (line[0] == '#') continue;
+    if (line.size() == 0) continue;
     std::stringstream ss(line);
+    if (line.substr(0,4) == "zone") {
 
-    if (!(ss >> zi.zone >> zi.building >> zi.room >> zi.max)) {
-      std::cout << "MISFORMATTED ZONE COUNTS" << std::endl; exit(1); }
-    ss >> zi.image_url;
-
-    zi.count=0;
-    zi.clear_seats();
-    if (zones.find(zi.zone) != zones.end()) {
-      std::cerr << "\nERROR: duplicate zone " << zi.zone << " in " << zone_counts_filename << std::endl;
-      exit(0);
-    }
-    if (zi.max != -1) {
-      assert (zi.max >= 0);
-      total_seats += zi.max;
-    }
-
-    bool read_another_zone = false;
-    while (istr_zone_counts >> token) {
-      //std::cout << "======================================\nTOKEN " << token << std::endl;
-      if (token[0] == '#') {
-        std::getline(istr_zone_counts,line);
-        //std::cout << "COMMENTED LINE " << line << std::endl;
-        continue;
-      } else if (token == "row") {
-        std::getline(istr_zone_counts,line);
-        std::stringstream ss(line);
-        std::string row,seat;
-        ss >> row >> token;
-        assert (token == ":");
-        std::vector<std::string> all_seats;
-        while (ss >> seat) {
-          all_seats.push_back(seat);
+      // process prev zone
+      if (zi.zone != "") {
+        if (zi.max == -1) {
+          zi.max = zi.num_available_seats();
+          total_seats += zi.max;
         }
-        bool skip = false;
-        for (std::vector<std::string>::size_type i = 0; i < all_seats.size(); i++) {
-          seat = all_seats[i];
-          //std::cout << "SEAT " << seat << std::endl;
-          if (seat.back() == 'X') {
-            //std::cout << "BROKEN DESK " << zi.zone << " "<< row << " " << seat << std::endl;
-            continue;
-          }
-          if (skip) {
-            skip = false;
-            //std::cout << "SKIPPING " << zi.zone << " "<< row << " " << seat << std::endl;
-            continue;
-          }
-          if (seat.back() == 'L') {
-            //std::cout << "LEFTY DESK " << zi.zone << " " << row << " " << seat << std::endl;
-            lefty_desk_count++;
-          }
-          skip = true;
-          //std::cout << "SEAT " << seat << std::endl;
-          zi.add_seat(row,all_seats[i]);
+        if (zi.num_available_seats() != 0 &&
+            zi.max != zi.num_available_seats()) {
+          std::cout << "AVAILABLE SEATS FOR ZONE " << zi.zone << " are incorrect " <<
+            zi.max << " max    vs " << zi.num_available_seats() << " available" << std::endl;
+          exit(1);
         }
-      } else if (token == "zone") {
-        read_another_zone = true;
-        break;
-      } else {
-        assert (0);
+        zones.insert(std::make_pair(zi.zone,zi));
       }
-      if (token == "zone") {
-        read_another_zone = true;
-        break;
+
+      if (!(ss >> token >> zi.zone >> zi.building >> zi.room >> zi.max)) {
+        std::cout << "MISFORMATTED ZONE COUNTS" << std::endl; exit(1);
+      }
+      assert (token == "zone");
+      ss >> zi.image_url;
+
+      //std::cout << "ZONE " << zi.zone << std::endl;
+      
+      zi.count=0;
+      zi.clear_seats();
+      if (zones.find(zi.zone) != zones.end()) {
+        std::cerr << "\nERROR: duplicate zone " << zi.zone << " in " << zone_counts_filename << std::endl;
+        exit(0);
+      }
+      if (zi.max != -1) {
+        assert (zi.max >= 0);
+        total_seats += zi.max;
+      }
+      
+    } else {
+      assert (line.substr(0,3) == "row");
+
+      ss >> token;
+      assert (token == "row");
+
+      std::string row;
+      ss >> row >> token;
+      assert (token == ":");
+
+      //std::cout << "ROW " << row << std::endl;
+      
+      std::string seat;
+      std::vector<std::string> all_seats;
+      while (ss >> seat) {
+        //std::cout << "SEAT READ " << seat << std::endl;
+        all_seats.push_back(seat);
+      }
+      //std::cout << "seat count " << all_seats.size() << std::endl;
+      bool skip = false;
+      for (std::vector<std::string>::size_type i = 0; i < all_seats.size(); i++) {
+        seat = all_seats[i];
+        //std::cout << "i is " << i << " " << seat << std::endl;
+        //std::cout << "SEAT " << seat << std::endl;
+        if (seat.back() == 'X') {
+          //std::cout << "BROKEN DESK " << zi.zone << " "<< row << " " << seat << std::endl;
+          skip = false;
+          continue;
+        }
+        if (skip) {
+          skip = false;
+          //std::cout << "SKIPPING " << zi.zone << " "<< row << " " << seat << std::endl;
+          continue;
+        }
+        if (seat.back() == 'L') {
+          //std::cout << "LEFTY DESK " << zi.zone << " " << row << " " << seat << std::endl;
+          lefty_desk_count++;
+        }
+        skip = true;
+        //std::cout << "USE SEAT " << seat << std::endl;
+        zi.add_seat(row,all_seats[i]);
       }
     }
+  }
+
+  // process last zone
+  if (zi.zone != "") {
     if (zi.max == -1) {
       zi.max = zi.num_available_seats();
       total_seats += zi.max;
@@ -245,9 +266,8 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
       exit(1);
     }
     zones.insert(std::make_pair(zi.zone,zi));
-    if (!read_another_zone) break;
-
   }
+  
   std::cout << "TOTAL SEATS FOR EXAM " << total_seats << std::endl;
   std::cout << "LEFTY DESK COUNT " << lefty_desk_count << std::endl;
 
@@ -443,7 +463,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
         ostr_zone_assignments << std::setw(12) << std::left << s->getSection()  << " ";
       else
         ostr_zone_assignments << std::setw(12) << std::left << "" << " ";*/
-    ostr_zone_assignments << std::setw(12) << std::left << s->getSection()  << " ";
+      ostr_zone_assignments << std::setw(12) << std::left << s->getSection()  << " ";
 
       ostr_zone_assignments << std::setw(10) << std::left << s->getExamBuilding()  << " ";
       ostr_zone_assignments << std::setw(10) << std::left << s->getExamRoom()  << " ";
@@ -462,18 +482,42 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
   // data for preparing exams
 
 
-  int total_assignments = 0;
+  std::map<std::string,std::map<std::string,std::set<std::string> > > new_order;
+
   for (std::map<std::string,ZoneInfo>::iterator itr = zones.begin();
        itr != zones.end(); itr++) {
-
-    std::cout << "ZONE " << std::left  << std::setw(6)  << itr->first 
-              << " "     << std::left  << std::setw(10) << itr->second.building << "  " 
-              << " "     << std::left  << std::setw(4)  << itr->second.room << "  " 
-              << " "     << std::right << std::setw(4)  << itr->second.count << "      (" << itr->second.max-itr->second.count << " seats remain)" << std::endl;
-
-    total_assignments += itr->second.count;
+    std::cout << "ADD ZONE " << itr->second.building << " " << itr->second.room << " " << itr->first << std::endl;
+    new_order[itr->second.building][itr->second.room].insert(itr->first);
   }
-  std::cout << "TOTAL " << total_assignments << std::endl;
+
+  int total_assignments = 0;
+  for (std::map<std::string,std::map<std::string,std::set<std::string> > >::iterator no_itr = new_order.begin();
+       no_itr != new_order.end();
+       no_itr++) {
+    for (std::map<std::string,std::set<std::string> >::iterator no_itr2 = no_itr->second.begin();
+         no_itr2 != no_itr->second.end();
+         no_itr2++) {
+      int room_total = 0;
+      for (std::set<std::string>::iterator no_itr3 = no_itr2->second.begin();
+           no_itr3 != no_itr2->second.end();
+           no_itr3++) {
+        std::map<std::string,ZoneInfo>::iterator itr = zones.find(*no_itr3);
+        assert (itr != zones.end());
+
+        std::cout << "ZONE " << std::left  << std::setw(8)  << itr->first 
+                  << " "     << std::left  << std::setw(10) << itr->second.building << "  " 
+                  << " "     << std::left  << std::setw(4)  << itr->second.room << "  " 
+                  << " "     << std::right << std::setw(4)  << itr->second.count << "      (" << itr->second.max-itr->second.count << " seats remain)" << std::endl;
+        
+        room_total += itr->second.count;
+        total_assignments += itr->second.count;
+      }
+      std::cout << "ROOM TOTAL: " << room_total << "\n" << std::endl;
+    }
+  }
+  
+
+  std::cout << "OVERALL TOTAL: " << total_assignments << std::endl;
 
 
 }
