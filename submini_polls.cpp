@@ -252,7 +252,10 @@ void SavePollReports(const std::vector<Student*> &students) {
     float total = 0;
 
     int prev_total = 0;
+    int which_lecture = 0;
+
     for (std::map<std::string,std::map<int,Poll> >::iterator it = GLOBAL_lectures.begin(); it != GLOBAL_lectures.end(); it++) {
+      which_lecture++;
       int num = it->second.size();
       std::string lect = it->first;
       int correct = s->second[lect].correct;
@@ -269,6 +272,21 @@ void SavePollReports(const std::vector<Student*> &students) {
         late_days_ostr << username << "," << foo << "," << late_days << "\r" << std::endl;
         THING = "EARNED LATE DAY #" + std::to_string(late_days) + " on " + foo;
       }
+
+      Student *student_obj = NULL;
+      for (int i = 0; i < students.size(); i++) {
+        if (students[i]->getUserName() == username)
+          student_obj = students[i];
+      }
+      assert (student_obj != NULL);
+      
+      if (student_obj->get_bonus_late_day(which_lecture)) {
+        late_days++;
+        late_days_ostr << username << "," << foo << "," << late_days << "\r" << std::endl;
+        THING += " BONUS LATE DAY #" + std::to_string(late_days) + " on " + foo;
+      }
+
+
       
       prev_total = total;
       student_ostr << "<tr><td align=center>" << lect << "</td><td align=center>"
