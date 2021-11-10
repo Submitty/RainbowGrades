@@ -840,7 +840,7 @@ void preprocesscustomizationfile(const std::string &now_string,
     LATE_DAY_PERCENTAGE_PENALTY = itr.value();
     assert (LATE_DAY_PERCENTAGE_PENALTY >= 0.0 && LATE_DAY_PERCENTAGE_PENALTY <= 0.5);
   } else if (token == "test_improvement_averaging_adjustment") {
-    TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT = true;
+    TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT = itr.value();
   } else if (token == "quiz_normalize_and_drop") {
     QUIZ_NORMALIZE_AND_DROP = itr.value();
   } else if (token == "lowest_test_counts_half") {
