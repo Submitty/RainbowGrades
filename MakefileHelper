@@ -40,7 +40,7 @@ pull:
 
 push:
 	rsync -azP individual_summary_html/*.html ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/summary_html/
-	rsync -azP individual_summary_html/*.json ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/seating/test1/
+	rsync -azP individual_summary_html/*.json ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/seating/final_exam/
 
 pull_test:
 	mkdir -p raw_data/
