@@ -875,6 +875,9 @@ void start_table_output( bool for_instructor,
         float tmp_std_dev = compute_stddev(vals,tmp_average);
         grade = tmp_std_dev;
       }
+    } else if (this_student->getUserName() == "LOWEST D") {
+      // don't show the overall average for the D/F border
+      grade = 0;
     } else {
       grade = this_student->overall();
     }
