@@ -1177,6 +1177,7 @@ void processcustomizationfile(const std::string &now_string,
       //assert (hw >= 1 && hw <= 10);
       assert (penalty >= -0.01 && penalty <= 1.01);
       Student *s = GetStudent(students,username);
+      //std::cout << "USERNAME " << username << std::endl;
       assert (s != NULL);
       s->mossify(hw,penalty);
     }
@@ -1459,9 +1460,13 @@ void load_student_grades(std::vector<Student*> &students) {
 
   int p_count = 0;
   for (auto j2 = participation_json.begin(); j2 < participation_json.end(); j2++) {
+    //std::cout << "IN PARTICIPATION PARSE" << std::endl;
     std::string participation_gradeable_id = (*j2)["id"];
+    //std::cout << "a" << participation_gradeable_id << std::endl;
     std::string participation_component = (*j2)["component"];
+    //std::cout << "b" << participation_component << std::endl;
     std::vector<nlohmann::json> notes = j["Note"];
+    //std::cout << "c" << std::endl;
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == participation_gradeable_id) {
         nlohmann::json scores = notes[x]["components"];
