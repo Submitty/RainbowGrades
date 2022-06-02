@@ -379,7 +379,7 @@ float Student::overall_b4_moss() const {
   return answer;
 }
 
-std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
+std::string Student::grade(bool flag_b4_moss, Student */*lowest_d*/) const {
 
   if (section == "null") return "";
 

@@ -53,7 +53,7 @@ TableCell::TableCell(const std::string& c, int d, const std::string& n, int ldu,
 }
 
 TableCell::TableCell(const std::string& c, float d, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
+                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/) {
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c; 

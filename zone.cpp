@@ -104,7 +104,7 @@ public:
 };
 
 
-int CountLefties(std::vector<Student*> &students,const std::string& lefty_file, float min_for_assignment) {
+int CountLefties(std::vector<Student*> &students,const std::string& lefty_file, float /*min_for_assignment*/) {
   if (lefty_file == "") return 0;
   std::ifstream istr(lefty_file.c_str());
   assert (istr.good());
@@ -132,7 +132,7 @@ int CountLefties(std::vector<Student*> &students,const std::string& lefty_file, 
 
 void LoadExamSeatingFile(const std::string &zone_counts_filename,
                          const std::string &zone_assignments_filename,
-                         const std::string &seating_spacing,
+                         const std::string &/*seating_spacing*/,
                          const std::string &left_right_handedness,
                          std::vector<Student*> &students) {
 
