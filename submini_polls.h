@@ -21,7 +21,7 @@ public:
   int getWrongClicks() const { return wrong_click; }
 
   bool is_correct(int option) {
-    for (int i=0; i < correct_options.size(); i++) {
+    for (unsigned int i = 0; i < correct_options.size(); i++) {
       if (option == correct_options[i])
         return true;
     }

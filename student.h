@@ -106,7 +106,7 @@ public:
 
   void add_bonus_late_day(int which_lecture) { bonus_late_days_which_lecture.push_back(which_lecture); }
   bool get_bonus_late_day(int which_lecture) const {
-    for (int i = 0; i < bonus_late_days_which_lecture.size(); i++) {
+    for (unsigned int i = 0; i < bonus_late_days_which_lecture.size(); i++) {
       if (bonus_late_days_which_lecture[i] == which_lecture)
         return true;
     }

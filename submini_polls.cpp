@@ -86,7 +86,7 @@ void LoadPolls(const std::vector<Student*> &students) {
   // ----------------------------------------------------------------------------
   // initialize a structure with the names of all students in the course
   std::string path = "../raw_data";
-  for (int i = 0; i < students.size(); i++) {
+  for (unsigned int i = 0; i < students.size(); i++) {
     std::string tmp = students[i]->getUserName();
     std::string section = students[i]->getSection();
     if (section == "null") continue;
@@ -161,13 +161,13 @@ void LoadPolls(const std::vector<Student*> &students) {
       // count the number of correct & incorrect choices
       int incorrect_choices = 0;
       int correct_choices = 0;
-      for (int i = 0; i < student_responses.size(); i++) {
+      for (unsigned int i = 0; i < student_responses.size(); i++) {
         int r = student_responses[i];
         std::vector<int>::const_iterator c_itr = std::find(c_options.begin(),c_options.end(),r);
         if (c_itr != itr3->second.getCorrectOptions().end()) {
           correct_choices++;
         } else {
-          std::vector<int>::const_iterator w_itr = std::find(w_options.begin(),w_options.end(),r);
+          //std::vector<int>::const_iterator w_itr = std::find(w_options.begin(),w_options.end(),r);
           //assert (w_itr != itr3->second.getWrongOptions().end());
           incorrect_choices++;
         }
@@ -191,7 +191,7 @@ void LoadPolls(const std::vector<Student*> &students) {
         full_credit = (correct_choices == 1);
       } else if (question_type == "multiple-response-exact") {
         assert (c_options.size() >= 1);
-        full_credit = (incorrect_choices == 0 && correct_choices == c_options.size());
+        full_credit = (incorrect_choices == 0 && correct_choices == int(c_options.size()));
       } else if (question_type == "multiple-response-flexible") {
         assert (c_options.size() >= 1);
         full_credit = (incorrect_choices == 0 && correct_choices >= 1);
@@ -216,7 +216,7 @@ void LoadPolls(const std::vector<Student*> &students) {
   }
 
   //Update the correct and incorrect counts for each student
-  for (int i = 0; i < students.size(); i++) {
+  for (unsigned int i = 0; i < students.size(); i++) {
     std::string tmp = students[i]->getUserName();
     std::string section = students[i]->getSection();
     if (section == "null") continue;
@@ -274,7 +274,7 @@ void SavePollReports(const std::vector<Student*> &students) {
       }
 
       Student *student_obj = NULL;
-      for (int i = 0; i < students.size(); i++) {
+      for (unsigned int i = 0; i < students.size(); i++) {
         if (students[i]->getUserName() == username)
           student_obj = students[i];
       }

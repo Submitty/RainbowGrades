@@ -37,7 +37,7 @@ inline std::string gradeable_to_string(const GRADEABLE_ENUM &g) {
 
 inline std::string tolower(const std::string &s) {
   std::string answer;
-  for (int i = 0; i < s.size(); i++) {
+  for (unsigned int i = 0; i < s.size(); i++) {
     answer += tolower(s[i]);
   }
   return answer;
@@ -45,7 +45,7 @@ inline std::string tolower(const std::string &s) {
 
 inline std::string spacify(const std::string &s) {
   std::string tmp = "";
-  for (std::string::size_type i = 0; i < s.size(); i++) {
+  for (unsigned int i = 0; i < s.size(); i++) {
     tmp += std::string(1,s[i]) + " ";
   }
   return tmp;

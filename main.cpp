@@ -1036,7 +1036,7 @@ void processcustomizationfile(const std::string &now_string,
             }
 
             std::cout << "search for " << message << std::endl;
-            for (std::size_t S = 0; S < students.size(); S++) {
+            for (unsigned int S = 0; S < students.size(); S++) {
               Student *s = students[S];
               if (!validSection(students[S]->getSection())) continue;
               //std::cout << "student " << s->getUserName() << std::endl;
@@ -1608,9 +1608,10 @@ void load_student_grades(std::vector<Student*> &students) {
 }
 
 
-void start_table_open_file(bool full_details, 
+/*void start_table_open_file(bool full_details,
                  const std::vector<Student*> &students, int S, int month, int day, int year,
                  enum GRADEABLE_ENUM which_gradeable_enum);
+*/
 
 void start_table_output(bool full_details,
                         const std::vector<Student*> &students, int S, int month, int day, int year,
@@ -1651,17 +1652,17 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
 
 
 
-  start_table_open_file(true,students,-1,month,day,year,GRADEABLE_ENUM::NONE);
+  //start_table_open_file(true,students,-1,month,day,year,GRADEABLE_ENUM::NONE);
   start_table_output(true,students,-1,month,day,year, sp,sa,sb,sc,sd,false);
 
-    start_table_open_file(true,students,-1,month,day,year,GRADEABLE_ENUM::NONE);
+  //start_table_open_file(true,students,-1,month,day,year,GRADEABLE_ENUM::NONE);
     start_table_output(true,students,-1,month,day,year, sp,sa,sb,sc,sd,true);
 
   int next_rank = 1;
   //int last_section = -1;
   std::string last_section;
 
-  for (int S = 0; S < (int)students.size(); S++) {
+  for (unsigned int S = 0; S < students.size(); S++) {
     //int rank = next_rank;
     if (students[S] == sp ||
         students[S] == student_average ||
@@ -1687,7 +1688,7 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
   }
   
 
-  for (int S = 0; S < (int)students.size(); S++) {
+  for (unsigned int S = 0; S < students.size(); S++) {
 
     nlohmann::json mj;
 
@@ -1819,7 +1820,7 @@ void loadAllowedLateDays(std::vector<Student*> &students) {
 
     //std::cout << "foo " << s << " ---  " << username << " -  " <<date << " -  " << allowed <<std::endl;
 
-    for (int i = 0; i < students.size(); i++) {
+    for (unsigned int i = 0; i < students.size(); i++) {
       Student* s = students[i];
       if (s->getUserName() == username) {
         s->setCurrentAllowedLateDays(allowed);
@@ -2024,7 +2025,7 @@ void assign_ranks(std::vector<Student*> &students){
   bool found_first = false; //Track if we've found a valid initial score for Rank #1
   int sharing_rank = 1;
 
-  for (unsigned int stu= 0; stu < students.size(); stu++) {
+  for (unsigned int stu = 0; stu < students.size(); stu++) {
     Student *this_student = students[stu];
     if (validSection(this_student->getSection())) {
       if(prev_score != this_student->overall()){

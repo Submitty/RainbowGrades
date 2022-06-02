@@ -480,11 +480,12 @@ void PrintExamRoomAndZoneTable(const std::string &g_id, nlohmann::json &mj, Stud
 
 void end_table(std::ofstream &ostr,  bool for_instructor, Student *s);
 
+/*
 void start_table_open_file(bool for_instructor,
                  const std::vector<Student*> &students, int rank, int month, int day, int year,
                  enum GRADEABLE_ENUM which_gradeable_enum) {
 
-  /*
+  / *
   ostr.exceptions ( std::ofstream::failbit | std::ofstream::badbit );
   try {
     ostr.open(filename.c_str());
@@ -494,9 +495,9 @@ void start_table_open_file(bool for_instructor,
     std::cerr << "Exception opening/reading file";
     exit(0);
   }
-  */
+  * /
 }
-
+*/
 
 void SelectBenchmarks(std::vector<int> &select_students, const std::vector<Student*> &students,
                       Student *sp, Student *sa, Student *sb, Student *sc, Student *sd) {
@@ -540,7 +541,7 @@ void SelectBenchmarks(std::vector<int> &select_students, const std::vector<Stude
 }
 
 
-void start_table_output( bool for_instructor,
+void start_table_output( bool /*for_instructor*/,
                          const std::vector<Student*> &students, int rank, int month, int day, int year,
                          Student *sp, Student *sa, Student *sb, Student *sc, Student *sd, bool csv_mode) {
 
