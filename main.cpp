@@ -1322,6 +1322,8 @@ void load_student_grades(std::vector<Student*> &students) {
         a = j[token].get<int>();
       }
       s->setRotatingSection(a);
+    } else if (token == "registration_type") {
+      // Skip this token for now
     } else if (token == "default_allowed_late_days") {
                   int value = 0;
                   if (!j[token].is_null()) {
