@@ -584,11 +584,15 @@ void start_table_output( bool /*for_instructor*/,
     student_data.push_back(counter); table.set(0,counter++,TableCell(grey_divider));
   }
 
-  student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","OVERALL"));
-  if(DISPLAY_RANK_TO_INDIVIDUAL) {
-      student_data.push_back(counter);  table.set(0, counter++, TableCell("ffffff", "RANK"));
+  if (DISPLAY_GRADE_SUMMARY) {
+    student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","OVERALL"));
   }
-  student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
+  if(DISPLAY_RANK_TO_INDIVIDUAL) {
+    student_data.push_back(counter);  table.set(0, counter++, TableCell("ffffff", "RANK"));
+  }
+  if (DISPLAY_GRADE_SUMMARY) {
+    student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
+  }
 
   if (DISPLAY_FINAL_GRADE) {
     std::cout << "DISPLAY FINAL GRADE" << std::endl;
@@ -600,17 +604,19 @@ void start_table_output( bool /*for_instructor*/,
     }
   } 
 
-  // ----------------------------
-  // % OF OVERALL AVERAGE FOR EACH GRADEABLE
-  for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
-    enum GRADEABLE_ENUM g = ALL_GRADEABLES[i];
-    if (g == GRADEABLE_ENUM::NOTE) {
-      assert (GRADEABLES[g].getPercent() < 0.01);
-      continue;
+  if (DISPLAY_GRADE_SUMMARY) {
+    // ----------------------------
+    // % OF OVERALL AVERAGE FOR EACH GRADEABLE
+    for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
+      enum GRADEABLE_ENUM g = ALL_GRADEABLES[i];
+      if (g == GRADEABLE_ENUM::NOTE) {
+        assert (GRADEABLES[g].getPercent() < 0.01);
+        continue;
+      }
+      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff",gradeable_to_string(g)+" %"));
     }
-    student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff",gradeable_to_string(g)+" %"));
+    student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
   }
-  student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
 
   // ----------------------------
   // DETAILS OF EACH GRADEABLE
@@ -891,7 +897,9 @@ void start_table_output( bool /*for_instructor*/,
                                      sd->overall());
     if (this_student == STDDEV_STUDENT_POINTER) color="ffffff";
     assert (color.size()==6);
-    table.set(myrow,counter++,TableCell(color,grade,2));
+    if (DISPLAY_GRADE_SUMMARY) {
+        table.set(myrow,counter++,TableCell(color,grade,2));
+    }
     if(DISPLAY_RANK_TO_INDIVIDUAL) {
       if(validSection(this_student->getSection())) {
         table.set(myrow, counter++, TableCell(color, this_student->getRank(), "", 0, CELL_CONTENTS_VISIBLE, "right"));
@@ -900,8 +908,9 @@ void start_table_output( bool /*for_instructor*/,
         table.set(myrow, counter++, TableCell("ffffff", "", "", 0, CELL_CONTENTS_VISIBLE, "right"));
       }
     }
-    table.set(myrow,counter++,TableCell(grey_divider));
-
+    if (DISPLAY_GRADE_SUMMARY) {
+      table.set(myrow,counter++,TableCell(grey_divider));
+    }
 
     if (DISPLAY_FINAL_GRADE) {
       std::string g = this_student->grade(false,sd);      
@@ -921,6 +930,7 @@ void start_table_output( bool /*for_instructor*/,
       }
     }
 
+    if (DISPLAY_GRADE_SUMMARY) {
     // ----------------------------
     // % OF OVERALL AVERAGE FOR EACH GRADEABLE
     for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
@@ -967,6 +977,7 @@ void start_table_output( bool /*for_instructor*/,
       table.set(myrow,counter++,TableCell(color,grade,2));
     }
     table.set(myrow,counter++,TableCell(grey_divider));
+    }
     
     // ----------------------------
     // DETAILS OF EACH GRADEABLE    
