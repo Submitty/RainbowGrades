@@ -104,11 +104,19 @@ public:
 
   int getDefaultAllowedLateDays() const { return default_allowed_late_days; }
 
-  void add_bonus_late_day(int which_lecture) { bonus_late_days_which_lecture.push_back(which_lecture); }
+  void add_bonus_late_day(int which_lecture) {
+    std::cout << "ADD BONUS " << which_lecture << " " << username << std::endl;
+    bonus_late_days_which_lecture.push_back(which_lecture);
+  }
   bool get_bonus_late_day(int which_lecture) const {
     for (unsigned int i = 0; i < bonus_late_days_which_lecture.size(); i++) {
-      if (bonus_late_days_which_lecture[i] == which_lecture)
+      if (bonus_late_days_which_lecture[i] == which_lecture) {
+        std::cout << "YES BONUS " << which_lecture << " " << username << std::endl;
         return true;
+      }
+    }
+    if (username == "said") {
+      std::cout << "NO BONUS" << which_lecture << " " << username << std::endl;
     }
     return false;
   }

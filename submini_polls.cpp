@@ -6,6 +6,8 @@
 #include <sstream>
 #include <cassert>
 #include <iomanip>
+#include <ctime>
+#include <chrono>
 
 #include <nlohmann/json.hpp>
 
@@ -187,7 +189,7 @@ void LoadPolls(const std::vector<Student*> &students) {
         assert (c_options.size() >= 1);
         assert (w_options.size() == 0);
         assert (correct_choices <= 1);
-        assert (incorrect_choices == 0);
+        //assert (incorrect_choices == 0);
         full_credit = (correct_choices == 1);
       } else if (question_type == "multiple-response-exact") {
         assert (c_options.size() >= 1);
@@ -198,7 +200,7 @@ void LoadPolls(const std::vector<Student*> &students) {
       } else if (question_type == "multiple-response-survey") {
         assert (c_options.size() >= 1);
         assert (w_options.size() == 0);
-        assert (incorrect_choices == 0);
+        //assert (incorrect_choices == 0);
         full_credit = (correct_choices >= 1);
       } else {
         std::cout << "OOPS: unknown question type '" << question_type << "'" << std::endl;
@@ -233,6 +235,17 @@ void LoadPolls(const std::vector<Student*> &students) {
 // into their individual rainbow grades report).
 // 
 void SavePollReports(const std::vector<Student*> &students) {
+
+  // make a string representing today's date:  yyyy-mm-dd
+  static std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+  time_t tt = std::chrono::system_clock::to_time_t(now);
+  tm local_tm = *localtime(&tt);
+  std::stringstream ss;
+  ss << local_tm.tm_year + 1900 << "-"
+     << std::setw(2) << std::setfill('-') << local_tm.tm_mon + 1 << "-"
+     << std::setw(2) << std::setfill('-') << local_tm.tm_mday;
+  std::string today_string = ss.str();
+
   std::ofstream late_days_ostr("late_days.csv");
   if (GLOBAL_lectures.size() == 0) return;
   system ("mkdir -p student_poll_reports");
@@ -258,6 +271,8 @@ void SavePollReports(const std::vector<Student*> &students) {
       which_lecture++;
       int num = it->second.size();
       std::string lect = it->first;
+
+      if (lect > today_string) continue;
       int correct = s->second[lect].correct;
       int wrong = s->second[lect].wrong;
       total += correct;
