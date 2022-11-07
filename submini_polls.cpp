@@ -247,7 +247,10 @@ void SavePollReports(const std::vector<Student*> &students) {
   std::string today_string = ss.str();
 
   std::cout << "TODAY " << today_string << std::endl;
-  
+     << std::setw(2) << std::setfill('-') << local_tm.tm_mon + 1 << "-"
+     << std::setw(2) << std::setfill('-') << local_tm.tm_mday;
+  std::string today_string = ss.str();
+
   std::ofstream late_days_ostr("late_days.csv");
   if (GLOBAL_lectures.size() == 0) return;
   system ("mkdir -p student_poll_reports");
