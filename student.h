@@ -115,9 +115,6 @@ public:
         return true;
       }
     }
-    if (username == "said") {
-      std::cout << "NO BONUS" << which_lecture << " " << username << std::endl;
-    }
     return false;
   }
 
