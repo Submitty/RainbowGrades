@@ -958,7 +958,6 @@ void processcustomizationfile(const std::string &now_string,
 
   std::string token,token2;
 
-  std::string iclicker_remotes_filename;
   std::vector<std::vector<std::vector<iClickerQuestion> > > iclicker_questions(MAX_LECTURES+1);
   
   for (nlohmann::json::iterator itr = j.begin(); itr != j.end(); itr++) {
@@ -1096,8 +1095,6 @@ void processcustomizationfile(const std::string &now_string,
     assert (GLOBAL_earned_late_days.size() == 0 || tmp > GLOBAL_earned_late_days.back());
         GLOBAL_earned_late_days.push_back(tmp);
     }
-  } else if (token == "iclicker_ids") {
-    iclicker_remotes_filename = itr.value().get<std::string>();
   } else if (token == "iclicker") {
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
       std::string temp = itr2.key();
@@ -1225,7 +1222,6 @@ void processcustomizationfile(const std::string &now_string,
     LoadExamSeatingFile(GLOBAL_EXAM_SEATING_COUNT,GLOBAL_EXAM_SEATING,GLOBAL_SEATING_SPACING,GLOBAL_LEFT_RIGHT_HANDEDNESS,students);
   }
   MakeRosterFile(students);
-  MatchClickerRemotes(students, iclicker_remotes_filename);
   AddClickerScores(students,iclicker_questions);
 }
 
@@ -1287,18 +1283,20 @@ void load_student_grades(std::vector<Student*> &students) {
     // non gradeables
     if (token == "user_id") {
       s->setUserName(j[token].get<std::string>());
-    } else if (token == "legal_first_name") {
+    } else if (token == "legal_first_name" || token == "legal_given_name") {
       s->setLegalFirstName(j[token].get<std::string>());
-    } else if (token == "legal_last_name") {
+    } else if (token == "legal_last_name" || token == "legal_family_name") {
       s->setLegalLastName(j[token].get<std::string>());
-    } else if (token == "preferred_first_name") {
+    } else if (token == "preferred_first_name" || token == "preferred_given_name") {
       if (!j[token].is_null()) {
         s->setPreferredFirstName(j[token].get<std::string>());
       }
-    } else if (token == "preferred_last_name") {
+    } else if (token == "preferred_last_name" || token == "preferred_family_name") {
       if (!j[token].is_null()) {
         s->setPreferredLastName(j[token].get<std::string>());
       }
+    } else if (token == "user_numeric_id") {
+      s->setNumericID(j[token].get<std::string>());
     } else if (token == "last_update") {
       s->setLastUpdate(j[token].get<std::string>());
     } else if (token == "registration_section") {

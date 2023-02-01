@@ -242,8 +242,8 @@ void SavePollReports(const std::vector<Student*> &students) {
   tm local_tm = *localtime(&tt);
   std::stringstream ss;
   ss << local_tm.tm_year + 1900 << "-"
-     << std::setw(2) << std::setfill('-') << local_tm.tm_mon + 1 << "-"
-     << std::setw(2) << std::setfill('-') << local_tm.tm_mday;
+     << std::setw(2) << std::setfill('0') << local_tm.tm_mon + 1 << "-"
+     << std::setw(2) << std::setfill('0') << local_tm.tm_mday;
   std::string today_string = ss.str();  
 
   std::cout << "TODAY " << today_string << std::endl;

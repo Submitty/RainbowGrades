@@ -38,7 +38,7 @@ Student::Student() {
   cached_hw = -1;
 
   // other grade-like data
-  // (remote id defaults to empty vector)
+  numeric_id = "";
   academic_integrity_form = false;
   participation = 0;
   understanding = 0;
@@ -379,7 +379,7 @@ float Student::overall_b4_moss() const {
   return answer;
 }
 
-std::string Student::grade(bool flag_b4_moss, Student */*lowest_d*/) const {
+std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
 
   if (section == "null") return "";
 
@@ -395,7 +395,7 @@ std::string Student::grade(bool flag_b4_moss, Student */*lowest_d*/) const {
   // (instructor can override with manual grade)
 
   //Old (pre Su2019) DS method
-  /*int failed_lab   = (GradeablePercent(GRADEABLE_ENUM::LAB)       < 1.01 * lowest_d->GradeablePercent(GRADEABLE_ENUM::LAB)       ) ? true : false;
+  int failed_lab   = (GradeablePercent(GRADEABLE_ENUM::LAB)       < 1.01 * lowest_d->GradeablePercent(GRADEABLE_ENUM::LAB)       ) ? true : false;
   int failed_hw    = (GradeablePercent(GRADEABLE_ENUM::HOMEWORK)  < 0.95 * lowest_d->GradeablePercent(GRADEABLE_ENUM::HOMEWORK)  ) ? true : false;
   int failed_testA = (GradeablePercent(GRADEABLE_ENUM::TEST)      < 0.90 * lowest_d->GradeablePercent(GRADEABLE_ENUM::TEST)      ) ? true : false;
   int failed_testB = (GradeablePercent(GRADEABLE_ENUM::EXAM)      < 0.90 * lowest_d->GradeablePercent(GRADEABLE_ENUM::EXAM)      ) ? true : false;
@@ -405,24 +405,25 @@ std::string Student::grade(bool flag_b4_moss, Student */*lowest_d*/) const {
       ( failed_testA +
         failed_testB +
         failed_testC ) > 1) {
-    //std::cout << "SHOULD AUTO FAIL";
+    std::cout << "SHOULD AUTO FAIL";
 
-    //((Student*)this)->other_note += "SHOULD AUTO FAIL";
+    ((Student*)this)->other_note += "SHOULD AUTO FAIL";
     return "F";
-  }*/
+  }
 
 
-
+  /*
   for(std::map<GRADEABLE_ENUM,float>::const_iterator it=OVERALL_FAIL_CUTOFFS.begin(); it != OVERALL_FAIL_CUTOFFS.end(); it++){
       if(GradeablePercent(it->first)/100.0 < GRADEABLES[it->first].getPercent() * it->second){
-          /*std::cerr << "Failing student " << this->getUserName() << " due to low " << gradeable_to_string(it->first)
-                    << " grade of " << GradeablePercent(it->first)/100.0 << " < "
-                    << GRADEABLES[it->first].getPercent() * it->second << " max is "
-                    << GRADEABLES[it->first].getPercent() << std::endl;*/
+        std::cerr << "Failing student " << this->getUserName() << " due to low " << gradeable_to_string(it->first)
+                  << " grade of " << GradeablePercent(it->first)/100.0 << " < "
+                  << GRADEABLES[it->first].getPercent() * it->second << " max is "
+                  << GRADEABLES[it->first].getPercent() << std::endl;
           return "F";
       }
   }
-
+  */
+  
   // otherwise apply the cutoffs
   if (over >= CUTOFFS["A"])  return "A";
   if (over >= CUTOFFS["A-"]) return "A-";
