@@ -120,10 +120,10 @@ void MatchClickerRemotes(std::vector<Student*> &students, const std::string &rem
       continue;
     }
     assert (s != NULL);
-    if (s->getRemoteID().size() != 0) {
+    if (false) { //s->getRemoteID().size() != 0) {
       std::cout << "student " << username << " has multiple remotes (replacing a lost remote)" << std::endl;
     }
-    s->setRemoteID(remote);
+    //s->setRemoteID(remote);
     //std::cout << "MATCH " << username << " " << remote << std::endl;
     if (GLOBAL_CLICKER_MAP.find(remote) != GLOBAL_CLICKER_MAP.end()) {
       std::cout << "ERROR!  already have this clicker assigned " << remote << " " << s->getUserName() << std::endl;
