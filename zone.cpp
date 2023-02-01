@@ -169,7 +169,11 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
     std::getline(istr_zone_counts,line);
     if (istr_zone_counts.eof()) break;
     //std::cout << "LINE " << line << std::endl;
+
     if (line[0] == '#') continue;
+
+    if (line == "SKIP") break;
+
     if (line.size() == 0) continue;
     std::stringstream ss(line);
     if (line.substr(0,4) == "zone") {

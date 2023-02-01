@@ -541,6 +541,10 @@ void SelectBenchmarks(std::vector<int> &select_students, const std::vector<Stude
 }
 
 
+std::ofstream GLOBAL_EWS_OUTPUT;
+
+std::ofstream GLOBAL_GRADES_OUTPUT;
+
 void start_table_output( bool /*for_instructor*/,
                          const std::vector<Student*> &students, int rank, int month, int day, int year,
                          Student *sp, Student *sa, Student *sb, Student *sc, Student *sd, bool csv_mode) {
@@ -552,6 +556,11 @@ void start_table_output( bool /*for_instructor*/,
 
   Table table;
 
+  GLOBAL_EWS_OUTPUT = std::ofstream("ews_output.txt");
+  assert (GLOBAL_EWS_OUTPUT.good());
+
+  GLOBAL_GRADES_OUTPUT = std::ofstream("grades_output.txt");
+  assert (GLOBAL_GRADES_OUTPUT.good());
 
   // =====================================================================================================
   // =====================================================================================================
@@ -565,6 +574,7 @@ void start_table_output( bool /*for_instructor*/,
     table.set(0,counter++,TableCell("ffffff","notes"));
   }
   student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME"));
+  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID"));
   if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
     table.set(0,counter++,TableCell("ffffff","LAST (LEGAL)"));
     table.set(0,counter++,TableCell("ffffff","FIRST (LEGAL)"));
@@ -791,8 +801,52 @@ void start_table_output( bool /*for_instructor*/,
       std::vector<std::string> ews = this_student->getEarlyWarnings();
       for (std::size_t i = 0; i < ews.size(); i++) {
         notes += ews[i];
+
+        //std::cout << "FOUND EWS " << this_student->getUserName() << ews[i] << std::endl;
+
       }
       std::string other_note = this_student->getOtherNote();
+
+      // TEMPORARY placeholder code until course section is added
+      std::string crn = "99999";
+      if (this_student->getSection() == "1") crn = "55037";
+      if (this_student->getSection() == "2") crn = "57469";
+      if (this_student->getSection() == "3") crn = "55038";
+      if (this_student->getSection() == "4") crn = "57234";
+      if (this_student->getSection() == "5") crn = "56274";
+      if (this_student->getSection() == "6") crn = "55039";
+      if (this_student->getSection() == "7") crn = "55328";
+      if (this_student->getSection() == "8") crn = "57673";
+      if (this_student->getSection() == "9") crn = "57871";
+      if (this_student->getSection() == "10")crn = "58089";
+        
+      if (other_note != "" && other_note.find("EWS2") != std::string::npos) {
+        
+        std::string category = "FAILING";
+        if (other_note.find("TEST") != std::string::npos) { category="TEST_PERFORMANCE"; }
+        if (other_note.find("HW") != std::string::npos) { category="MISSING_INCOMPLETE_HW"; }
+        if (other_note.find("ATTENDANCE") != std::string::npos) { category="ATTENDANCE"; }
+        
+        GLOBAL_EWS_OUTPUT << this_student->getSection() << ","
+                          << crn << "," << this_student->getUserName() << ","
+                          << this_student->getNumericID() << ","
+                          << category << "," << other_note << std::endl;
+        
+      }
+
+      std::string student_grade = this_student->grade(false,sd);      
+      
+      if (this_student->getSection() != "null" &&
+          this_student->getSection() != "STAFF" &&
+          this_student->getSection() != "ALAC"
+          ) {
+      
+        GLOBAL_GRADES_OUTPUT << this_student->getSection() << ","
+                             << crn << "," << this_student->getUserName() << ","
+                             << this_student->getNumericID() << ","
+                             << student_grade << std::endl;
+      }
+      
       std::string recommendation = this_student->getRecommendation();
       std::string THING;
       if(!csv_mode) {
@@ -803,6 +857,7 @@ void start_table_output( bool /*for_instructor*/,
       }
       else{
           THING = notes + " " + other_note + " " + recommendation;
+        
       }
       assert (default_color.size()==6);
       table.set(myrow,counter++,TableCell(default_color,THING));
@@ -811,6 +866,7 @@ void start_table_output( bool /*for_instructor*/,
     //counter+=3;
     assert (default_color.size()==6);
     table.set(myrow,counter++,TableCell(default_color,this_student->getUserName()));
+    table.set(myrow,counter++,TableCell(default_color,this_student->getNumericID()));
     if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
       table.set(myrow,counter++,TableCell(default_color,this_student->getLastName()));
       table.set(myrow,counter++,TableCell(default_color,this_student->getFirstName()));

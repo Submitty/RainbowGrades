@@ -105,13 +105,13 @@ public:
   int getDefaultAllowedLateDays() const { return default_allowed_late_days; }
 
   void add_bonus_late_day(int which_lecture) {
-    std::cout << "ADD BONUS " << which_lecture << " " << username << std::endl;
+    //std::cout << "ADD BONUS " << which_lecture << " " << username << std::endl;
     bonus_late_days_which_lecture.push_back(which_lecture);
   }
   bool get_bonus_late_day(int which_lecture) const {
     for (unsigned int i = 0; i < bonus_late_days_which_lecture.size(); i++) {
       if (bonus_late_days_which_lecture[i] == which_lecture) {
-        std::cout << "YES BONUS " << which_lecture << " " << username << std::endl;
+        //std::cout << "YES BONUS " << which_lecture << " " << username << std::endl;
         return true;
       }
     }
@@ -119,7 +119,7 @@ public:
   }
 
   // other grade-like data
-  const std::vector<std::string>& getRemoteID() const { return remote_id; }
+  const std::string& getNumericID() const { return numeric_id; }
   bool getAcademicIntegrityForm()  const { return academic_integrity_form; }
   float getParticipation()           const { return participation; }
   float getUnderstanding()           const { return understanding; }
@@ -165,7 +165,7 @@ public:
   void mossify(const std::string &gradeable, float penalty);
 
   // other grade-like data
-  void setRemoteID(const std::string& r_id) { remote_id.push_back(r_id); }
+  void setNumericID(const std::string& r_id) { numeric_id = r_id; }
   void setAcademicIntegrityForm() { academic_integrity_form = true; }
   void setParticipation(float x) { participation = x; }
   void setUnderstanding(float x) { understanding = x; }
@@ -246,7 +246,7 @@ private:
   int rank;
 
   // other grade-like data
-  std::vector<std::string> remote_id;
+  std::string numeric_id;
   bool academic_integrity_form;
   float participation;
   float understanding;
