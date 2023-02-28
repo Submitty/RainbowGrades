@@ -1296,7 +1296,13 @@ void load_student_grades(std::vector<Student*> &students) {
         s->setPreferredLastName(j[token].get<std::string>());
       }
     } else if (token == "user_numeric_id") {
-      s->setNumericID(j[token].get<std::string>());
+
+      if (j[token].is_string()) {
+        s->setNumericID(j[token].get<std::string>());
+      }
+      else {
+        s->setNumericID("");
+      }
     } else if (token == "last_update") {
       s->setLastUpdate(j[token].get<std::string>());
     } else if (token == "registration_section") {
