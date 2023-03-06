@@ -95,13 +95,12 @@ float compute_stddev(const std::vector<float> &vals, float average) {
 // ==========================================================
 
 int convertYear(const std::string &major) {
-  if (major == "FR") return 1;
-  if (major == "SO") return 2;
-  if (major == "JR") return 3;
-  if (major == "SR") return 4;
-  if (major == "FY") return 5;
-  if (major == "GR") return 6;
-  else return 10;
+    // Replacing if condition with better code, which does the same job
+    std::vector<std::string> majorIndex{"FR","SO","JR","SR","FY","GR"};
+    for(int index=0;index<majorIndex.size();index++){
+        if(major==majorIndex[index])return index+1;
+    }
+    return 10;
 }
 
 int convertMajor(const std::string &major) {
