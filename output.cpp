@@ -712,7 +712,7 @@ void start_table_output( bool /*for_instructor*/,
   // HORIZONTAL GRAY DIVIDER
   for (int i = 0; i < table.numCols(); i++) {
     table.set(1,i,TableCell(grey_divider));
-  }  
+  }
 
 
   // header row
