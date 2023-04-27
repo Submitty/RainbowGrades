@@ -114,7 +114,7 @@ public:
     assert (hasCorrespondence(id));
     return correspondences.find(id)->second;
   }
-  
+
   bool isReleased(const std::string &id) const {
     assert (released.find(id) != released.end());
     return released.find(id)->second;
