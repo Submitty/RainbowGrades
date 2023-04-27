@@ -114,11 +114,16 @@ public:
     assert (hasCorrespondence(id));
     return correspondences.find(id)->second;
   }
-
   bool isReleased(const std::string &id) const {
     assert (released.find(id) != released.end());
     return released.find(id)->second;
   }
+
+  std::string getInquiry(const std::string &id) const {
+    assert (inquiry_status.find(id) != inquiry_status.end());
+    return inquiry_status.find(id)->second;
+  }
+
   float getItemMaximum(const std::string &id) const {
     if (maximums.find(id) == maximums.end()){
       return 0;
@@ -181,6 +186,11 @@ public:
     released[id] = is_released;
   }
 
+  void setInquiry(const std::string &id, const std::string& status) {
+    assert (hasCorrespondence(id));
+    inquiry_status[id] = status;
+  }
+
   void setMaximum(const std::string&id, float maximum) {
     assert (hasCorrespondence(id));
     assert (maximums.find(id) == maximums.end());
@@ -233,6 +243,7 @@ private:
   std::map<std::string,std::string> original_ids;
   std::map<std::string,std::string> resubmit_ids;
   std::map<std::string,float> autograde_replacement_percentages;
+  std::map<std::string, std::string> inquiry_status;
 };
 
 // ===============================================================================

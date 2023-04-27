@@ -663,6 +663,11 @@ void preprocesscustomizationfile(const std::string &now_string,
         GRADEABLES[g].setReleased(token_key,released);
       }
 
+      if (grade_id.find("inquiry") != grade_id.end()) {
+        std::string inquiry = grade_id.value("inquiry","");
+        GRADEABLES[g].setInquiry(token_key, inquiry);
+      }
+
       float maximum = grade_id.value("max",0.0);
       GRADEABLES[g].setMaximum(token_key,maximum);
 
@@ -1352,6 +1357,7 @@ void load_student_grades(std::vector<Student*> &students) {
       bool invalid = false;
       std::string gradeable_id = (*itr2).value("id","ERROR BAD ID");
       std::string gradeable_name = (*itr2).value("name",gradeable_id);
+      //std::string inquiry = (*itr2).value("inquiry_status",gradeable_id);
       std::string status;
       if (itr2 != (itr.value()).end() && (*itr2).is_string()) {
         status = (*itr2).value("status","NOT ELECTRONIC");
