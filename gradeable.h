@@ -180,6 +180,7 @@ public:
     assert (released.find(id) == released.end());
     released[id] = is_released;
   }
+
   void setMaximum(const std::string&id, float maximum) {
     assert (hasCorrespondence(id));
     assert (maximums.find(id) == maximums.end());
