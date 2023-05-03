@@ -589,6 +589,8 @@ void preprocesscustomizationfile(const std::string &now_string,
     benchmark_percents.push_back(token);
   }
 
+  
+
   perfect = new Student();perfect->setUserName("PERFECT");
   student_average = new Student();student_average->setUserName("AVERAGE");
   student_stddev = new Student();student_stddev->setUserName("STDDEV");
