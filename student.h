@@ -53,6 +53,7 @@ public:
   int getLateDaysUsed() const { return late_days_used; }
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
+  const std::string& getInquiry() const { return inquiry; }
 private:
   float value;
   int late_days_used;
