@@ -1452,7 +1452,7 @@ void load_student_grades(std::vector<Student*> &students) {
                           assert (late_days_charged == 0);
                         }
                         std::string inquiry = (*itr2).value("inquiry","");
-                        /* Could be useful for reviewing
+                        /*
                         if (inquiry != "") {
                           std::cout << "===="<< inquiry << "====" << std::endl;
                         } */

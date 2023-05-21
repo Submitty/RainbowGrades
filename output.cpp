@@ -1056,8 +1056,6 @@ void start_table_output( bool /*for_instructor*/,
           std::string details;
           details = this_student->getGradeableItemGrade(g,j).getNote();
           std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
-          std::string inquiry;
-          inquiry = this_student->getGradeableItemGrade(g,j).getInquiry();
 
           if (status.find("Bad") != std::string::npos) {
             details += " " + status;
