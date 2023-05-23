@@ -23,11 +23,16 @@ public:
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="left" , int s=1, int r=0);
   TableCell(const std::string& c         , float              d   , int precision, const std::string& n="", int ldu=0,
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0);
+TableCell(float              d   ,const std::string& c         , int precision, const std::string& n="", int ldu=0,
+              CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0, bool i = false, bool ai = false);
+
   std::string make_cell_string(bool csv_mode) const;
 
   std::string color;
   std::string data;
   int late_days_used;
+    bool academic_integrity = false;
+    bool inquiry = false;
   std::string align;
   enum CELL_CONTENTS_STATUS visible;
   int span;

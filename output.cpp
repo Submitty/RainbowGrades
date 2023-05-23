@@ -973,6 +973,7 @@ void start_table_output( bool /*for_instructor*/,
       color = GradeColor(g);
       if (this_student->getMossPenalty() < -0.01) {
         g += "@";
+          std::cout << this_student->getUserName() << std::endl;
       }
       assert (color.size()==6);
       table.set(myrow,counter++,TableCell(color,g,"",0,CELL_CONTENTS_VISIBLE,"center"));
@@ -1056,13 +1057,15 @@ void start_table_output( bool /*for_instructor*/,
           std::string details;
           details = this_student->getGradeableItemGrade(g,j).getNote();
           std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
-
+            bool inquiry = this_student->getGradeableItemGrade(g,j).getInquiry();
+            bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
           if (status.find("Bad") != std::string::npos) {
             details += " " + status;
           }
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
           assert (color.size()==6);
-          table.set(myrow,counter++,TableCell(color,grade,1,details,late_days_used,visible));
+//          table.set(myrow,counter++,TableCell(color,grade,1,details,late_days_used,visible));
+            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible, "right", 1, 0,Academic_integrity, Academic_integrity));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
@@ -1260,6 +1263,7 @@ void start_table_output( bool /*for_instructor*/,
 void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
 
   ostr << "<p>* = 1 late day used</p>" << std::endl;
+  ostr << "<p>@ = Academic Integrity Violation</p>" << std::endl;
 
   if (s != NULL) {
     std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");

@@ -52,7 +52,7 @@ TableCell::TableCell(const std::string& c, int d, const std::string& n, int ldu,
   rotate=r;
 }
 
-TableCell::TableCell(const std::string& c, float d, int precision, const std::string& n, int ldu,
+TableCell::TableCell(const std::string& c, float d,  int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/) {
   assert (c.size() == 6);
   assert (precision >= 0);
@@ -72,10 +72,50 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
   rotate = 0;
 }
 
+
+TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
+                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/, bool i, bool ai) {
+  assert (c.size() == 6);
+  assert (precision >= 0);
+  color=c;
+  if (fabs(d) > 0.0001) {
+    std::stringstream ss;
+    ss << std::setprecision(precision) << std::fixed << d;
+    data=ss.str(); span=s;
+  } else {
+    data = "";
+  }
+  note=n;
+  late_days_used=ldu,
+  visible=v;
+  align=a;
+  span=s;
+  rotate = 0;
+    inquiry = i;
+    academic_integrity = ai;
+}
+
+
+//"<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa; outline:2px solid #FC0204; outline-offset: -2px; \">\n"
+//#42f55a   #4287f5
+
 std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   assert (c.color.size() == 6);
+    
+    std::string tmp = "";
+    if (c.academic_integrity)
+    {
+        tmp = "outline:4px solid #42f55a; outline-offset: -4px;";
+    }
+    else if (c.inquiry)
+    {
+        tmp = "outline:4px solid #ecf542; outline-offset: -4px;";
+    }
+    
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
-  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << ";\" align=\"" << c.align << "\">";
+//  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << ";  outline:2px solid #4287f5; outline-offset: -2px; \" align=\"" << c.align << "\">";
+  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << tmp << " \" align=\"" << c.align << "\">";
+    
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
   }
@@ -92,6 +132,12 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
       if (c.late_days_used > 3) { ostr << " (" << std::to_string(c.late_days_used) << "*)"; }
       else { ostr << " " << std::string(c.late_days_used,'*'); }
     }
+      
+    if (c.academic_integrity)
+    {
+        ostr << " @";
+    }
+      
     if (mynote.length() > 0 &&
         mynote != " " &&
         (global_details 
@@ -174,11 +220,13 @@ void Table::output(std::ostream& ostr,
           ostr << "" << MESSAGES[i] << "<br>\n";
       }
       if (last_update != "") {
-          ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
+//          ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
+          ostr << "<em>Information last updated: this should pop up" << last_update << "</em><br>\n";
       }
       ostr << "&nbsp;<br>\n";
 
 
+//      ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa; outline:2px solid #FC0204; outline-offset: -2px; \">\n";
       ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa;\">\n";
       //  ostr << "<table border=0 cellpadding=3 cellspacing=2 style=\"background-color:#aaaaaa\">\n";
   }
