@@ -442,6 +442,8 @@ std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
 
 
 
+
+    
 void Student::mossify(const std::string &gradeable, float penalty) {
 
   // if the penalty is "a whole or partial letter grade"....
@@ -449,15 +451,172 @@ void Student::mossify(const std::string &gradeable, float penalty) {
                                  CUTOFFS["B"]-CUTOFFS["C"] +
                                  CUTOFFS["C"]-CUTOFFS["D"]) / 3.0;
 
-  if (!GRADEABLES[GRADEABLE_ENUM::HOMEWORK].hasCorrespondence(gradeable)) {
-    std::cerr << "WARNING -- NO GRADEABLE TO MOSSIFY" << std::endl;
-  } else {
+  if (GRADEABLES[GRADEABLE_ENUM::HOMEWORK].hasCorrespondence(gradeable))
+  {
     int which = GRADEABLES[GRADEABLE_ENUM::HOMEWORK].getCorrespondence(gradeable).first;
     if (!(getGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which).getValue() > 0)) {
+      std::cout << getGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which).getValue()  << std::endl;
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
       std::cerr << "WARNING:  the grade for this homework is already 0, moss penalty error?" << std::endl;
     }
-    setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
+   setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
+      // setGradeableItemGradeforintegrity(GRADEABLE_ENUM::HOMEWORK,which,0, true,false);
   }
+  else if (GRADEABLES[GRADEABLE_ENUM::ASSIGNMENT].hasCorrespondence(gradeable))
+  {    
+    int which = GRADEABLES[GRADEABLE_ENUM::ASSIGNMENT].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::ASSIGNMENT,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this assignment is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::ASSIGNMENT,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::PROBLEM_SET].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::PROBLEM_SET].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::PROBLEM_SET,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this problem set is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::PROBLEM_SET,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::QUIZ].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::QUIZ].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::QUIZ,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this quiz is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::QUIZ,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::TEST].hasCorrespondence(gradeable))
+  {
+        int which = GRADEABLES[GRADEABLE_ENUM::TEST].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::TEST,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this test is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::TEST,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::EXAM].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::EXAM].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::EXAM,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this exam is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::EXAM,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::EXERCISE].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::EXERCISE].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::EXERCISE,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this exercise is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::EXERCISE,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::LECTURE_EXERCISE].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::LECTURE_EXERCISE].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::LECTURE_EXERCISE,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this lecture exercise is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::LECTURE_EXERCISE,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::READING].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::READING].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::READING,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this reading is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::READING,which,0); 
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::WORKSHEET].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::WORKSHEET].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::WORKSHEET,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this worksheet is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::WORKSHEET,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::LAB].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::LAB].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::LAB,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this lab is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::LAB,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::RECITATION].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::RECITATION].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::RECITATION,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this recitation is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::RECITATION,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::PROJECT].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::PROJECT].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::PROJECT,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this project is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::PROJECT,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::PARTICIPATION].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::PARTICIPATION].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::PARTICIPATION,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this participation is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::PARTICIPATION,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::NOTE].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::NOTE].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::NOTE,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this note is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::NOTE,which,0);
+  }
+  else if (GRADEABLES[GRADEABLE_ENUM::NONE].hasCorrespondence(gradeable))
+  {
+    int which = GRADEABLES[GRADEABLE_ENUM::NONE].getCorrespondence(gradeable).first;
+    if (!(getGradeableItemGrade(GRADEABLE_ENUM::NONE,which).getValue() > 0)) {
+      std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+      std::cerr << "WARNING:  the grade for this none catagory is already 0, moss penalty error?" << std::endl;
+    }
+   setGradeableItemGrade(GRADEABLE_ENUM::NONE,which,0);
+  }
+  else
+  {
+    std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
+    std::cerr << "WARNING -- NO GRADEABLE TO MOSSIFY" << std::endl;
+  }
+
+
+
+
+
+//   if (!GRADEABLES[GRADEABLE_ENUM::HOMEWORK].hasCorrespondence(gradeable)) {
+//     std::cerr << "WARNING -- NO GRADEABLE TO MOSSIFY" << std::endl;
+//   } else {
+//     int which = GRADEABLES[GRADEABLE_ENUM::HOMEWORK].getCorrespondence(gradeable).first;
+//     if (!(getGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which).getValue() > 0)) {
+//       std::cerr << "WARNING:  the grade for this homework is already 0, moss penalty error?" << std::endl;
+//     }
+// //    setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
+//       setGradeableItemGradeforintegrity(GRADEABLE_ENUM::HOMEWORK,which,0, true,false);
+//   }
 
   // the penalty is positive
   // but it will be multiplied by a negative and added to the total;
@@ -466,11 +625,13 @@ void Student::mossify(const std::string &gradeable, float penalty) {
   moss_penalty += -0.0000001;
   moss_penalty += -average_letter_grade * penalty;
 
+    std::cout << "Moss penalty: student.cpp 481 " << moss_penalty << std::endl;
   std::stringstream foo;
   foo << std::setprecision(2) << std::fixed << penalty;
 
   addWarning("[PLAGIARISM " + gradeable + " " + foo.str() + "]<br>");
 }
+
 
 
 
