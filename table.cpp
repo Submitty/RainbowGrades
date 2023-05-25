@@ -109,7 +109,8 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     }
     else if (c.inquiry)
     {
-        tmp = "outline:4px solid #ecf542; outline-offset: -4px;";
+      std::cout << "table.cpp line 112, is passed" << std::endl;
+        tmp = "outline:4px dashed #ecf542; outline-offset: -4px;";
     }
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
@@ -135,6 +136,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
       
     if (c.academic_integrity)
     {
+      std::cout << "table.cpp line 139 print out @ has passed" << std::endl;
         ostr << " @";
     }
       

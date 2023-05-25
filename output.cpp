@@ -1065,7 +1065,7 @@ void start_table_output( bool /*for_instructor*/,
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
           assert (color.size()==6);
 //          table.set(myrow,counter++,TableCell(color,grade,1,details,late_days_used,visible));
-            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible, "right", 1, 0,Academic_integrity, Academic_integrity));
+            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible, "right", 1, 0, inquiry, Academic_integrity));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 

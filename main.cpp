@@ -1461,8 +1461,23 @@ void load_student_grades(std::vector<Student*> &students) {
                         if (status.find("Bad") != std::string::npos) {
                           assert (late_days_charged == 0);
                         }
+                        std::string inquiry = itr2->value("inquiry", "");
+                        bool iq = false;
+                        if ((inquiry != "None") && (inquiry != "Resolved"))
+                        {
+                          // From ReportController.php
+                          std::cout << inquiry << ": inqury status" << std::endl;
+                          assert(inquiry == "Open");
+                          iq = true;
+                          std::cout << "=====================" << inquiry << "===" << std::endl;
+                          if (s->getUserName() != "") {
+                          std::cout << "Name: " << s->getUserName() << std::endl;
+                          std::cout << "Name: " << s->getFirstName() << std::endl;
+                        }
+                        }
                         if (GRADEABLES[g].isReleased(gradeable_id)) {
-                          s->setGradeableItemGrade(g,which,score,late_days_charged,other_note,status);
+                          // s->setGradeableItemGrade(g,which,score,late_days_charged,other_note,status);
+                          s->setGradeableItemGradeforinquiry(g,which,score,iq,late_days_charged,other_note,status);
                         }
       }
 

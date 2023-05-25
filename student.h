@@ -174,6 +174,7 @@ public:
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
   void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status="");
     void setGradeableItemGradeforintegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, bool inquiry, int late_days_used=0, const std::string &note="",const std::string &status="");
+    void setGradeableItemGradeforinquiry(GRADEABLE_ENUM g, int i, float value,  bool inquiry, int late_days_used=0, const std::string &note="",const std::string &status="");
 
   void mossify(const std::string &gradeable, float penalty);
 

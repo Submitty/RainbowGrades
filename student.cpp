@@ -104,6 +104,17 @@ void Student::setGradeableItemGradeforintegrity(GRADEABLE_ENUM g, int i, float v
   itr->second[i] = ItemGrade(value,late_days_used,note,status, inquiry, academic_integrity);
 }
 
+void Student::setGradeableItemGradeforinquiry(GRADEABLE_ENUM g, int i, float value, bool inquiry,
+                                    int late_days_used, const std::string &note, const std::string &status) {
+  assert (i >= 0 && i < GRADEABLES[g].getCount());
+  std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
+  assert (itr != all_item_grades.end());
+  assert (int(itr->second.size()) > i);
+    
+  itr->second[i] = ItemGrade(value,late_days_used,note,status, inquiry);
+}
+
+
 
 
 
@@ -467,8 +478,8 @@ void Student::mossify(const std::string &gradeable, float penalty) {
       std::cout << "GRADABLE UNIQUE ID:  " << gradeable << std::endl;
       std::cerr << "WARNING:  the grade for this homework is already 0, moss penalty error?" << std::endl;
     }
-   setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
-      // setGradeableItemGradeforintegrity(GRADEABLE_ENUM::HOMEWORK,which,0, true,false);
+   // setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
+      setGradeableItemGradeforintegrity(GRADEABLE_ENUM::HOMEWORK,which,0, true,false);
   }
   else if (GRADEABLES[GRADEABLE_ENUM::ASSIGNMENT].hasCorrespondence(gradeable))
   {    
@@ -503,7 +514,8 @@ void Student::mossify(const std::string &gradeable, float penalty) {
     if (!(getGradeableItemGrade(GRADEABLE_ENUM::TEST,which).getValue() > 0)) {
       std::cerr << "WARNING:  the grade for this test is already 0, moss penalty error?" << std::endl;
     }
-   setGradeableItemGrade(GRADEABLE_ENUM::TEST,which,0);
+   // setGradeableItemGrade(GRADEABLE_ENUM::TEST,which,0);
+    setGradeableItemGradeforintegrity(GRADEABLE_ENUM::TEST,which,0, true,false);
   }
   else if (GRADEABLES[GRADEABLE_ENUM::EXAM].hasCorrespondence(gradeable))
   {
