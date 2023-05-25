@@ -1059,13 +1059,17 @@ void start_table_output( bool /*for_instructor*/,
           std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
             bool inquiry = this_student->getGradeableItemGrade(g,j).getInquiry();
             bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
+            // std::cout << "output 1062 print status " << status << std::endl;
+            bool bad_status = false;
           if (status.find("Bad") != std::string::npos) {
+            bad_status = true;
+            std::cout << "bad_status" << std::endl;
             details += " " + status;
           }
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
           assert (color.size()==6);
 //          table.set(myrow,counter++,TableCell(color,grade,1,details,late_days_used,visible));
-            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible, "right", 1, 0, inquiry, Academic_integrity));
+            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible, "right", 1, 0, inquiry, Academic_integrity, bad_status));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
@@ -1263,7 +1267,8 @@ void start_table_output( bool /*for_instructor*/,
 void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
 
   ostr << "<p>* = 1 late day used</p>" << std::endl;
-  ostr << "<p>@ = Academic Integrity Violation</p>" << std::endl;
+  // This should only pop up for those who violated policy FIX HERE
+  // ostr << "<p>@ = Academic Integrity Violation</p>" << std::endl;
 
   if (s != NULL) {
     std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");

@@ -96,6 +96,31 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
 }
 
 
+TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
+                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/, bool i, bool ai, bool bs) {
+  assert (c.size() == 6);
+  assert (precision >= 0);
+  color=c;
+  if (fabs(d) > 0.0001) {
+    std::stringstream ss;
+    ss << std::setprecision(precision) << std::fixed << d;
+    data=ss.str(); span=s;
+  } else {
+    data = "";
+  }
+  note=n;
+  late_days_used=ldu,
+  visible=v;
+  align=a;
+  span=s;
+  rotate = 0;
+    inquiry = i;
+    academic_integrity = ai;
+    bad_status = bs;
+}
+
+
+
 //"<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa; outline:2px solid #FC0204; outline-offset: -2px; \">\n"
 //#42f55a   #4287f5
 
@@ -111,6 +136,10 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     {
       std::cout << "table.cpp line 112, is passed" << std::endl;
         tmp = "outline:4px dashed #ecf542; outline-offset: -4px;";
+    }
+    else if (c.bad_status)
+    {
+      tmp = "outline:4px dashed #4287f5; outline-offset: -4px;";
     }
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";

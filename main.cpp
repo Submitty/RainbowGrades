@@ -1293,6 +1293,7 @@ void load_student_grades(std::vector<Student*> &students) {
     // non gradeables
     if (token == "user_id") {
       s->setUserName(j[token].get<std::string>());
+      std::cout << "This is username line 1296 on main " << s->getUserName() << std::endl;
     } else if (token == "legal_first_name" || token == "legal_given_name") {
       s->setLegalFirstName(j[token].get<std::string>());
     } else if (token == "legal_last_name" || token == "legal_family_name") {
@@ -1460,7 +1461,17 @@ void load_student_grades(std::vector<Student*> &students) {
                         }
                         if (status.find("Bad") != std::string::npos) {
                           assert (late_days_charged == 0);
+                          std::cout << "main 1464 This is Bad status " << s->getUserName() << std::endl;
                         }
+
+
+                        std::string status_bad = itr2->value("status", "");
+                        bool bs = false;
+                        if (status_bad == "Bad")
+                        {
+                          std::cout << "main 1471 Bad " << s->getUserName() << std::endl;
+                        }
+
                         std::string inquiry = itr2->value("inquiry", "");
                         bool iq = false;
                         if ((inquiry != "None") && (inquiry != "Resolved"))
