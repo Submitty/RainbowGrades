@@ -1469,6 +1469,7 @@ void load_student_grades(std::vector<Student*> &students) {
                         bool bs = false;
                         if (status_bad == "Bad")
                         {
+                          bs = true;
                           std::cout << "main 1471 Bad " << s->getUserName() << std::endl;
                         }
 
@@ -1481,14 +1482,10 @@ void load_student_grades(std::vector<Student*> &students) {
                           assert(inquiry == "Open");
                           iq = true;
                           std::cout << "=====================" << inquiry << "===" << std::endl;
-                          if (s->getUserName() != "") {
-                          std::cout << "Name: " << s->getUserName() << std::endl;
-                          std::cout << "Name: " << s->getFirstName() << std::endl;
-                        }
                         }
                         if (GRADEABLES[g].isReleased(gradeable_id)) {
                           // s->setGradeableItemGrade(g,which,score,late_days_charged,other_note,status);
-                          s->setGradeableItemGradeforinquiry(g,which,score,iq,late_days_charged,other_note,status);
+                          s->setGradeableItemGrade_status(g,which,score,bs,iq,late_days_charged,other_note,status);
                         }
       }
 

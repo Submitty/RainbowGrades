@@ -1057,10 +1057,11 @@ void start_table_output( bool /*for_instructor*/,
           std::string details;
           details = this_student->getGradeableItemGrade(g,j).getNote();
           std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
+            bool bad_status = this_student->getGradeableItemGrade(g,j).getBadStatus();
             bool inquiry = this_student->getGradeableItemGrade(g,j).getInquiry();
             bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
             // std::cout << "output 1062 print status " << status << std::endl;
-            bool bad_status = false;
+            
           if (status.find("Bad") != std::string::npos) {
             bad_status = true;
             std::cout << "bad_status" << std::endl;
@@ -1069,7 +1070,7 @@ void start_table_output( bool /*for_instructor*/,
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
           assert (color.size()==6);
 //          table.set(myrow,counter++,TableCell(color,grade,1,details,late_days_used,visible));
-            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible, "right", 1, 0, inquiry, Academic_integrity, bad_status));
+            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible, "right", 1, 0,bad_status, inquiry, Academic_integrity));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
