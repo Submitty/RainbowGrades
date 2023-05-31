@@ -97,7 +97,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
 
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/, bool bs, bool ov,  bool i, bool ai) {
+                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, int s, int /*r*/) {
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -114,9 +114,28 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   align=a;
   span=s;
   rotate = 0;
-  bad_status = bs;
-  override = ov;
-    inquiry = i;
+  event = e;
+
+if (event == "Bad")
+    {
+      bad_status = true;
+      override = inquiry = false;
+    }
+    else if ( event == "Overridden")
+    {
+      override = true;
+      bad_status = inquiry = false;
+    }
+    else if (event == "Open")
+    {
+      inquiry = true;
+      bad_status = override = false;
+    }
+
+
+  // bad_status = bs;
+  // override = ov;
+  //   inquiry = i;
     academic_integrity = ai;
     
 }

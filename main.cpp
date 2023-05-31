@@ -1464,19 +1464,21 @@ void load_student_grades(std::vector<Student*> &students) {
                           std::cout << "main 1464 This is Bad status " << s->getUserName() << std::endl;
                         }
 
-
-                        std::string status_bad = itr2->value("status", "");
+                        std::string event;
+                        std::string status_check = itr2->value("status", "");
                         bool bs = false;
                         bool ov = false;
-                        if (status_bad == "Bad")
+                        if (status_check == "Bad")
                         {
-                          bs = true;
-                          std::cout << "main 1471 Bad " << s->getUserName() << std::endl;
+                          event = "Bad";
+                          // bs = true;
+                          // std::cout << "main 1471 Bad " << s->getUserName() << std::endl;
                         }
-                        if (status_bad == "Overridden")
+                        if (status_check == "Overridden")
                         {
-                          ov = true;
-                          std::cout << "main 1471 Overridden " << s->getUserName() << std::endl;
+                          event = "Overridden";
+                          // ov = true;
+                          // std::cout << "main 1471 Overridden " << s->getUserName() << std::endl;
                         }
 
                         std::string inquiry = itr2->value("inquiry", "");
@@ -1484,14 +1486,16 @@ void load_student_grades(std::vector<Student*> &students) {
                         if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != ""))
                         {
                           // From ReportController.php
-                          std::cout << inquiry << ": inqury status" << std::endl;
+                          // std::cout << inquiry << ": inqury status" << std::endl;
                           assert(inquiry == "Open");
-                          iq = true;
-                          std::cout << "=====================" << inquiry << "===" << std::endl;
+                          event = "Open";
+                          // iq = true;
+                          // std::cout << "=====================" << inquiry << "===" << std::endl;
                         }
                         if (GRADEABLES[g].isReleased(gradeable_id)) {
                           // s->setGradeableItemGrade(g,which,score,late_days_charged,other_note,status);
-                          s->setGradeableItemGrade_status(g,which,score,bs,ov,iq,late_days_charged,other_note,status);
+                          // s->setGradeableItemGrade_status(g,which,score,bs,ov,iq,late_days_charged,other_note,status);
+                          s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status);
                         }
       }
 

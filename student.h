@@ -19,15 +19,30 @@
 
 class ItemGrade {
 public:
-  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", bool bs=false,bool ov=false,  bool iq=false, bool ai=false) {
+  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false) {
     value = v;
     late_days_used = ldu;
     note = n;
-    bad_status = bs;
-    override = ov;
-    inquiry = iq;
+    event = e;
     academic_integrity = ai;
-      
+    
+    // if (event == "Bad")
+    // {
+    //   bad_status = true;
+    //   override = inquiry = false;
+    // }
+    // else if ( event = "Overridden")
+    // {
+    //   override = true;
+    //   bad_status = inquiry = false;
+    // }
+    // else if (event = "Open")
+    // {
+    //   inquiry = true;
+    //   bad_status = override = false;
+    // }
+
+
     if (s != "UNKONWN") {
       status = s;
     }
@@ -57,6 +72,7 @@ public:
   int getLateDaysUsed() const { return late_days_used; }
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
+  const std::string& getEvent() const { return event; }
      bool getOverride() const { return override; }
      bool getBadStatus() const { return bad_status; }
      bool getInquiry() const { return inquiry; }
@@ -75,6 +91,7 @@ private:
     bool academic_integrity;
   std::string note;
   std::string status;
+  std::string event;
 };
 
 //====================================================================
@@ -182,6 +199,7 @@ public:
     void setGradeableItemGradeforintegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
     void setGradeableItemGradeforinquiry(GRADEABLE_ENUM g, int i, float value,  bool inquiry, int late_days_used=0, const std::string &note="",const std::string &status="");
     void setGradeableItemGrade_status(GRADEABLE_ENUM g, int i, float value, bool bad_status, bool override, bool inquiry, int late_days_used=0, const std::string &note="",const std::string &status="");
+    void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="");
 
   void mossify(const std::string &gradeable, float penalty);
 
