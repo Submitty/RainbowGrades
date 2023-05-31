@@ -1467,15 +1467,21 @@ void load_student_grades(std::vector<Student*> &students) {
 
                         std::string status_bad = itr2->value("status", "");
                         bool bs = false;
+                        bool ov = false;
                         if (status_bad == "Bad")
                         {
                           bs = true;
                           std::cout << "main 1471 Bad " << s->getUserName() << std::endl;
                         }
+                        if (status_bad == "Overridden")
+                        {
+                          ov = true;
+                          std::cout << "main 1471 Overridden " << s->getUserName() << std::endl;
+                        }
 
                         std::string inquiry = itr2->value("inquiry", "");
                         bool iq = false;
-                        if ((inquiry != "None") && (inquiry != "Resolved"))
+                        if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != ""))
                         {
                           // From ReportController.php
                           std::cout << inquiry << ": inqury status" << std::endl;
@@ -1485,7 +1491,7 @@ void load_student_grades(std::vector<Student*> &students) {
                         }
                         if (GRADEABLES[g].isReleased(gradeable_id)) {
                           // s->setGradeableItemGrade(g,which,score,late_days_charged,other_note,status);
-                          s->setGradeableItemGrade_status(g,which,score,bs,iq,late_days_charged,other_note,status);
+                          s->setGradeableItemGrade_status(g,which,score,bs,ov,iq,late_days_charged,other_note,status);
                         }
       }
 

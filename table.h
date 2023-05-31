@@ -26,7 +26,7 @@ public:
 TableCell(float              d   ,const std::string& c         , int precision, const std::string& n="", int ldu=0,
               CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0, bool i = false, bool ai = false);
 TableCell(float              d   ,const std::string& c         , int precision, const std::string& n="", int ldu=0,
-              CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0, bool i = false, bool ai = false, bool bs = false);
+              CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0, bool i = false, bool ai = false, bool bs = false, bool ov = false);
 
   std::string make_cell_string(bool csv_mode) const;
 
@@ -36,6 +36,7 @@ TableCell(float              d   ,const std::string& c         , int precision, 
     bool academic_integrity = false;
     bool inquiry = false;
     bool bad_status = false;
+    bool override = false;
   std::string align;
   enum CELL_CONTENTS_STATUS visible;
   int span;

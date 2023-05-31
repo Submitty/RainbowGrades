@@ -97,7 +97,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
 
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/, bool bs,  bool i, bool ai) {
+                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/, bool bs, bool ov,  bool i, bool ai) {
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -114,9 +114,11 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   align=a;
   span=s;
   rotate = 0;
+  bad_status = bs;
+  override = ov;
     inquiry = i;
     academic_integrity = ai;
-    bad_status = bs;
+    
 }
 
 
@@ -130,11 +132,16 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     std::string tmp = "";
     if (c.academic_integrity)
     {
+      std::cout << "table.cpp line 112 : academic_integrity" << std::endl;
         tmp = "outline:4px solid #0a0a0a; outline-offset: -4px;";
+    }
+    else if (c.override)
+    {
+      tmp = "outline:4px solid #fcba03; outline-offset: -4px;";
     }
     else if (c.inquiry)
     {
-      std::cout << "table.cpp line 112, is passed" << std::endl;
+      std::cout << "table.cpp line 112 : inquiry" << std::endl;
         tmp = "outline:4px dashed #4287f5; outline-offset: -4px;";
     }
     else if (c.bad_status)

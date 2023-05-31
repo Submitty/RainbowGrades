@@ -101,7 +101,7 @@ void Student::setGradeableItemGradeforintegrity(GRADEABLE_ENUM g, int i, float v
   assert (itr != all_item_grades.end());
   assert (int(itr->second.size()) > i);
     
-  itr->second[i] = ItemGrade(value,late_days_used,note,status, false, false, academic_integrity);
+  itr->second[i] = ItemGrade(value,late_days_used,note,status, false, false, false, academic_integrity);
 }
 
 void Student::setGradeableItemGradeforinquiry(GRADEABLE_ENUM g, int i, float value, bool inquiry,
@@ -114,14 +114,14 @@ void Student::setGradeableItemGradeforinquiry(GRADEABLE_ENUM g, int i, float val
   itr->second[i] = ItemGrade(value,late_days_used,note,status, inquiry);
 }
 
-void Student::setGradeableItemGrade_status(GRADEABLE_ENUM g, int i, float value, bool bad_status, bool inquiry,
+void Student::setGradeableItemGrade_status(GRADEABLE_ENUM g, int i, float value, bool bad_status, bool override, bool inquiry,
                                     int late_days_used, const std::string &note, const std::string &status) {
   assert (i >= 0 && i < GRADEABLES[g].getCount());
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
   assert (itr != all_item_grades.end());
   assert (int(itr->second.size()) > i);
     
-  itr->second[i] = ItemGrade(value,late_days_used,note,status, bad_status, inquiry);
+  itr->second[i] = ItemGrade(value,late_days_used,note,status, bad_status, override, inquiry);
 }
 
 
@@ -490,6 +490,7 @@ void Student::mossify(const std::string &gradeable, float penalty) {
       std::cerr << "WARNING:  the grade for this homework is already 0, moss penalty error?" << std::endl;
     }
    // setGradeableItemGrade(GRADEABLE_ENUM::HOMEWORK,which,0);
+    std::cout << "mossify at studentcpp 493 is passing" << std::endl;
       setGradeableItemGradeforintegrity(GRADEABLE_ENUM::HOMEWORK,which,0, true);
   }
   else if (GRADEABLES[GRADEABLE_ENUM::ASSIGNMENT].hasCorrespondence(gradeable))
@@ -526,6 +527,7 @@ void Student::mossify(const std::string &gradeable, float penalty) {
       std::cerr << "WARNING:  the grade for this test is already 0, moss penalty error?" << std::endl;
     }
    // setGradeableItemGrade(GRADEABLE_ENUM::TEST,which,0);
+    std::cout << "mossify at studentcpp 530 is passing" << std::endl;
     setGradeableItemGradeforintegrity(GRADEABLE_ENUM::TEST,which,0, true);
   }
   else if (GRADEABLES[GRADEABLE_ENUM::EXAM].hasCorrespondence(gradeable))
