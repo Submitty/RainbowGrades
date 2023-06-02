@@ -1177,16 +1177,6 @@ void processcustomizationfile(const std::string &now_string,
       //std::cout << "USERNAME " << username << std::endl;
       assert (s != NULL);
       s->mossify(hw,penalty);
-        // I don't understand why this code does not include "academic_integrity_form" boolean value, which already exist.
-        // in fact, that value is not used anywhere in this thing.
-        //here
-//        students[S]->getGradeableItemGrade(g,item).getValue()
-//        GRADEABLE_ENUM g;
-//        int item;
-//        LookupGradeable(hw,g,item);
-//        s->getGradeableItemGrade(g,item).setAcademicIntegrity(true);
-        
-        
     }
   } else if (token == "final_cutoff") {
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
