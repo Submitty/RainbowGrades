@@ -73,22 +73,22 @@ public:
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
   const std::string& getEvent() const { return event; }
-     bool getOverride() const { return override; }
-     bool getBadStatus() const { return bad_status; }
-     bool getInquiry() const { return inquiry; }
+     // bool getOverride() const { return override; }
+     // bool getBadStatus() const { return bad_status; }
+     // bool getInquiry() const { return inquiry; }
      bool getAcademicIntegrity() const { return academic_integrity; }
     // inquiry should set both true and false b/c once inquiry has been resolved, it should change back to false;
     
-    void setinquiry(bool trueorfalse ) { inquiry = trueorfalse;}
-    void setAcademicIntegrity(bool trueorfalse ) { academic_integrity = trueorfalse;}
+    
+    
     
 private:
   float value;
   int late_days_used;
-  bool override;
-  bool bad_status;
-    bool inquiry;
-    bool academic_integrity;
+  // bool override;
+  // bool bad_status;
+  // bool inquiry;
+  bool academic_integrity;
   std::string note;
   std::string status;
   std::string event;

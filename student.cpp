@@ -102,7 +102,7 @@ void Student::setGradeableItemGradeforintegrity(GRADEABLE_ENUM g, int i, float v
   assert (int(itr->second.size()) > i);
   std::string temp = "";
     
-  itr->second[i] = ItemGrade(value,late_days_used,note,status, tmp, academic_integrity);
+  itr->second[i] = ItemGrade(value,late_days_used,note,status,temp,academic_integrity);
 }
 
 // void Student::setGradeableItemGradeforinquiry(GRADEABLE_ENUM g, int i, float value, bool inquiry,

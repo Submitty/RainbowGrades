@@ -74,29 +74,6 @@ TableCell::TableCell(const std::string& c, float d,  int precision, const std::s
 
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/, bool i, bool ai) {
-  assert (c.size() == 6);
-  assert (precision >= 0);
-  color=c;
-  if (fabs(d) > 0.0001) {
-    std::stringstream ss;
-    ss << std::setprecision(precision) << std::fixed << d;
-    data=ss.str(); span=s;
-  } else {
-    data = "";
-  }
-  note=n;
-  late_days_used=ldu,
-  visible=v;
-  align=a;
-  span=s;
-  rotate = 0;
-    inquiry = i;
-    academic_integrity = ai;
-}
-
-
-TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, int s, int /*r*/) {
   assert (c.size() == 6);
   assert (precision >= 0);
@@ -114,29 +91,27 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   align=a;
   span=s;
   rotate = 0;
+  academic_integrity = ai;
   event = e;
-
-if (event == "Bad")
-    {
-      bad_status = true;
-      override = inquiry = false;
-    }
-    else if ( event == "Overridden")
-    {
-      override = true;
-      bad_status = inquiry = false;
-    }
-    else if (event == "Open")
-    {
-      inquiry = true;
-      bad_status = override = false;
-    }
-
-
-  // bad_status = bs;
-  // override = ov;
-  //   inquiry = i;
-    academic_integrity = ai;
+  if (event == "Bad")
+  {
+    bad_status = true;
+    override = inquiry = false;
+  }
+  else if ( event == "Overridden")
+  {
+    override = true;
+    bad_status = inquiry = false;
+  }
+  else if (event == "Open")
+  {
+    inquiry = true;
+    bad_status = override = false;
+  }
+  else
+  {
+   inquiry = bad_status = override = false; 
+  }
     
 }
 
@@ -148,29 +123,29 @@ if (event == "Bad")
 std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   assert (c.color.size() == 6);
     
-    std::string tmp = "";
+    std::string outline = "";
     if (c.academic_integrity)
     {
       std::cout << "table.cpp line 112 : academic_integrity" << std::endl;
-        tmp = "outline:4px solid #0a0a0a; outline-offset: -4px;";
+        outline = "outline:4px solid #0a0a0a; outline-offset: -4px;";
     }
     else if (c.override)
     {
-      tmp = "outline:4px solid #fcba03; outline-offset: -4px;";
+      outline = "outline:4px solid #fcca03; outline-offset: -4px;";
     }
     else if (c.inquiry)
     {
       std::cout << "table.cpp line 112 : inquiry" << std::endl;
-        tmp = "outline:4px dashed #4287f5; outline-offset: -4px;";
+        outline = "outline:4px dashed #1cfc03; outline-offset: -4px;";
     }
     else if (c.bad_status)
     {
-      tmp = "outline:4px solid #42f55a; outline-offset: -4px;";
+      outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
 //  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << ";  outline:2px solid #4287f5; outline-offset: -2px; \" align=\"" << c.align << "\">";
-  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << tmp << " \" align=\"" << c.align << "\">";
+  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \"padding-left:10px; align=\"" << c.align << "\">";
     
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
