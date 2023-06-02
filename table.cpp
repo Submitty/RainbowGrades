@@ -145,7 +145,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
 //  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << ";  outline:2px solid #4287f5; outline-offset: -2px; \" align=\"" << c.align << "\">";
-  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \"padding-left:10px; align=\"" << c.align << "\">";
+  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
     
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
