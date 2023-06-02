@@ -105,27 +105,6 @@ void Student::setGradeableItemGradeforintegrity(GRADEABLE_ENUM g, int i, float v
   itr->second[i] = ItemGrade(value,late_days_used,note,status,temp,academic_integrity);
 }
 
-// void Student::setGradeableItemGradeforinquiry(GRADEABLE_ENUM g, int i, float value, bool inquiry,
-//                                     int late_days_used, const std::string &note, const std::string &status) {
-//   assert (i >= 0 && i < GRADEABLES[g].getCount());
-//   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
-//   assert (itr != all_item_grades.end());
-//   assert (int(itr->second.size()) > i);
-    
-//   itr->second[i] = ItemGrade(value,late_days_used,note,status, inquiry);
-// }
-
-// void Student::setGradeableItemGrade_status(GRADEABLE_ENUM g, int i, float value, bool bad_status, bool override, bool inquiry,
-//                                     int late_days_used, const std::string &note, const std::string &status) {
-//   assert (i >= 0 && i < GRADEABLES[g].getCount());
-//   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
-//   assert (itr != all_item_grades.end());
-//   assert (int(itr->second.size()) > i);
-    
-//   itr->second[i] = ItemGrade(value,late_days_used,note,status, bad_status, override, inquiry);
-// }
-
-
 void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event, int late_days_used, const std::string &note, const std::string &status) {
   assert (i >= 0 && i < GRADEABLES[g].getCount());
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);

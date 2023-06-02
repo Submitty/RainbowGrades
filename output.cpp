@@ -1058,20 +1058,13 @@ void start_table_output( bool /*for_instructor*/,
           details = this_student->getGradeableItemGrade(g,j).getNote();
           std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
           std::string event = this_student->getGradeableItemGrade(g,j).getEvent();
-          // bool override = this_student->getGradeableItemGrade(g,j).getOverride();
-          //   bool bad_status = this_student->getGradeableItemGrade(g,j).getBadStatus();
-          //   bool inquiry = this_student->getGradeableItemGrade(g,j).getInquiry();
-
-            bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
-            // std::cout << "output 1062 print status " << status << std::endl;
-            
+          bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
           if (status.find("Bad") != std::string::npos) {
             details += " " + status;
           }
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
           assert (color.size()==6);
-//          table.set(myrow,counter++,TableCell(color,grade,1,details,late_days_used,visible));
-            table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity));
+          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 

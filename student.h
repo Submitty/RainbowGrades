@@ -26,23 +26,6 @@ public:
     event = e;
     academic_integrity = ai;
     
-    // if (event == "Bad")
-    // {
-    //   bad_status = true;
-    //   override = inquiry = false;
-    // }
-    // else if ( event = "Overridden")
-    // {
-    //   override = true;
-    //   bad_status = inquiry = false;
-    // }
-    // else if (event = "Open")
-    // {
-    //   inquiry = true;
-    //   bad_status = override = false;
-    // }
-
-
     if (s != "UNKONWN") {
       status = s;
     }
@@ -73,21 +56,11 @@ public:
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
   const std::string& getEvent() const { return event; }
-     // bool getOverride() const { return override; }
-     // bool getBadStatus() const { return bad_status; }
-     // bool getInquiry() const { return inquiry; }
-     bool getAcademicIntegrity() const { return academic_integrity; }
-    // inquiry should set both true and false b/c once inquiry has been resolved, it should change back to false;
-    
-    
-    
+  bool getAcademicIntegrity() const { return academic_integrity; }
     
 private:
   float value;
   int late_days_used;
-  // bool override;
-  // bool bad_status;
-  // bool inquiry;
   bool academic_integrity;
   std::string note;
   std::string status;

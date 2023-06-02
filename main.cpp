@@ -1293,7 +1293,6 @@ void load_student_grades(std::vector<Student*> &students) {
     // non gradeables
     if (token == "user_id") {
       s->setUserName(j[token].get<std::string>());
-      std::cout << "This is username line 1296 on main " << s->getUserName() << std::endl;
     } else if (token == "legal_first_name" || token == "legal_given_name") {
       s->setLegalFirstName(j[token].get<std::string>());
     } else if (token == "legal_last_name" || token == "legal_family_name") {
@@ -1473,7 +1472,6 @@ void load_student_grades(std::vector<Student*> &students) {
                         {
                           event = "Overridden";
                         }
-
                         std::string inquiry = itr2->value("inquiry", "");
                         if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != ""))
                         {

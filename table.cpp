@@ -117,9 +117,6 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
 
 
 
-//"<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa; outline:2px solid #FC0204; outline-offset: -2px; \">\n"
-//#42f55a   #4287f5
-
 std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   assert (c.color.size() == 6);
     
