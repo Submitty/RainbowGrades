@@ -121,10 +121,12 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   assert (c.color.size() == 6);
     
     std::string outline = "";
+    std::string mark = "";
     if (c.academic_integrity)
     {
       std::cout << "table.cpp line 112 : academic_integrity" << std::endl;
         outline = "outline:4px solid #0a0a0a; outline-offset: -4px;";
+        mark = "@";
     }
     else if (c.override)
     {
@@ -149,7 +151,12 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   }
   ostr << "<font size=-1>";
   std::string mynote = c.getNote();
-  if ((c.data == "" && mynote=="")
+
+  if (c.academic_integrity)
+  {
+    ostr << mark;
+  }
+  else if ((c.data == "" && mynote=="")
       || c.visible==CELL_CONTENTS_HIDDEN
       || (c.visible==CELL_CONTENTS_VISIBLE_INSTRUCTOR && GLOBAL_instructor_output == false) 
       || (c.visible==CELL_CONTENTS_VISIBLE_STUDENT    && GLOBAL_instructor_output == true)) {
@@ -161,12 +168,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
       else { ostr << " " << std::string(c.late_days_used,'*'); }
     }
       
-    if (c.academic_integrity)
-    {
-      std::cout << "table.cpp line 139 print out @ has passed" << std::endl;
-        ostr << " @";
-    }
-      
+    
     if (mynote.length() > 0 &&
         mynote != " " &&
         (global_details 
@@ -249,15 +251,10 @@ void Table::output(std::ostream& ostr,
           ostr << "" << MESSAGES[i] << "<br>\n";
       }
       if (last_update != "") {
-//          ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
-          ostr << "<em>Information last updated: this should pop up" << last_update << "</em><br>\n";
+          ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
       }
       ostr << "&nbsp;<br>\n";
-
-
-//      ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa; outline:2px solid #FC0204; outline-offset: -2px; \">\n";
       ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa;\">\n";
-      //  ostr << "<table border=0 cellpadding=3 cellspacing=2 style=\"background-color:#aaaaaa\">\n";
   }
   
   if (transpose) {
