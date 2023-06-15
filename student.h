@@ -84,6 +84,7 @@ public:
   
   // registration status
   const std::string& getSection()           const { return section; }
+  const std::string& getCourseSectionId()           const { return course_section_id; }
   int getRotatingSection()   const { return rotating_section; }
   bool getAudit()            const { return audit; }
   bool getWithdraw()         const { return withdraw; }
@@ -153,6 +154,7 @@ public:
 
   // registration status
   void setSection(std::string x) { section = x; }
+  void setCourseSectionId(std::string x) { course_section_id = x; }
   void setRotatingSection(int x) { rotating_section = x; }
   void setAudit() { audit = true; }
   void setWithdraw() { withdraw = true; }
@@ -231,6 +233,7 @@ private:
 
     // registration status
   std::string section;
+  std::string course_section_id;
   int rotating_section;
   bool audit;
   bool withdraw;
