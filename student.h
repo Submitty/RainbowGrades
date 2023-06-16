@@ -154,7 +154,7 @@ public:
 
   // registration status
   void setSection(std::string x) { section = x; }
-  void setCourseSectionId(std::string x) { course_section_id = x; }
+  void setCourseSectionId(const std::string &x) { course_section_id = x; }
   void setRotatingSection(int x) { rotating_section = x; }
   void setAudit() { audit = true; }
   void setWithdraw() { withdraw = true; }
