@@ -119,11 +119,11 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         outline = "outline:4px solid #0a0a0a; outline-offset: -4px;";
         mark = "@";
     } else if (c.override){
-      outline = "outline:4px solid #fcca03; outline-offset: -4px;";
+        outline = "outline:4px solid #fcca03; outline-offset: -4px;";
     } else if (c.inquiry){
         outline = "outline:4px dashed #1cfc03; outline-offset: -4px;";
     } else if (c.bad_status){
-      outline = "outline:4px solid #fc0303; outline-offset: -4px;";
+        outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
