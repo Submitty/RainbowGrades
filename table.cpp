@@ -115,28 +115,18 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     
     std::string outline = "";
     std::string mark = "";
-    if (c.academic_integrity)
-    {
-      std::cout << "table.cpp line 112 : academic_integrity" << std::endl;
+    if (c.academic_integrity){
         outline = "outline:4px solid #0a0a0a; outline-offset: -4px;";
         mark = "@";
-    }
-    else if (c.override)
-    {
+    } else if (c.override){
       outline = "outline:4px solid #fcca03; outline-offset: -4px;";
-    }
-    else if (c.inquiry)
-    {
-      std::cout << "table.cpp line 112 : inquiry" << std::endl;
+    } else if (c.inquiry){
         outline = "outline:4px dashed #1cfc03; outline-offset: -4px;";
-    }
-    else if (c.bad_status)
-    {
+    } else if (c.bad_status){
       outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
-//  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << ";  outline:2px solid #4287f5; outline-offset: -2px; \" align=\"" << c.align << "\">";
   ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
     
   if (0) { //rotate == 90) {
