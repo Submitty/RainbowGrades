@@ -1320,6 +1320,15 @@ void load_student_grades(std::vector<Student*> &students) {
             a = "null";
           }
           s->setSection(a);
+    } else if (token == "course_section_id") {
+          std::string a;
+          if(!j[token].is_null()) {
+           a = j[token].get<std::string>();
+          }
+          else{
+            a = "null";
+          }
+          s->setCourseSectionId(a);
     } else if (token == "rotating_section") {
       int a = -1;
       if (!j[token].is_null()) {
