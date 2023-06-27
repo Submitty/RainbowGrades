@@ -973,7 +973,6 @@ void start_table_output( bool /*for_instructor*/,
       color = GradeColor(g);
       if (this_student->getMossPenalty() < -0.01) {
         g += "@";
-          std::cout << this_student->getUserName() << std::endl;
       }
       assert (color.size()==6);
       table.set(myrow,counter++,TableCell(color,g,"",0,CELL_CONTENTS_VISIBLE,"center"));
