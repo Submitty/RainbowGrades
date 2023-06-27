@@ -490,8 +490,6 @@ void Student::mossify(const std::string &gradeable, float penalty) {
 
   moss_penalty += -0.0000001;
   moss_penalty += -average_letter_grade * penalty;
-
-    std::cout << "Moss penalty: student.cpp 481 " << moss_penalty << std::endl;
   std::stringstream foo;
   foo << std::setprecision(2) << std::fixed << penalty;
 
