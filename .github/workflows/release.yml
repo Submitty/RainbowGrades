@@ -9,15 +9,20 @@ jobs:
     name: Dispatch Update
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/repository-dispatch@v2
+      - name: Send request
         if: ${{ github.repository_owner == 'Submitty' }}
-        with:
-          event-type: repo-release
-          token: ${{ secrets.PAT }}
-          repository: ${{ github.repository_owner }}/Submitty
-          client-payload: '{
+        run: >
+          curl -L
+          -X POST
+          -H "Accept: application/vnd.github+json"
+          -H "Authorization: Bearer ${{ secrets.PAT }}"
+          -H "X-GitHub-Api-Version: 2022-11-28"
+          https://api.github.com/repos/${{ github.repository_owner }}/Submitty/dispatches
+          -d '{
+            "event_type": "repo-release",
+            "client_payload": {
               "repo_name": ${{ toJSON(github.event.repository.name) }},
               "repo": ${{ toJSON(github.event.repository.full_name) }},
               "tag": ${{ toJSON(github.event.release.tag_name) }}
-            }'
-
+            }
+          }'
