@@ -9,7 +9,7 @@ jobs:
     name: Dispatch Update
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/repository-dispatch@v2
+      - uses: Submitty/peter-evans-repository-dispatch
         if: ${{ github.repository_owner == 'Submitty' }}
         with:
           event-type: repo-release
