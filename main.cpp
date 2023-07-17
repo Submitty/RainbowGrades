@@ -19,12 +19,10 @@ int GLOBAL_ACTIVE_TEST_ZONE = 0;
 std::string GLOBAL_ACTIVE_TEST_ID = "";
 
 #include "student.h"
-#include "iclicker.h"
 #include "gradeable.h"
 #include "grade.h"
 #include <nlohmann/json.hpp>
 
-// defined in iclicker.cpp
 std::string ReadQuoted(std::istream &istr);
 void suggest_curves(std::vector<Student*> &students);
 void assign_ranks(std::vector<Student*> &students);
@@ -36,7 +34,6 @@ std::vector<std::string> OMIT_SECTION_FROM_STATS;
 //====================================================================
 // DIRECTORIES & FILES
 
-std::string ICLICKER_ROSTER_FILE              = "./iclicker_Roster.txt";
 std::string OUTPUT_FILE                       = "./output.html";
 std::string OUTPUT_CSV_FILE                   = "./output.csv";
 std::string CUSTOMIZATION_FILE                = "./customization_no_comments.json";
@@ -61,9 +58,6 @@ bool  TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT = false;
 bool  LOWEST_TEST_COUNTS_HALF = false;
 
 int QUIZ_NORMALIZE_AND_DROP = 0;
-
-std::vector<std::string> ICLICKER_QUESTION_NAMES;
-float MAX_ICLICKER_TOTAL;
 
 std::map<std::string,float> CUTOFFS;
 std::map<GRADEABLE_ENUM,float> OVERALL_FAIL_CUTOFFS;
@@ -134,7 +128,6 @@ bool DISPLAY_MOSS_DETAILS = false;
 bool DISPLAY_FINAL_GRADE = false;
 bool DISPLAY_GRADE_SUMMARY = false;
 bool DISPLAY_GRADE_DETAILS = false;
-bool DISPLAY_ICLICKER = false;
 bool DISPLAY_LATE_DAYS = false;
 bool DISPLAY_RANK_TO_INDIVIDUAL = false;
 
@@ -250,10 +243,6 @@ bool by_section(const Student *s1, const Student *s2) {
   if (S1 < S2) return true;
   if (S1 > S2) return false;
     return by_name(s1,s2);
-}
-
-bool by_iclicker(const Student* s1, const Student* s2) {
-  return (s1->getIClickerTotalFromStart() > s2->getIClickerTotalFromStart());
 }
 
 
@@ -395,8 +384,6 @@ void preprocesscustomizationfile(const std::string &now_string,
         DISPLAY_GRADE_SUMMARY = true;
       } else if (token == "grade_details") {
         DISPLAY_GRADE_DETAILS = true;
-      } else if (token == "iclicker") {
-        DISPLAY_ICLICKER = true;
 
       } else {
         std::cout << "OOPS " << token << std::endl;
@@ -789,8 +776,6 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_GRADE_SUMMARY = true;
     } else if (token == "grade_details") {
       DISPLAY_GRADE_DETAILS = true;
-    } else if (token == "iclicker") {
-      DISPLAY_ICLICKER = true;
     } else if (token == "display_rank_to_individual"){
       DISPLAY_RANK_TO_INDIVIDUAL = true;
     } else {
@@ -866,8 +851,6 @@ bool OmitSectionFromStats(const std::string &section) {
 void MakeRosterFile(std::vector<Student*> &students) {
 
   std::sort(students.begin(),students.end(),by_name);
-
-  std::ofstream ostr("./iclicker_Roster.txt");
 
 
   for (unsigned int i = 0; i < students.size(); i++) {
@@ -958,7 +941,6 @@ void processcustomizationfile(const std::string &now_string,
 
   std::string token,token2;
 
-  std::vector<std::vector<std::vector<iClickerQuestion> > > iclicker_questions(MAX_LECTURES+1);
   
   for (nlohmann::json::iterator itr = j.begin(); itr != j.end(); itr++) {
     token = itr.key();
@@ -1095,36 +1077,7 @@ void processcustomizationfile(const std::string &now_string,
     assert (GLOBAL_earned_late_days.size() == 0 || tmp > GLOBAL_earned_late_days.back());
         GLOBAL_earned_late_days.push_back(tmp);
     }
-  } else if (token == "iclicker") {
-    for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
-      std::string temp = itr2.key();
-      std::vector<nlohmann::json> iclickerLectures = j[token][temp];
-      int which_lecture = std::stoi(temp);
 
-      //Each step through this loop is one {} line inside a lecture, the naming of lecture vs lectures here is confusing
-      for (std::size_t i = 0; i < iclickerLectures.size(); i++) {
-        nlohmann::json iclickerLecture = iclickerLectures[i];
-        iclicker_questions[which_lecture].push_back(std::vector<iClickerQuestion>());
-
-
-        int which_column = iclickerLecture["column"].get<int>();
-        std::string correct_answer = iclickerLecture["answer"].get<std::string>();
-        assert (which_lecture >= 1 && which_lecture <= MAX_LECTURES);
-
-
-        //Code to support multiple iClicker files for one question
-        nlohmann::json j_filenames = iclickerLecture["file"];
-        std::vector<std::string> filenames;
-        for (std::size_t k = 0; k < j_filenames.size(); k++) {
-          filenames.push_back(j_filenames[k].get<std::string>());
-        }
-
-        for (std::size_t k=0; k<filenames.size(); k++) {
-          iclicker_questions[which_lecture].back().push_back(iClickerQuestion(filenames[k], which_column, correct_answer));
-        }
-
-      }
-    }
   } else if (token == "audit") {
     std::vector<nlohmann::json> audit_list = itr.value();
     for (std::size_t i = 0; i < audit_list.size(); i++) {
@@ -1222,7 +1175,6 @@ void processcustomizationfile(const std::string &now_string,
     LoadExamSeatingFile(GLOBAL_EXAM_SEATING_COUNT,GLOBAL_EXAM_SEATING,GLOBAL_SEATING_SPACING,GLOBAL_LEFT_RIGHT_HANDEDNESS,students);
   }
   MakeRosterFile(students);
-  AddClickerScores(students,iclicker_questions);
 }
 
 
@@ -1730,10 +1682,6 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
       
       
     }
-    
-    if (MAX_ICLICKER_TOTAL > 0) {
-      ostr2 << "<em>recent iclicker = " << students[S]->getIClickerRecent() << " / 12.0</em>" << std::endl;
-    }
 #endif
 
 
@@ -1893,14 +1841,9 @@ int main(int argc, char* argv[]) {
     DISPLAY_FINAL_GRADE = false;
     DISPLAY_GRADE_SUMMARY = false;
     DISPLAY_GRADE_DETAILS = false;
-    DISPLAY_ICLICKER = false;
 
     std::sort(students.begin(),students.end(),by_name);
 
-  } else if (GLOBAL_sort_order == std::string("by_iclicker")) {
-    std::sort(students.begin(),students.end(),by_iclicker);
-
-    DISPLAY_ICLICKER = true;
 
   } else if (GLOBAL_sort_order == std::string("by_test_and_exam")) {
     std::sort(students.begin(),students.end(),by_test_and_exam);
@@ -1916,7 +1859,7 @@ int main(int argc, char* argv[]) {
     }
     else {
       std::cerr << "UNKNOWN SORT OPTION " << GLOBAL_sort_order << std::endl;
-      std::cerr << "  Usage: " << argv[0] << " [ by_overall | by_name | by_section | by_zone | by_iclicker | by_lab | by_exercise | by_reading | by_worksheet | by_hw | by_test | by_exam | by_test_and_exam ]" << std::endl;
+      std::cerr << "  Usage: " << argv[0] << " [ by_overall | by_name | by_section | by_zone | by_lab | by_exercise | by_reading | by_worksheet | by_hw | by_test | by_exam | by_test_and_exam ]" << std::endl;
       exit(1);
     }
   }
