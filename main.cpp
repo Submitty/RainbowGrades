@@ -773,7 +773,7 @@ void preprocesscustomizationfile(const std::string &now_string,
   
   //std::cout << "3" << std::endl;
   
-  // get display optioons
+  // get display options
   std::vector<std::string> displays = j["display"].get<std::vector<std::string> >();
   for (std::size_t i=0; i<displays.size(); i++) {
   token = displays[i];
