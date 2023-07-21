@@ -137,9 +137,6 @@ std::vector<std::string> MESSAGES;
 
 //====================================================================
 
-std::ofstream priority_stream("priority.txt");
-std::ofstream late_days_stream("late_days.txt");
-
 //void PrintExamRoomAndZoneTable(std::ofstream &ostr, Student *s, const nlohmann::json &special_message);
 void PrintExamRoomAndZoneTable(const std::string &id, nlohmann::json &mj, Student *s, const nlohmann::json &special_message);
 
@@ -848,59 +845,6 @@ bool OmitSectionFromStats(const std::string &section) {
 }
 
 
-void MakeRosterFile(std::vector<Student*> &students) {
-
-  std::sort(students.begin(),students.end(),by_name);
-
-
-  for (unsigned int i = 0; i < students.size(); i++) {
-    std::string foo = "active";
-    if (students[i]->getLastName() == "") continue;
-
-    //XXX: Is this still being called? We definitely can have more than 10 sections in general...
-    //if (students[i]->getSection() <= 0 || students[i]->getSection() > 10) continue;
-    if (students[i]->getSection() == "null") continue;
-    if (students[i]->getGradeableItemGrade(GRADEABLE_ENUM::TEST,0).getValue() < 1) {
-      //std::cout << "STUDENT DID NOT TAKE TEST 1  " << students[i]->getUserName() << std::endl;
-      foo = "inactive";
-    }
-    std::string room = students[i]->getExamRoom();
-    std::string zone = students[i]->getExamZone();
-    if (room == "") room = "DCC 308";
-    if (zone == "") zone = "SEE INSTRUCTOR";
-
-
-
-#if 0
-    ostr 
-      << std::left << std::setw(15) << students[i]->getPreferredLastName()
-      << std::left << std::setw(13) << students[i]->getPreferredFirstName()
-      << std::left << std::setw(12) << students[i]->getUserName()
-      << std::left << std::setw(12) << room
-      << std::left << std::setw(10) << zone
-      << std::endl;
-
-    ostr 
-      << students[i]->getPreferredLastName() << ","
-      << students[i]->getPreferredFirstName() << ","
-      << students[i]->getUserName() << std::endl;
-
-#else
-
-    ostr 
-      << students[i]->getSection()   << "\t"
-      << students[i]->getPreferredLastName()     << "\t"
-      << students[i]->getPreferredFirstName() << "\t"
-      << students[i]->getUserName()  << "\t"
-      //<< foo 
-      << std::endl;
- 
-#endif
-  }
-
-}
-
-
 // defined in zone.cpp
 void LoadExamSeatingFile(const std::string &zone_counts_filename,
                          const std::string &zone_assignments_filename,
@@ -1174,7 +1118,6 @@ void processcustomizationfile(const std::string &now_string,
   if (GLOBAL_EXAM_SEATING_COUNT != "" && GLOBAL_EXAM_SEATING != "") {
     LoadExamSeatingFile(GLOBAL_EXAM_SEATING_COUNT,GLOBAL_EXAM_SEATING,GLOBAL_SEATING_SPACING,GLOBAL_LEFT_RIGHT_HANDEDNESS,students);
   }
-  MakeRosterFile(students);
 }
 
 
@@ -1670,20 +1613,6 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
     mj["zone"] = "A";
 
     ostr2_json << mj.dump(4);*/
-    
-
-#if 0
-    if (students[S]->hasPriorityHelpStatus()) {
-      ostr2 << "<h3>PRIORITY HELP QUEUE</h3>" << std::endl;
-      priority_stream << std::left << std::setw(15) << students[S]->getSection()
-                      << std::left << std::setw(15) << students[S]->getUserName() 
-                      << std::left << std::setw(15) << students[S]->getPreferredFirstName()
-                      << std::left << std::setw(15) << students[S]->getPreferredLastName() << std::endl;
-      
-      
-    }
-#endif
-
 
     nlohmann::json::iterator special_message_itr = GLOBAL_CUSTOMIZATION_JSON.find("special_message");
     nlohmann::json special_message;
@@ -1695,24 +1624,6 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
     PrintExamRoomAndZoneTable(GLOBAL_ACTIVE_TEST_ID, mj,students[S],special_message);
 
     ostr2_json << mj.dump(4);
-
-    int prev = students[S]->getAllowedLateDays(0);
-
-    for (int i = 1; i <= MAX_LECTURES; i++) {
-      int tmp = students[S]->getAllowedLateDays(i);
-      if (prev != tmp) {
-
-        std::map<int,Date>::iterator itr = LECTURE_DATE_CORRESPONDENCES.find(i);
-        if (itr == LECTURE_DATE_CORRESPONDENCES.end()) {
-          continue;
-        }
-        Date &d = itr->second;
-        late_days_stream << students[S]->getUserName() << ","
-                         << d.getStringRep() << "," 
-                         << tmp << std::endl;
-        prev = tmp;
-      }
-    }
   }
 }
 
