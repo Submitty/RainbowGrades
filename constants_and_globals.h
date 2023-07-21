@@ -15,7 +15,6 @@ extern bool DISPLAY_MOSS_DETAILS;
 extern bool DISPLAY_FINAL_GRADE;
 extern bool DISPLAY_GRADE_SUMMARY;
 extern bool DISPLAY_GRADE_DETAILS;
-extern bool DISPLAY_ICLICKER;
 extern bool DISPLAY_LATE_DAYS;
 extern bool DISPLAY_RANK_TO_INDIVIDUAL;
 
@@ -52,13 +51,6 @@ extern int took_final;
 extern int dropped;
 extern int auditors;
 extern float LATE_DAY_PERCENTAGE_PENALTY;
-
-// ==========================================================
-#define ICLICKER_RECENT 12
-#define ICLICKER_PRIORITY 0.666
-extern float MAX_ICLICKER_TOTAL;
-
-
 
 // ==========================================================
 // PROTOTYPES 
