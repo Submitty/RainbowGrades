@@ -29,7 +29,7 @@ Student::Student() {
     GRADEABLE_ENUM g = ALL_GRADEABLES[i];
     all_item_grades[g]   = std::vector<ItemGrade>(GRADEABLES[g].getCount(),ItemGrade(0));
   }
-  // (iclicker defaults to empty map)
+
   earn_late_days_from_polls = true; //TODO: Change this to false, make customization.json option
 
   rotating_section = -1;
@@ -334,7 +334,6 @@ int Student::getAllowedLateDays(int which_lecture) const {
   //   60 questions => 4 late days
   //   90 qustions  => 5 late days
 
-  //float total = getIClickerTotal(which_lecture,0);
   float total = 0;
   //TODO: Condition may need to change to use a global depending on how we do it in customization.json
   if(earn_late_days_from_polls){
@@ -525,52 +524,6 @@ float Student::getPollPoints() const {
 }
 
 // =============================================================================================
-
-
-bool iclickertotalhelper(const std::string &clickername,int which_lecture) {
-  std::stringstream ss(clickername);
-  int foo;
-  ss >> foo;
-  if (foo <= which_lecture) return true;
-  return false;
-}
-
-
-void Student::addIClickerAnswer(const std::string& which_question, char which_answer, iclicker_answer_enum grade) { 
-  iclickeranswers[which_question] = std::make_pair(which_answer,grade);  }
-
-float Student::getIClickerRecent() const {
-  if (getUserName() == "PERFECT") { return std::min((int)ICLICKER_QUESTION_NAMES.size(),ICLICKER_RECENT); }
-  return getIClickerTotal(100, std::max(0,(int)ICLICKER_QUESTION_NAMES.size()-ICLICKER_RECENT));
-}
-
-float Student::getIClickerTotal(int which_lecture, int start) const {
-  if (getUserName() == "PERFECT") { return MAX_ICLICKER_TOTAL; } 
-  float ans = 0;
-  for (unsigned int i = start; i < ICLICKER_QUESTION_NAMES.size(); i++) {
-    std::map<std::string,std::pair<char,iclicker_answer_enum> >::const_iterator itr = iclickeranswers.find(ICLICKER_QUESTION_NAMES[i]);
-    if (itr == iclickeranswers.end()) continue;
-    if (!iclickertotalhelper(itr->first,which_lecture)) continue;
-    if (itr->second.second == ICLICKER_CORRECT ||
-        itr->second.second == ICLICKER_PARTICIPATED) {
-      ans += 1.0;
-    } else if (itr->second.second == ICLICKER_INCORRECT) {
-      ans += 0.5;
-    }
-  }
-  return ans;
-}
-
-std::pair<std::string,iclicker_answer_enum> Student::getIClickerAnswer(const std::string& which_question) const {
-  std::pair<std::string,iclicker_answer_enum> noanswer = std::make_pair("",ICLICKER_NOANSWER);
-  std::map<std::string,std::pair<char,iclicker_answer_enum> >::const_iterator itr = iclickeranswers.find(which_question); 
-  if (itr == iclickeranswers.end()) return noanswer;
-  
-  char x = itr->second.first;
-  std::string tmp(1,x);
-  iclicker_answer_enum val = itr->second.second;
-  return std::make_pair(tmp,val);
-}
 
 void Student::incrementPollsCorrect(unsigned int amount=1){
   polls_correct += amount;
