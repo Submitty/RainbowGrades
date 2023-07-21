@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <sstream>
 
-#include "iclicker.h"
 #include "gradeable.h"
 #include "constants_and_globals.h"
 
@@ -188,16 +187,8 @@ public:
 
 
   // ---------------
-  // I-CLICKER
-  
-  void addIClickerAnswer(const std::string& which_question, char which_answer, iclicker_answer_enum grade);
-  float getIClickerRecent() const;
-  float getIClickerTotalFromStart() const { return getIClickerTotal(100,0);  }
-  float getIClickerTotal(int which_lecture, int start) const;
-  bool hasPriorityHelpStatus() const { 
-    return (getIClickerRecent() >= ICLICKER_PRIORITY * float (ICLICKER_RECENT));  
-  }
-  std::pair<std::string,iclicker_answer_enum>  getIClickerAnswer(const std::string& which_question) const;
+  // POLLS
+
   void incrementPollsCorrect(unsigned int amount);
   void incrementPollsIncorrect(unsigned int amount);
 
@@ -241,7 +232,6 @@ private:
 
   // grade data
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> > all_item_grades;
-  std::map<std::string,std::pair<char,iclicker_answer_enum> > iclickeranswers;
   
   std::vector<std::string> zones;
   float moss_penalty;
