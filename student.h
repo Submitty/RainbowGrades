@@ -2,6 +2,7 @@
 #define _STUDENT_H_
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <cassert>
