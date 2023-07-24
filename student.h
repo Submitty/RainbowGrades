@@ -19,10 +19,13 @@
 
 class ItemGrade {
 public:
-  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="") {
+  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false) {
     value = v;
     late_days_used = ldu;
     note = n;
+    event = e;
+    academic_integrity = ai;
+    
     if (s != "UNKONWN") {
       status = s;
     }
@@ -52,11 +55,16 @@ public:
   int getLateDaysUsed() const { return late_days_used; }
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
+  const std::string& getEvent() const { return event; }
+  bool getAcademicIntegrity() const { return academic_integrity; }
+    
 private:
   float value;
   int late_days_used;
+  bool academic_integrity;
   std::string note;
   std::string status;
+  std::string event;
 };
 
 //====================================================================
@@ -163,6 +171,8 @@ public:
   // grade data
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
   void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status="");
+  void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
+  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="");
 
   void mossify(const std::string &gradeable, float penalty);
 

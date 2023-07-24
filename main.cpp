@@ -1355,8 +1355,25 @@ void load_student_grades(std::vector<Student*> &students) {
                         if (status.find("Bad") != std::string::npos) {
                           assert (late_days_charged == 0);
                         }
+
+                        std::string event;
+                        std::string status_check = itr2->value("status", "");
+                        if (status_check == "Bad")
+                        {
+                          event = "Bad";
+                        }
+                        if (status_check == "Overridden")
+                        {
+                          event = "Overridden";
+                        }
+                        std::string inquiry = itr2->value("inquiry", "");
+                        if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != ""))
+                        {
+                          assert(inquiry == "Open");
+                          event = "Open";
+                        }
                         if (GRADEABLES[g].isReleased(gradeable_id)) {
-                          s->setGradeableItemGrade(g,which,score,late_days_charged,other_note,status);
+                          s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status);
                         }
       }
 
