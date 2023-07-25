@@ -13,6 +13,8 @@
 #include "gradeable.h"
 #include "constants_and_globals.h"
 
+extern std::vector<float> GLOBAL_earned_late_days;
+
 //====================================================================
 //====================================================================
 // stores the grade for a single gradeable

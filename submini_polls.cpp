@@ -14,8 +14,6 @@
 #include "student.h"
 #include "submini_polls.h"
 
-std::vector<float> GLOBAL_earned_late_days;
-
 std::map<std::string,std::map<std::string,LectureResult> > GLOBAL_students;
 std::map<int,std::pair<std::string,int> > GLOBAL_poll_id_map;
 std::map<std::string,std::map<int,Poll> > GLOBAL_lectures;

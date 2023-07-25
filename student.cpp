@@ -2,6 +2,7 @@
 
 extern std::map<GRADEABLE_ENUM,float> OVERALL_FAIL_CUTOFFS;
 const std::string GradeColor(const std::string &grade);
+std::vector<float> GLOBAL_earned_late_days;
 
 // =============================================================================================
 // =============================================================================================

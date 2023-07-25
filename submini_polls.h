@@ -2,7 +2,6 @@
 #include <string>
 #include "student.h"
 
-extern std::vector<float> GLOBAL_earned_late_days;
 
 class Poll {
 public:
