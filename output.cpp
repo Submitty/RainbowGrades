@@ -12,7 +12,6 @@
 #include <cmath>
 
 #include "student.h"
-#include "iclicker.h"
 #include "grade.h"
 #include "table.h"
 #include "benchmark.h"
@@ -683,30 +682,6 @@ void start_table_output( bool /*for_instructor*/,
   }
 
 
-
-
-  // ----------------------------
-  // ICLICKER
-  if (DISPLAY_ICLICKER && ICLICKER_QUESTION_NAMES.size() > 0) {
-
-    student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","iclicker status"));
-    student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
-    student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ICLICKER TOTAL"));
-    //student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ICLICKER RECENT"));
-    student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
-    
-    /*
-      ostr << "<td align=center bgcolor=888888>&nbsp;</td>" 
-           << "<td align=center colspan=" << ICLICKER_QUESTION_NAMES.size() << ">ICLICKER QUESTIONS<br>CORRECT(green)=1.0, INCORRECT(red)=0.5, POLL(yellow)=1.0, NO ANSWER(white)=0.0<br>30.0 iClicker points = 3rd late day, 60.0 iClicker pts = 4th late day, 90.0 iClicker pts = 5th late day<br>&ge;8.0/12.0 most recent=Priority Help Queue (iClicker status highlighted in blue)</td>";
-    */
-
-    for (unsigned int i = 0; i < ICLICKER_QUESTION_NAMES.size(); i++) {
-      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff",ICLICKER_QUESTION_NAMES[i]));
-    }
-    student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
-
-  }
-
   // =====================================================================================================
   // =====================================================================================================
   // HORIZONTAL GRAY DIVIDER
@@ -1118,68 +1093,6 @@ void start_table_output( bool /*for_instructor*/,
         table.set(myrow,counter++,TableCell(grey_divider));
       }
     }
-
-
-
-    // ----------------------------
-    // ICLICKER
-    if (DISPLAY_ICLICKER && ICLICKER_QUESTION_NAMES.size() > 0) {
-
-      if (false) { //this_student->getRemoteID().size() != 0) { // && this_student->hasPriorityHelpStatus()) {
-        table.set(myrow,counter++,TableCell("ccccff","registered"));
-        //} else if (this_student->getRemoteID() != "") {
-        //table.set(myrow,counter++,TableCell("ffffff","registered"));
-      } else if (this_student->getLastName() == "") {
-        table.set(myrow,counter++,TableCell("ffffff"/*default_color*/,""));
-      } else {
-        table.set(myrow,counter++,TableCell("ffcccc","no iclicker registration"));
-      }
-      table.set(myrow,counter++,TableCell(grey_divider));
-
-      if (this_student->getLastName() != "" ||
-          this_student->getUserName() == "PERFECT") {
-        float grade = this_student->getIClickerTotalFromStart();
-        std::string color = coloritcolor(grade,
-                                         MAX_ICLICKER_TOTAL,
-                                         0.90*MAX_ICLICKER_TOTAL,
-                                         0.80*MAX_ICLICKER_TOTAL,
-                                         0.60*MAX_ICLICKER_TOTAL,
-                                         0.40*MAX_ICLICKER_TOTAL);
-        table.set(myrow,counter++,TableCell(color,grade,1));
-        /*
-        grade = this_student->getIClickerRecent();
-        color = coloritcolor(grade,
-                             ICLICKER_RECENT,
-                             0.90*ICLICKER_RECENT,
-                             0.80*ICLICKER_RECENT,
-                             0.60*ICLICKER_RECENT,
-                             0.40*ICLICKER_RECENT);
-        table.set(myrow,counter++,TableCell(color,grade,1));
-        */
-      } else {
-        color="ffffff"; // default_color;
-        table.set(myrow,counter++,TableCell(color,""));
-        //table.set(myrow,counter++,TableCell(color,""));
-      }
-
-      table.set(myrow,counter++,TableCell(grey_divider));
-      for (unsigned int i = 0; i < ICLICKER_QUESTION_NAMES.size(); i++) {
-        std::pair<std::string,float> answer = this_student->getIClickerAnswer(ICLICKER_QUESTION_NAMES[i]);
-        std::string thing = answer.first;
-        std::string color = "ffffff"; //default_color;
-        if (answer.second == ICLICKER_CORRECT) {
-          color = "aaffaa"; 
-        } else if (answer.second == ICLICKER_PARTICIPATED) {
-          color = "ffffaa"; 
-        } else if (answer.second == ICLICKER_INCORRECT) {
-          color = "ffaaaa"; 
-        } else {
-          assert (answer.second == ICLICKER_NOANSWER);
-        }
-        table.set(myrow,counter++,TableCell(color,thing,"",0,CELL_CONTENTS_VISIBLE_INSTRUCTOR,"center"));
-      }
-      table.set(myrow,counter++,TableCell(grey_divider));
-    }
   }
 
 
@@ -1273,36 +1186,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
       }
     }
   }
-
-  if (GLOBAL_instructor_output == false &&
-      DISPLAY_ICLICKER) {
-
-    //ostr << "<p><b>IClicker Legend:</b><br> &nbsp;&nbsp; CORRECT(green)=1.0 <br> &nbsp;&nbsp; INCORRECT(red)=0.5 <br>&nbsp;&nbsp; POLL(yellow)=1.0 <br> &nbsp;&nbsp; NO ANSWER(white)=0.0<br>" << std::endl;
-    ostr << "<p><b>Lecture Poll Scoring:</b><br> &nbsp;&nbsp; CORRECT=1.0 <br> &nbsp;&nbsp; INCORRECT=0.5 <br> &nbsp;&nbsp; NO ANSWER=0.0<br>" << std::endl;
-    if (s != NULL) {
-      ostr << "<b>Initial number of allowed late days: </b>" << s->getDefaultAllowedLateDays() <<  "<br>" << std::endl;
-    }
-    if(!GLOBAL_earned_late_days.empty()) {
-      ostr << "<b>Extra late days earned after iclicker points:</b> ";
-      for (std::size_t i = 0; i < GLOBAL_earned_late_days.size(); i++) {
-        ostr << GLOBAL_earned_late_days[i];
-        if (i < GLOBAL_earned_late_days.size() - 1) {
-          ostr << ", ";
-        }
-      }
-      ostr << "<br>" << std::endl;
-    }
-    ostr << "</p>" << std::endl;
-
-
-    //ostr << GLOBAL_earned_late
-
-    //25.0 iClicker points = 3rd late day, 50.0 iClicker pts = 4th late day, 75.0 iClicker pts = 5th late day<br>&ge;8.0/12.0 most recent=Priority Help Queue (iClicker status highlighted in blue)</td>";
-  }
-
   ostr << "<p>&nbsp;<p>\n";
-
-
 
   bool print_moss_message = false;
   if (s != NULL && s->getMossPenalty() < -0.01) {
