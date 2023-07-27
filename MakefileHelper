@@ -1,4 +1,4 @@
-.PHONY: default pull push all compile overall section lab hw test quiz final zone clean src_clean remove_json_comments
+.PHONY: default pull push all compile overall section lab hw test quiz final zone clean src_clean remove_json_comments version
 
 default: overall
 
@@ -25,6 +25,8 @@ $(error Variable REPORTS_DIRECTORY not set)
 endif
 
 nlohmann_json_dir=${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann/json
+
+export RAINBOW_GRADES_DIRECTORY
 
 ${nlohmann_json_dir}:
 	mkdir -p ${nlohmann_json_dir}
@@ -67,6 +69,8 @@ endif
 
 json_include = -I${nlohmann_json_dir}/include/
 
+version:
+	python3 ${RAINBOW_GRADES_DIRECTORY}/track_Rainbow_version.py
 
 remove_json_comments: customization.json
 	cpp -xc++ $< | sed -e '/^#/d' > customization_no_comments.json
