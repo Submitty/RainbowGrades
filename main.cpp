@@ -37,11 +37,12 @@ std::vector<std::string> OMIT_SECTION_FROM_STATS;
 std::string OUTPUT_FILE                       = "./output.html";
 std::string OUTPUT_CSV_FILE                   = "./output.csv";
 std::string CUSTOMIZATION_FILE                = "./customization_no_comments.json";
+std::string RG_VERSION_FILE                   = "./RG_version.json";
 
 std::string RAW_DATA_DIRECTORY                = "./raw_data/all_grades/";
 std::string INDIVIDUAL_FILES_OUTPUT_DIRECTORY = "./individual_summary_html/";
 std::string ALL_STUDENTS_OUTPUT_DIRECTORY     = "./all_students_summary_html/";
-std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV     = "./all_students_summary_csv/";
+std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV = "./all_students_summary_csv/";
 
 nlohmann::json GLOBAL_CUSTOMIZATION_JSON;
 
