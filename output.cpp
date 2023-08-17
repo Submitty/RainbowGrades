@@ -1197,6 +1197,42 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
     ostr << "@ = final grade with Academic Integrity Violation penalty<p>&nbsp;<p>\n";
   }
 
+  ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
+  ostr << "<tr>\n";
+    ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+    ostr << "<font size = \"-1\"> Border-outline </font>";
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+        ostr << "<font size = \"-1\"> Meaning </font>";
+    ostr << "</td>";
+    ostr << "</tr>\n";
+  ostr << "<tr>\n";
+  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0a0a0a; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+  ostr << "<font size = \"-1\"> Academic Integrity Violation </font>";
+  ostr << "</td>";
+  ostr << "</tr>\n";
+    ostr << "<tr>\n";
+    ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fcca03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+      ostr << "<font size = \"-1\"> Grade override </font>";
+      ostr << "</td>";
+    ostr << "</tr>\n";
+      ostr << "<tr>\n";
+      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #1cfc03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+
+      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+      ostr << "<font size = \"-1\"> Grade inquiry in progress </font>";
+      ostr << "</td>";
+      ostr << "</tr>\n";
+        ostr << "<tr>\n";
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fc0303; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+      ostr << "<font size = \"-1\"> Bad status </font>";
+      ostr << "</td>";
+        ostr << "</tr>\n";
+  ostr << "</table>\n";
+
+
   if (DISPLAY_FINAL_GRADE) { // && students.size() > 50) {
 
   int total_A = grade_counts[Grade("A")] + grade_counts[Grade("A-")];
