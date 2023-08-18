@@ -1177,6 +1177,38 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   // This should only pop up for those who violated policy FIX HERE
   // ostr << "<p>@ = Academic Integrity Violation</p>" << std::endl;
 
+    ostr << "<style> .spacer {display: inline-block; width: 66px;} </style>\n";
+    ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
+    ostr << "<tr>\n";
+    ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0a0a0a; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+      ostr << "<span class=\"spacer\"></span>";
+      ostr << "</td>";
+    ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+    ostr << "<font size = \"-1\"> Academic Integrity Violation </font>";
+    ostr << "</td>";
+    ostr << "</tr>\n";
+      ostr << "<tr>\n";
+      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fcca03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+        ostr << "<font size = \"-1\"> Grade override </font>";
+        ostr << "</td>";
+      ostr << "</tr>\n";
+        ostr << "<tr>\n";
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #1cfc03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+        ostr << "<font size = \"-1\"> Grade inquiry in progress </font>";
+        ostr << "</td>";
+        ostr << "</tr>\n";
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fc0303; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+        ostr << "<font size = \"-1\"> Bad status = too many late days used on this assignment <br> ";
+        ostr << "<span class=\"spacer\"></span> OR you didn’t have enough late days to use </font>";
+        ostr << "</td>";
+          ostr << "</tr>\n";
+    ostr << "</table>\n";
+
   if (s != NULL) {
     std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");
     if (istr.good()) {
@@ -1196,41 +1228,6 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   if (print_moss_message) {
     ostr << "@ = final grade with Academic Integrity Violation penalty<p>&nbsp;<p>\n";
   }
-
-  ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
-  ostr << "<tr>\n";
-    ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-    ostr << "<font size = \"-1\"> Border-outline </font>";
-        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-        ostr << "<font size = \"-1\"> Meaning </font>";
-    ostr << "</td>";
-    ostr << "</tr>\n";
-  ostr << "<tr>\n";
-  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0a0a0a; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
-  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-  ostr << "<font size = \"-1\"> Academic Integrity Violation </font>";
-  ostr << "</td>";
-  ostr << "</tr>\n";
-    ostr << "<tr>\n";
-    ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fcca03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
-      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-      ostr << "<font size = \"-1\"> Grade override </font>";
-      ostr << "</td>";
-    ostr << "</tr>\n";
-      ostr << "<tr>\n";
-      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #1cfc03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
-
-      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-      ostr << "<font size = \"-1\"> Grade inquiry in progress </font>";
-      ostr << "</td>";
-      ostr << "</tr>\n";
-        ostr << "<tr>\n";
-        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fc0303; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
-      ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-      ostr << "<font size = \"-1\"> Bad status </font>";
-      ostr << "</td>";
-        ostr << "</tr>\n";
-  ostr << "</table>\n";
 
 
   if (DISPLAY_FINAL_GRADE) { // && students.size() > 50) {
