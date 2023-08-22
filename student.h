@@ -178,6 +178,15 @@ public:
 
   void mossify(const std::string &gradeable, float penalty);
 
+    void set_event_academic_integrity(bool value) {academic_integrity = value;}
+    void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
+    void set_event_overridden(bool value) {overridden = value;}
+    void set_event_bad_status(bool value) {bad_status = value;}
+    bool get_event_academic_integrity() {return academic_integrity;}
+    bool get_event_grade_inquiry() {return grade_inquiry;}
+    bool get_event_overridden() {return overridden;}
+    bool get_event_bad_status() {return bad_status;}
+
   // other grade-like data
   void setNumericID(const std::string& r_id) { numeric_id = r_id; }
   void setAcademicIntegrityForm() { academic_integrity_form = true; }
@@ -234,6 +243,10 @@ private:
 
   int current_allowed_late_days;
   int default_allowed_late_days;
+  bool academic_integrity = false;
+  bool grade_inquiry = false;
+  bool overridden = false;
+  bool bad_status = false;
 
     // registration status
   std::string section;
