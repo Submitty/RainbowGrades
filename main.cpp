@@ -1075,6 +1075,7 @@ void processcustomizationfile(const std::string &now_string,
       //std::cout << "USERNAME " << username << std::endl;
       assert (s != NULL);
       s->mossify(hw,penalty);
+      s->set_event_academic_integrity(true);
     }
   } else if (token == "final_cutoff") {
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
@@ -1356,24 +1357,23 @@ void load_student_grades(std::vector<Student*> &students) {
                         if (status.find("Bad") != std::string::npos) {
                           assert (late_days_charged == 0);
                         }
-
-                        std::string event;
-                        std::string status_check = itr2->value("status", "");
-                        if (status_check == "Bad")
-                        {
-                          event = "Bad";
-                        }
-                        if (status_check == "Overridden")
-                        {
-                          event = "Overridden";
-                        }
-                        std::string inquiry = itr2->value("inquiry", "");
-                        if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != ""))
-                        {
-                          assert(inquiry == "Open");
-                          event = "Open";
-                        }
                         if (GRADEABLES[g].isReleased(gradeable_id)) {
+                           std::string event;
+                           std::string status_check = itr2->value("status", "");
+                           if (status_check == "Bad") {
+                             event = "Bad";
+                             s->set_event_bad_status(true);
+                           }
+                           if (status_check == "Overridden") {
+                             event = "Overridden";
+                             s->set_event_overridden(true);
+                           }
+                           std::string inquiry = itr2->value("inquiry", "");
+                           if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
+                             assert(inquiry == "Open");
+                             event = "Open";
+                             s->set_event_grade_inquiry(true);
+                           }
                           s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status);
                         }
       }
