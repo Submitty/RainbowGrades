@@ -488,7 +488,7 @@ void Student::mossify(const std::string &gradeable, float penalty) {
   // but it will be multiplied by a negative and added to the total;
   assert (penalty >= 0);
 
-  moss_penalty += -0.0000001;
+  moss_penalty += -0.0000002;
   moss_penalty += -average_letter_grade * penalty;
   std::stringstream foo;
   foo << std::setprecision(2) << std::fixed << penalty;
