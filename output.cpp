@@ -946,7 +946,7 @@ void start_table_output( bool /*for_instructor*/,
     if (DISPLAY_FINAL_GRADE) {
       std::string g = this_student->grade(false,sd);      
       color = GradeColor(g);
-      if (this_student->getMossPenalty() < -0.01) {
+      if (this_student->getMossPenalty() < -0.00000001) {
         g += "@";
       }
       assert (color.size()==6);
@@ -1175,6 +1175,16 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
 
   ostr << "<p>* = 1 late day used</p>" << std::endl;
 
+
+  bool print_moss_message = false;
+  if (s != NULL && s->getMossPenalty() < -0.0000001) {
+    print_moss_message = true;
+  }
+
+  if (print_moss_message) {
+    ostr << "@ = Academic Integrity Violation penalty<p>&nbsp;<p>\n";
+  }
+
   // Description of border outline that are in effect
   if (s != NULL)
   {
@@ -1232,7 +1242,6 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   }
 
 
-
   if (s != NULL) {
     std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");
     if (istr.good()) {
@@ -1244,14 +1253,6 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   }
   ostr << "<p>&nbsp;<p>\n";
 
-  bool print_moss_message = false;
-  if (s != NULL && s->getMossPenalty() < -0.01) {
-    print_moss_message = true;
-  }
-
-  if (print_moss_message) {
-    ostr << "@ = final grade with Academic Integrity Violation penalty<p>&nbsp;<p>\n";
-  }
 
   if (DISPLAY_FINAL_GRADE) { // && students.size() > 50) {
 
