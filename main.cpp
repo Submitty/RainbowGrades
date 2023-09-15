@@ -1367,6 +1367,10 @@ void load_student_grades(std::vector<Student*> &students) {
                              event = "Overridden";
                              s->set_event_overridden(true);
                            }
+                           if (status_check == "VersionConflict") {
+                             event = "VersionConflict";
+                             s->set_event_version_conflict(true);
+                           }
                            std::string inquiry = itr2->value("inquiry", "");
                            if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
                              assert(inquiry == "Open");
