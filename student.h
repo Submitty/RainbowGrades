@@ -176,7 +176,7 @@ public:
   void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
   void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="");
 
-  void mossify(const std::string &gradeable, float penalty);
+  void academic_sanction(const std::string &gradeable, float penalty);
 
     void set_event_academic_integrity(bool value) {academic_integrity = value;}
     void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
