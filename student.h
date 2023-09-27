@@ -108,7 +108,7 @@ public:
   int getPollsIncorrect() const;
   float getPollPoints() const;
   int getUsedLateDays() const;
-  float getMossPenalty() const { return moss_penalty; }
+  float getAcademicSanctionPenalty() const { return academic_sanction_penalty; }
 
   void setCurrentAllowedLateDays(int d) { current_allowed_late_days = d; }
   void setDefaultAllowedLateDays(int d) { default_allowed_late_days = d; }
@@ -217,14 +217,14 @@ public:
 
   // HELPER FUNCTIONS
   float GradeablePercent(GRADEABLE_ENUM g) const;
-  float overall() const { return overall_b4_moss() + moss_penalty; }
+  float overall() const { return overall_b4_academic_sanction() + academic_sanction_penalty; }
   float adjusted_test(int i) const;
   float adjusted_test_pct() const;
   float lowest_test_counts_half_pct() const;
   float quiz_normalize_and_drop(int num) const;
-  float overall_b4_moss() const;
-  std::string grade(bool flag_b4_moss, Student *lowest_d) const;
-  void outputgrade(std::ostream &ostr,bool flag_b4_moss,Student *lowest_d) const;
+  float overall_b4_academic_sanction() const;
+  std::string grade(bool flag_b4_academic_sanction, Student *lowest_d) const;
+  void outputgrade(std::ostream &ostr,bool flag_b4_academic_sanction,Student *lowest_d) const;
   
 private:
 
@@ -260,7 +260,7 @@ private:
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> > all_item_grades;
   
   std::vector<std::string> zones;
-  float moss_penalty;
+  float academic_sanction_penalty;
   float cached_hw;
   int rank;
 
