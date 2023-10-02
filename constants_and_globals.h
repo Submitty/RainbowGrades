@@ -11,7 +11,7 @@ class Student;
 // What sections to display in the output table
 extern bool DISPLAY_INSTRUCTOR_NOTES;
 extern bool DISPLAY_EXAM_SEATING;
-extern bool DISPLAY_MOSS_DETAILS;
+extern bool DISPLAY_ACADEMIC_SANCTION_DETAILS;
 extern bool DISPLAY_FINAL_GRADE;
 extern bool DISPLAY_GRADE_SUMMARY;
 extern bool DISPLAY_GRADE_DETAILS;
