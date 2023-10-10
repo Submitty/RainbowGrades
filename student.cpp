@@ -143,14 +143,11 @@ bool operator<(const score_object &a, const score_object &b) {
   float p2 = b.percentage;
   float sm2 = b.scale_max;
   float my_max2 = std::max(m2,sm2);
-  // Commented out by Konstantin Kuzmin 20220502T151600
   // Grades should be compared by the normalized grade only, not normalized grade multiplied by percentages. Otherwise, a grade of 90 for the gradeable
-  //   with percentage 0.1 will always be considered lower than a grade of 60 for the gradeable with percentage 0.2, since 0.1 * 0.9 < 0.2 * 0.6
-  //return p1 * s1 / my_max1 < p2 * s2 / my_max2;
-  // 14 lines added by Konstantin Kuzmin 20220508T162100. If two scores are different, order by score.
+  // with percentage 0.1 will always be considered lower than a grade of 60 for the gradeable with percentage 0.2, since 0.1 * 0.9 < 0.2 * 0.6
   bool result;
   // If any of the two scores has a max of 0 (but not both of them), it means it is extra credit, so it will always be considered larger, so that we do not
-  //   remove extra credit assignment scores under the "drop the lowest" rule
+  // remove extra credit assignment scores under the "drop the lowest" rule
   if (((m1 == 0.0) && (m2 != 0.0)) || ((m1 != 0.0) && (m2 == 0.0))) {
     result = (m1 == 0.0) ? false : true;
   }
@@ -160,17 +157,10 @@ bool operator<(const score_object &a, const score_object &b) {
   // otherwise, order by percentage decreasing, so that if two scores are equal, the gradable with the higher percentage is considered smaller.
   // For example, for p1==0.1, s1/my_max1 == 0.9 and p2==0.2, s2/my_max2 == 0.9, the operator would return false.
   else result = (p1 > p2);
-  //std::cout << "m1 = " << m1 << " m2 = " << m2 << " p1 = " << p1 << " s1 = " << s1 << " my_max1 = " << my_max1 << " p2 = " << p2 << " s2 = " << s2 << " my_max2 = " << my_max2 << "; s1 / my_max1 = " << s1 / my_max1 << " s2 / my_max2 = " << s2 / my_max2 << " abs: " << std::abs(s1 / my_max1 - s2 / my_max2) << " ret value: " << result << std::endl;
   return result;
 }
 
 float Student::GradeablePercent(GRADEABLE_ENUM g) const {
-  //  Added 5 lines by Konstantin Kuzmin 20230824T022700
-  // if (this->username != "gonzae7") return 0; // todeas
-  // std::cout << "username: " << username << std::endl;
-  // for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
-    // std::cout << "\tGRADEABLES[g].getID(i): " << GRADEABLES[g].getID(i) << std::endl;
-  // }
   if (GRADEABLES[g].getCount() == 0) return 0;
   assert (GRADEABLES[g].getPercent() >= 0);
 
@@ -191,13 +181,11 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   //Do one pass to get the defined item scores
   float nonzero_sum = 0;
   int nonzero_count = 0;
-  //  Added 1 line by Konstantin Kuzmin 20230824T035800
   int non_extra_credit_count = 0;
   for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
     //float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
     if(!id.empty()){
-      //  Added 3 lines by Konstantin Kuzmin 20230824T035900
       if (GRADEABLES[g].getItemMaximum(id) > 0) {
         non_extra_credit_count++;
       }
@@ -220,11 +208,10 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
     float m = nonzero_sum/nonzero_count;
-    // Commented out by Konstantin Kuzmin 20220508T165400
     //if(!id.empty() && GRADEABLES[g].isReleased(id)){
-    //  Added 1 line by Konstantin Kuzmin 20220508T165300
     if(!id.empty()){
       m = GRADEABLES[g].getItemMaximum(id);
+      std::cout << "m" << m << std::endl;
     }
     float p = GRADEABLES[g].getItemPercentage(id);
     float sm = GRADEABLES[g].getScaleMaximum(id);
@@ -233,12 +220,8 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
 
   // sort the scores (smallest first)
   std::sort(scores.begin(),scores.end());
-
-  // Commented out 2 lines by Konstantin Kuzmin 20230824T040000
-  // assert (GRADEABLES[g].getRemoveLowest() >= 0 &&
-          // GRADEABLES[g].getRemoveLowest() < GRADEABLES[g].getCount());
-  // Added 2 lines by Konstantin Kuzmin 20230824T040100 to check that the number of "drop the lowest" is less
-  //   than the number of non extra credit gradeables, i.e., it is not allowed to drop all non extra credit gradeables
+  //to check that the number of "drop the lowest" is less than the number of non extra credit gradeables,
+  // i.e., it is not allowed to drop all non extra credit gradeables
   assert (GRADEABLES[g].getRemoveLowest() >= 0 && (
           (non_extra_credit_count > 0 && GRADEABLES[g].getRemoveLowest() < non_extra_credit_count)) ||
           (GRADEABLES[g].getRemoveLowest() == 0));
@@ -261,7 +244,6 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
 
   // sum the remaining (higher) scores
   float sum = 0;
-  // 1 line added by Konstantin Kuzmin 20220502T151600
   // to also sum the remaining (higher) percentages
   float sum_percentage = 0;
   for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
@@ -285,24 +267,18 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     if (my_max > 0) {
       sum += p * s / my_max;
     }
-    // 3 lines added by Konstantin Kuzmin 20220508T173500
     //   to add percentages only for non-extra credit gradeables
     if (m != 0.0) {
       sum_percentage += p;
     }
   }
-  // 2 lines added by Konstantin Kuzmin 20220502T151600
-  // std::cout << "sum_max: " << sum_max << " sum_scaled_max: " << sum_scaled_max << " sum_percentage: " << sum_percentage << std::endl;
   assert(sum_percentage <= 1.0);
-
-  // 3 lines added by Konstantin Kuzmin 20230824T040400
   if (sum_max == 0) { // pure extra credit category
     sum_percentage = 1.0;
   }
 
-  // Commented out by Konstantin Kuzmin 20220502T151600
+
   //float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum;
-  // 2 lines added by Konstantin Kuzmin 20220502T151600
   float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum / sum_percentage;
   // std::cout << "sum: " << sum << "; GRADEABLES[g].getPercent() * sum / sum_percentage: " << (GRADEABLES[g].getPercent() * sum / sum_percentage) << "; sum_percentage: " << sum_percentage << std::endl;
   float percentage_upper_clamp = GRADEABLES[g].getBucketPercentageUpperClamp();
@@ -550,7 +526,7 @@ void Student::mossify(const std::string &gradeable, float penalty) {
   // but it will be multiplied by a negative and added to the total;
   assert (penalty >= 0);
 
-  moss_penalty += -0.0000001;
+  moss_penalty += -0.0000002;
   moss_penalty += -average_letter_grade * penalty;
   std::stringstream foo;
   foo << std::setprecision(2) << std::fixed << penalty;
