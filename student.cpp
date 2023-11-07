@@ -115,6 +115,16 @@ void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value,
   itr->second[i] = ItemGrade(value,late_days_used,note,status,event);
 }
 
+void Student::setGradeableItemGrade_extension(GRADEABLE_ENUM g, int i, float value, const std::string &event, int late_days_used, const std::string &note, const std::string &status) {
+  assert (i >= 0 && i < GRADEABLES[g].getCount());
+  std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
+  assert (itr != all_item_grades.end());
+  assert (int(itr->second.size()) > i);
+  std::string temp = "";
+    
+  itr->second[i] = ItemGrade(value,late_days_used,note,status,temp,temp,event,days_extension,reason);
+}
+
 
 
 
@@ -390,6 +400,16 @@ int Student::getUsedLateDays() const {
   }
   return answer;
 }
+
+ int Student::getDaysOfExtension() const {
+  int answer = 0;
+  for (std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator itr = all_item_grades.begin(); itr != all_item_grades.end(); itr++) {
+    for (std::size_t i = 0; i < itr->second.size(); i++) {
+      answer += itr->second[i].getDaysOfExtension();
+    }
+  }
+  return answer;
+ }
 
 // =============================================================================================
 
