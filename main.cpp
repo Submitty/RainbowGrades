@@ -124,7 +124,7 @@ std::string BONUS_FILE;
 
 bool DISPLAY_INSTRUCTOR_NOTES = false;
 bool DISPLAY_EXAM_SEATING = false;
-bool DISPLAY_MOSS_DETAILS = false;
+bool DISPLAY_ACADEMIC_SANCTION_DETAILS = false;
 bool DISPLAY_FINAL_GRADE = false;
 bool DISPLAY_GRADE_SUMMARY = false;
 bool DISPLAY_GRADE_DETAILS = false;
@@ -151,8 +151,8 @@ void PrintExamRoomAndZoneTable(const std::string &id, nlohmann::json &mj, Studen
 
 
 bool by_overall(const Student* s1, const Student* s2) {
-  float s1_overall = s1->overall_b4_moss();
-  float s2_overall = s2->overall_b4_moss();
+  float s1_overall = s1->overall_b4_academic_sanction();
+  float s2_overall = s2->overall_b4_academic_sanction();
 
   if (s1 == AVERAGE_STUDENT_POINTER) return true;
   if (s2 == AVERAGE_STUDENT_POINTER) return false;
@@ -373,8 +373,8 @@ void preprocesscustomizationfile(const std::string &now_string,
         DISPLAY_INSTRUCTOR_NOTES = true;
       } else if (token == "exam_seating") {
         DISPLAY_EXAM_SEATING = true;
-      } else if (token == "moss_details") {
-        DISPLAY_MOSS_DETAILS = true;
+      } else if (token == "academic_sanction_details") {
+        DISPLAY_ACADEMIC_SANCTION_DETAILS = true;
       } else if (token == "final_grade") {
         DISPLAY_FINAL_GRADE = true;
       } else if (token == "grade_summary") {
@@ -765,8 +765,8 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_INSTRUCTOR_NOTES = true;
     } else if (token == "exam_seating") {
       DISPLAY_EXAM_SEATING = true;
-    } else if (token == "moss_details") {
-      DISPLAY_MOSS_DETAILS = true;
+    } else if (token == "academic_sanction_details") {
+      DISPLAY_ACADEMIC_SANCTION_DETAILS = true;
     } else if (token == "final_grade") {
       DISPLAY_FINAL_GRADE = true;
     } else if (token == "grade_summary") {
@@ -1073,7 +1073,7 @@ void processcustomizationfile(const std::string &now_string,
       Student *s = GetStudent(students,username);
       //std::cout << "USERNAME " << username << std::endl;
       assert (s != NULL);
-      s->mossify(hw,penalty);
+      s->academic_sanction(hw,penalty);
       s->set_event_academic_integrity(true);
     }
   } else if (token == "final_cutoff") {
@@ -1765,7 +1765,7 @@ int main(int argc, char* argv[]) {
 
     DISPLAY_INSTRUCTOR_NOTES = false;
     DISPLAY_EXAM_SEATING = true;
-    DISPLAY_MOSS_DETAILS = false;
+    DISPLAY_ACADEMIC_SANCTION_DETAILS = false;
     DISPLAY_FINAL_GRADE = false;
     DISPLAY_GRADE_SUMMARY = false;
     DISPLAY_GRADE_DETAILS = false;

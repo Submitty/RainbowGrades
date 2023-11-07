@@ -35,7 +35,7 @@ Student::Student() {
 
   rotating_section = -1;
   zones = std::vector<std::string>(GRADEABLES[GRADEABLE_ENUM::TEST].getCount(),"");
-  moss_penalty = 0;
+  academic_sanction_penalty = 0;
   cached_hw = -1;
 
   // other grade-like data
@@ -430,7 +430,7 @@ int Student::getUsedLateDays() const {
 
 // =============================================================================================
 
-float Student::overall_b4_moss() const {
+float Student::overall_b4_academic_sanction() const {
   float answer = 0;
   for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
     GRADEABLE_ENUM g = ALL_GRADEABLES[i];
@@ -439,15 +439,15 @@ float Student::overall_b4_moss() const {
   return answer;
 }
 
-std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
+std::string Student::grade(bool flag_b4_academic_sanction, Student *lowest_d) const {
 
   if (section == "null") return "";
 
-  if (!flag_b4_moss && manual_grade != "") return manual_grade;
-
+  if (!flag_b4_academic_sanction && manual_grade != "") return manual_grade;
+  
   float over = overall();
-  if (flag_b4_moss) {
-    over = overall_b4_moss();
+  if (flag_b4_academic_sanction) {
+    over = overall_b4_academic_sanction();
   }
 
 
@@ -503,7 +503,7 @@ std::string Student::grade(bool flag_b4_moss, Student *lowest_d) const {
 
 
 
-void Student::mossify(const std::string &gradeable, float penalty) {
+void Student::academic_sanction(const std::string &gradeable, float penalty) {
 
   // if the penalty is "a whole or partial letter grade"....
   float average_letter_grade = (CUTOFFS["A"]-CUTOFFS["B"] +
@@ -513,11 +513,11 @@ void Student::mossify(const std::string &gradeable, float penalty) {
   int item;
   LookupGradeable(gradeable,g,item);
   if (!GRADEABLES[g].hasCorrespondence(gradeable)) {
-    std::cerr << "WARNING -- NO GRADEABLE TO MOSSIFY" << std::endl;
+    std::cerr << "WARNING -- NO GRADEABLE TO ACADEMIC SANCTION" << std::endl;
   } else {
     int which = GRADEABLES[g].getCorrespondence(gradeable).first;
     if (!(getGradeableItemGrade(g,which).getValue() > 0)) {
-      std::cerr << "WARNING:  the grade for this " <<gradeable_to_string(g)<<" is already 0, moss penalty error?" << std::endl;
+      std::cerr << "WARNING:  the grade for this " <<gradeable_to_string(g)<<" is already 0, academic sanction penalty error?" << std::endl;
     }
       setGradeableItemGrade_AcademicIntegrity(g,which,0, true);
   }
@@ -526,8 +526,8 @@ void Student::mossify(const std::string &gradeable, float penalty) {
   // but it will be multiplied by a negative and added to the total;
   assert (penalty >= 0);
 
-  moss_penalty += -0.0000002;
-  moss_penalty += -average_letter_grade * penalty;
+  academic_sanction_penalty += -0.0000002;
+  academic_sanction_penalty += -average_letter_grade * penalty;
   std::stringstream foo;
   foo << std::setprecision(2) << std::fixed << penalty;
 
@@ -553,11 +553,11 @@ void Student::ManualGrade(const std::string &grade, const std::string &message) 
 }
 
 
-void Student::outputgrade(std::ostream &ostr,bool flag_b4_moss,Student *lowest_d) const {
-  std::string g = grade(flag_b4_moss,lowest_d);
+void Student::outputgrade(std::ostream &ostr,bool flag_b4_academic_sanction,Student *lowest_d) const {
+  std::string g = grade(flag_b4_academic_sanction,lowest_d);
   
   std::string color = GradeColor(g);
-  if (moss_penalty < -0.01) {
+  if (academic_sanction_penalty < -0.01) {
     ostr << "<td align=center bgcolor=" << color << ">" << g << " @</td>";
   } else {
     ostr << "<td align=center bgcolor=" << color << ">" << g << "</td>";
