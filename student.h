@@ -21,7 +21,7 @@ extern std::vector<float> GLOBAL_earned_late_days;
 
 class ItemGrade {
 public:
-  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false, int de=0, std::string& r="") {
+  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false, int de=0, const std::string& r="") {
     value = v;
     late_days_used = ldu;
     note = n;
@@ -179,9 +179,9 @@ public:
 
   // grade data
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
-  void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status=""wa);
+  void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status="");
   void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
-  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="",int exceptions=0,std::string &reason="");
+  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="",int exceptions=0, const std::string &reason="");
 
   void mossify(const std::string &gradeable, float penalty);
 

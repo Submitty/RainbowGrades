@@ -107,7 +107,7 @@ void Student::setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, f
 }
 
 void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event, 
-                                           int late_days_used, const std::string &note, const std::string &status, int exceptions, std::string &reason) {
+                                           int late_days_used, const std::string &note, const std::string &status, int exceptions, const std::string &reason) {
   assert (i >= 0 && i < GRADEABLES[g].getCount());
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
   assert (itr != all_item_grades.end());
