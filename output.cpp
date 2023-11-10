@@ -677,6 +677,7 @@ void start_table_output( bool /*for_instructor*/,
       //Late days headers
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED LATE DAYS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","USED LATE DAYS"));
+      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED ABSENCE EXTENSIONS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
     }
   }
@@ -1081,6 +1082,8 @@ void start_table_output( bool /*for_instructor*/,
           int used = this_student->getUsedLateDays();
           color = coloritcolor(allowed-used+2, 5+2, 3+2, 2+2, 1+2, 0+2);
           table.set(myrow,counter++,TableCell(color,used,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          int exceptions = this_student->getLateDayExceptions();
+          table.set(myrow,counter++,TableCell("ffffff",exceptions,"",0,CELL_CONTENTS_VISIBLE,"right"));
         } else {
           color="ffffff"; // default_color;
           table.set(myrow,counter++,TableCell(color,""));
