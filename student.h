@@ -27,8 +27,8 @@ public:
     note = n;
     event = e;
     academic_integrity = ai;
-    days_of_extension = de;
-    reason_for_extension = r;
+    late_day_exceptions = de;
+    reason_for_exception = r;
     
     if (s != "UNKONWN") {
       status = s;
@@ -57,8 +57,8 @@ public:
     return adjusted_value; 
   }
   int getLateDaysUsed() const { return late_days_used; }
-  int getDaysOfExtension() const { return days_of_extension; }
-  const std::string& getReasonForExtension() const { return reason_for_extension; }
+  int getLateDayExceptions() const { return late_day_exceptions; }
+  const std::string& getReasonForException() const { return reason_for_exception; }
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
   const std::string& getEvent() const { return event; }
@@ -67,12 +67,12 @@ public:
 private:
   float value;
   int late_days_used;
-  int days_of_exension;
+  int late_day_exceptions;
   bool academic_integrity;
   std::string note;
   std::string status;
   std::string event;
-  std::string reason_for_extension;
+  std::string reason_for_exception;
 };
 
 //====================================================================
@@ -114,7 +114,7 @@ public:
   int getPollsIncorrect() const;
   float getPollPoints() const;
   int getUsedLateDays() const;
-  int getDaysOfExtension() const;
+  int getLateDayExceptions() const;
   float getMossPenalty() const { return moss_penalty; }
 
   void setCurrentAllowedLateDays(int d) { current_allowed_late_days = d; }
@@ -181,7 +181,7 @@ public:
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
   void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status=""wa);
   void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
-  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="");
+  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="",int exceptions=0,std::string &reason="");
 
   void mossify(const std::string &gradeable, float penalty);
 
