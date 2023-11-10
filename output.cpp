@@ -607,7 +607,7 @@ void start_table_output( bool /*for_instructor*/,
     std::cout << "DISPLAY FINAL GRADE" << std::endl;
     student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","FINAL GRADE"));
     student_data.push_back(counter); table.set(0,counter++,TableCell(grey_divider));
-    if (DISPLAY_MOSS_DETAILS) {
+    if (DISPLAY_ACADEMIC_SANCTION_DETAILS) {
       table.set(0,counter++,TableCell("ffffff","RAW GRADE"));
       table.set(0,counter++,TableCell(grey_divider));
     }
@@ -947,14 +947,14 @@ void start_table_output( bool /*for_instructor*/,
     if (DISPLAY_FINAL_GRADE) {
       std::string g = this_student->grade(false,sd);      
       color = GradeColor(g);
-      if (this_student->getMossPenalty() < -0.00000001) {
+      if (this_student->getAcademicSanctionPenalty() < -0.00000001) {
         g += "@";
       }
       assert (color.size()==6);
       table.set(myrow,counter++,TableCell(color,g,"",0,CELL_CONTENTS_VISIBLE,"center"));
       table.set(myrow,counter++,TableCell(grey_divider));
 
-      if (DISPLAY_MOSS_DETAILS) {
+      if (DISPLAY_ACADEMIC_SANCTION_DETAILS) {
         std::string g2 = this_student->grade(true,sd);
         color = GradeColor(g2);
         table.set(myrow,counter++,TableCell(color,g2,"",0,CELL_CONTENTS_VISIBLE,"center"));
@@ -1179,12 +1179,12 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   ostr << "<p>* = 1 late day used</p>" << std::endl;
 
 
-  bool print_moss_message = false;
-  if (s != NULL && s->getMossPenalty() < -0.0000001) {
-    print_moss_message = true;
+  bool print_academic_sanction_message = false;
+  if (s != NULL && s->getAcademicSanctionPenalty() < -0.0000001) {
+    print_academic_sanction_message = true;
   }
 
-  if (print_moss_message) {
+  if (print_academic_sanction_message) {
     ostr << "@ = Academic Integrity Violation penalty<p>&nbsp;<p>\n";
   }
 

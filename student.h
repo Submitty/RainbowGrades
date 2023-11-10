@@ -115,7 +115,7 @@ public:
   float getPollPoints() const;
   int getUsedLateDays() const;
   int getLateDayExceptions() const;
-  float getMossPenalty() const { return moss_penalty; }
+  float getAcademicSanctionPenalty() const { return academic_sanction_penalty; }
 
   void setCurrentAllowedLateDays(int d) { current_allowed_late_days = d; }
   void setDefaultAllowedLateDays(int d) { default_allowed_late_days = d; }
@@ -183,7 +183,7 @@ public:
   void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
   void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="",int exceptions=0, const std::string &reason="");
 
-  void mossify(const std::string &gradeable, float penalty);
+  void academic_sanction(const std::string &gradeable, float penalty);
 
     void set_event_academic_integrity(bool value) {academic_integrity = value;}
     void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
@@ -224,14 +224,14 @@ public:
 
   // HELPER FUNCTIONS
   float GradeablePercent(GRADEABLE_ENUM g) const;
-  float overall() const { return overall_b4_moss() + moss_penalty; }
+  float overall() const { return overall_b4_academic_sanction() + academic_sanction_penalty; }
   float adjusted_test(int i) const;
   float adjusted_test_pct() const;
   float lowest_test_counts_half_pct() const;
   float quiz_normalize_and_drop(int num) const;
-  float overall_b4_moss() const;
-  std::string grade(bool flag_b4_moss, Student *lowest_d) const;
-  void outputgrade(std::ostream &ostr,bool flag_b4_moss,Student *lowest_d) const;
+  float overall_b4_academic_sanction() const;
+  std::string grade(bool flag_b4_academic_sanction, Student *lowest_d) const;
+  void outputgrade(std::ostream &ostr,bool flag_b4_academic_sanction,Student *lowest_d) const;
   
 private:
 
@@ -267,7 +267,7 @@ private:
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> > all_item_grades;
   
   std::vector<std::string> zones;
-  float moss_penalty;
+  float academic_sanction_penalty;
   float cached_hw;
   int rank;
 
