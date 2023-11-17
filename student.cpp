@@ -211,7 +211,6 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     //if(!id.empty() && GRADEABLES[g].isReleased(id)){
     if(!id.empty()){
       m = GRADEABLES[g].getItemMaximum(id);
-      std::cout << "m" << m << std::endl;
     }
     float p = GRADEABLES[g].getItemPercentage(id);
     float sm = GRADEABLES[g].getScaleMaximum(id);
@@ -272,7 +271,8 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
       sum_percentage += p;
     }
   }
-  assert(sum_percentage <= 1.0);
+  const float tolerance = 0.000001;
+  assert(sum_percentage <= 1.0 + tolerance);
   if (sum_max == 0) { // pure extra credit category
     sum_percentage = 1.0;
   }
@@ -280,10 +280,10 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
 
   //float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum;
   float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum / sum_percentage;
-  // std::cout << "sum: " << sum << "; GRADEABLES[g].getPercent() * sum / sum_percentage: " << (GRADEABLES[g].getPercent() * sum / sum_percentage) << "; sum_percentage: " << sum_percentage << std::endl;
+//  std::cout << "sum: " << sum << "; GRADEABLES[g].getPercent() * sum / sum_percentage: " << (GRADEABLES[g].getPercent() * sum / sum_percentage) << "; sum_percentage: " << sum_percentage << std::endl;
   float percentage_upper_clamp = GRADEABLES[g].getBucketPercentageUpperClamp();
   // 1 line added by Konstantin Kuzmin 20230823T181400
-  // std::cout << "percentage: " << percentage << "; percentage_upper_clamp: " << (percentage_upper_clamp) << "; GRADEABLES[g].hasSortedWeight():" << GRADEABLES[g].hasSortedWeight() << std::endl;
+//  std::cout << "percentage: " << percentage << "; percentage_upper_clamp: " << (percentage_upper_clamp) << "; GRADEABLES[g].hasSortedWeight():" << GRADEABLES[g].hasSortedWeight() << std::endl;
   if (percentage_upper_clamp > 0) {
     percentage = std::min(percentage, percentage_upper_clamp);
   }
