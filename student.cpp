@@ -213,7 +213,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     //if(!id.empty() && GRADEABLES[g].isReleased(id)){
     if(!id.empty()){
       m = GRADEABLES[g].getItemMaximum(id);
-      std::cout << "m" << m << std::endl;
+      // std::cout << "m" << m << std::endl;
     }
     float p = GRADEABLES[g].getItemPercentage(id);
     float sm = GRADEABLES[g].getScaleMaximum(id);
@@ -274,7 +274,8 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
       sum_percentage += p;
     }
   }
-  assert(sum_percentage <= 1.0);
+  const float tolerance = 0.000001;
+  assert(sum_percentage <= 1.0 + tolerance);
   if (sum_max == 0) { // pure extra credit category
     sum_percentage = 1.0;
   }
