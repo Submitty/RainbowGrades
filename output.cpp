@@ -1093,6 +1093,7 @@ void start_table_output( bool /*for_instructor*/,
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
+          table.set(myrow,counter++,TableCell(color,""));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
       }
