@@ -115,6 +115,7 @@ public:
   float getPollPoints() const;
   int getUsedLateDays() const;
   int getLateDayExceptions() const;
+  std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > getItemsWithExceptions() const;
   float getAcademicSanctionPenalty() const { return academic_sanction_penalty; }
 
   void setCurrentAllowedLateDays(int d) { current_allowed_late_days = d; }

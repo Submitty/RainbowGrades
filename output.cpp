@@ -677,7 +677,7 @@ void start_table_output( bool /*for_instructor*/,
       //Late days headers
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED LATE DAYS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","USED LATE DAYS"));
-      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ABSENCE EXTENSIONS"));
+      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","EXCUSED EXTENSIONS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
     }
   }
@@ -1248,6 +1248,13 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
 
 
   if (s != NULL) {
+    std::ifstream istr2("student_extension_reports/"+s->getUserName()+".html");
+    if (istr2.good()) {
+      std::string tmp_s;
+      while (getline(istr2,tmp_s)) {
+        ostr << tmp_s;
+      }
+    }
     std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");
     if (istr.good()) {
       std::string tmp_s;

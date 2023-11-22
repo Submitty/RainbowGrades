@@ -1727,6 +1727,38 @@ void loadAllowedLateDays(std::vector<Student*> &students) {
   }
 }
 
+void SaveExtensionReports(const std::vector<Student*> &students) {
+  system ("mkdir -p student_extension_reports");
+  for (size_t i=0;i<students.size();i++) {
+    std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > gradeablesWithExtensions = students[i]->getItemsWithExceptions();
+    std::string username = students[i]->getUserName();
+    std::ofstream student_ostr("student_extension_reports/"+username+".html");
+    assert (student_ostr.good());
+    
+    student_ostr << "<h3> Excused Absence Extensions for: " << username << "</h3>" << std::endl;
+    student_ostr << "<table cellpadding=5 style=\"border:1px solid #aaaaaa; background-color:#ffffff;\">" << std::endl;
+    student_ostr << "<tr><td align=center>Gradeable</td><td align=center>Days Extended</td><td align=center>Reason</td><td></td></tr>" << std::endl;
+    if (gradeablesWithExtensions.size() == 0) {
+      student_ostr << "<tr><td>N/a</td></tr>" << std::endl;
+    }
+    else {
+      for (size_t i2=0;i2<gradeablesWithExtensions.size();i2++) {
+        ItemGrade item = std::get<0>(gradeablesWithExtensions[i2]);
+        GRADEABLE_ENUM g = std::get<0>(std::get<1>(gradeablesWithExtensions[i2]));
+        int index = std::get<1>(std::get<1>(gradeablesWithExtensions[i2]));
+        std::string gradeable_id = GRADEABLES[g].getID(index);
+        std::string gradeable_name = "";
+        if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
+          gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
+        }
+        student_ostr << "<tr><td align=center>" << gradeable_name << "</td><td align=center>"
+                   << item.getLateDayExceptions() << "</td><td align=center>"
+                   << item.getReasonForException() << "</td></tr>" << std::endl;
+      }
+    }
+    student_ostr << "</table>" << std::endl;
+  }
+}
 
 int main(int argc, char* argv[]) {
 
@@ -1747,6 +1779,8 @@ int main(int argc, char* argv[]) {
 
   LoadPolls(students);
   SavePollReports(students);
+
+  SaveExtensionReports(students);
 
   loadAllowedLateDays(students);
 

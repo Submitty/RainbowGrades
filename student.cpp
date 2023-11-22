@@ -441,6 +441,20 @@ int Student::getUsedLateDays() const {
   return answer;
  }
 
+ std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > Student::getItemsWithExceptions() const {
+  std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > result;
+  for (std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator itr = all_item_grades.begin(); itr != all_item_grades.end(); itr++) {
+    for (std::size_t i = 0; i < itr->second.size(); i++) {
+      if (itr->second[i].getLateDayExceptions()>0) {
+        std::tuple<GRADEABLE_ENUM,int> indexes{itr->first,i};
+        std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > itemInfo{itr->second[i],indexes};
+        result.push_back(itemInfo);
+      }
+    }
+  }
+  return result;
+ }
+
 // =============================================================================================
 
 float Student::overall_b4_academic_sanction() const {
