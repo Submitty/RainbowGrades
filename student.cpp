@@ -469,9 +469,7 @@ float Student::overall_b4_academic_sanction() const {
 std::string Student::grade(bool flag_b4_academic_sanction, Student *lowest_d) const {
 
   if (section == "null") return "";
-
   if (!flag_b4_academic_sanction && manual_grade != "") return manual_grade;
-  
   float over = overall();
   if (flag_b4_academic_sanction) {
     over = overall_b4_academic_sanction();

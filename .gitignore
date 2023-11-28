@@ -8,3 +8,4 @@
 *.log
 *.out
 *.synctex.gz
+/.idea/
