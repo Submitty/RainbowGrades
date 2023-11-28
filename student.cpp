@@ -272,7 +272,8 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
       sum_percentage += p;
     }
   }
-  assert(sum_percentage <= 1.0);
+  const float tolerance = 0.000001;
+  assert(sum_percentage <= 1.0 + tolerance);
   if (sum_max == 0) { // pure extra credit category
     sum_percentage = 1.0;
   }
@@ -442,9 +443,7 @@ float Student::overall_b4_academic_sanction() const {
 std::string Student::grade(bool flag_b4_academic_sanction, Student *lowest_d) const {
 
   if (section == "null") return "";
-
   if (!flag_b4_academic_sanction && manual_grade != "") return manual_grade;
-  
   float over = overall();
   if (flag_b4_academic_sanction) {
     over = overall_b4_academic_sanction();
