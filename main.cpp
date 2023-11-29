@@ -1731,13 +1731,12 @@ void SaveExtensionReports(const std::vector<Student*> &students) {
     std::string username = students[i]->getUserName();
     std::ofstream student_ostr("student_extension_reports/"+username+".html");
     assert (student_ostr.good());
-    
+    if (gradeablesWithExtensions.size() == 0) {
+      return;
+    }
     student_ostr << "<h3> Excused Absence Extensions for: " << username << "</h3>" << std::endl;
     student_ostr << "<table cellpadding=5 style=\"border:1px solid #aaaaaa; background-color:#ffffff;\">" << std::endl;
     student_ostr << "<tr><td>Gradeable</td><td align=center>Days Extended</td><td align=center>Reason</td><td></td></tr>" << std::endl;
-    if (gradeablesWithExtensions.size() == 0) {
-      student_ostr << "<tr><td>N/a</td></tr>" << std::endl;
-    }
     else {
       for (size_t i2=0;i2<gradeablesWithExtensions.size();i2++) {
         ItemGrade item = std::get<0>(gradeablesWithExtensions[i2]);
