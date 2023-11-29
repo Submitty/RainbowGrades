@@ -112,9 +112,9 @@ void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value,
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
   assert (itr != all_item_grades.end());
   assert (int(itr->second.size()) > i);
-  bool temp = false;
+  bool academic_integrity = false;
     
-  itr->second[i] = ItemGrade(value,late_days_used,note,status,event,temp,exceptions,reason);
+  itr->second[i] = ItemGrade(value,late_days_used,note,status,event,academic_integrity,exceptions,reason);
 }
 
 
