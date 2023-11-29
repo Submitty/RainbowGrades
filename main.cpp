@@ -1374,11 +1374,8 @@ void load_student_grades(std::vector<Student*> &students) {
                              s->set_event_grade_inquiry(true);
                            }
                            int late_day_exceptions = itr2->value("late_day_exceptions",0);
-                           if (late_day_exceptions > 0) {
-                             std::string reason_for_exception = itr2->value("reason_for_exception","");
-                             s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
-                           }
-                           else s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status);
+                           std::string reason_for_exception = itr2->value("reason_for_exception","");
+                           s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
                         }
       }
 
