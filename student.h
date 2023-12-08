@@ -190,10 +190,12 @@ public:
     void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
     void set_event_overridden(bool value) {overridden = value;}
     void set_event_bad_status(bool value) {bad_status = value;}
+    void set_event_extension(bool value) {extension = value;}
     bool get_event_academic_integrity() {return academic_integrity;}
     bool get_event_grade_inquiry() {return grade_inquiry;}
     bool get_event_overridden() {return overridden;}
     bool get_event_bad_status() {return bad_status;}
+    bool get_event_extension() {return extension;}
 
   // other grade-like data
   void setNumericID(const std::string& r_id) { numeric_id = r_id; }
@@ -255,6 +257,7 @@ private:
   bool grade_inquiry = false;
   bool overridden = false;
   bool bad_status = false;
+  bool extension = false;
 
     // registration status
   std::string section;

@@ -1219,6 +1219,17 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "</tr>\n";
         }
+        if (s->get_event_extension())
+        {
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0066e0; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+          ostr << "<span class=\"spacer\"></span>";
+          ostr << "</td>";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+          ostr << "<font size = \"-1\"> Excused Absence Extension </font>";
+          ostr << "</td>";
+          ostr << "</tr>\n";
+        }
         if (s->get_event_grade_inquiry())
         {
           ostr << "<tr>\n";

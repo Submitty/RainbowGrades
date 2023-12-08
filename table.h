@@ -35,6 +35,7 @@ public:
   bool inquiry = false;
   bool bad_status = false;
   bool override = false;
+  bool extension = false;
   std::string align;
   enum CELL_CONTENTS_STATUS visible;
   int span;

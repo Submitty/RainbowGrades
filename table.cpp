@@ -95,15 +95,18 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   event = e;
   if (event == "Bad"){
     bad_status = true;
-    override = inquiry = false;
+    override = inquiry = extension = false;
   } else if ( event == "Overridden"){
     override = true;
-    bad_status = inquiry = false;
+    bad_status = inquiry = extension = false;
   } else if (event == "Open"){
     inquiry = true;
-    bad_status = override = false;
+    bad_status = override = extension = false;
+  } else if (event == "Extension"){
+    extension = true;
+    inquiry = bad_status = override = false;
   } else {
-   inquiry = bad_status = override = false; 
+   inquiry = bad_status = override = extension = false; 
   }
     
 }
@@ -120,6 +123,8 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         mark = "@";
     } else if (c.override){
         outline = "outline:4px solid #fcca03; outline-offset: -4px;";
+    } else if (c.extension){
+        outline = "outline:4px solid #0066e0; outline-offset: -4px;";
     } else if (c.inquiry){
         outline = "outline:4px dashed #1cfc03; outline-offset: -4px;";
     } else if (c.bad_status){
