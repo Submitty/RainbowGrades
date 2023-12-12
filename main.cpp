@@ -1736,7 +1736,7 @@ void SaveExtensionReports(const std::vector<Student*> &students) {
     std::ofstream student_ostr("student_extension_reports/"+username+".html");
     assert (student_ostr.good());
     if (gradeablesWithExtensions.size() == 0) {
-      return;
+      continue;
     }
     student_ostr << "<h3> Excused Absence Extensions for: " << username << "</h3>" << std::endl;
     student_ostr << "<table cellpadding=5 style=\"border:1px solid #aaaaaa; background-color:#ffffff;\">" << std::endl;

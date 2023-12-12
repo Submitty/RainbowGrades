@@ -74,7 +74,7 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
 
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, int s, int /*r*/) {
+                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, int s, int /*r*/,const std::string& reason) {
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -93,6 +93,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   rotate = 0;
   academic_integrity = ai;
   event = e;
+  reason_for_exception = reason;
   if (event == "Bad"){
     bad_status = true;
     override = inquiry = extension = false;
@@ -133,7 +134,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
 //  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
-        ostr << "<td class=\"hoverable-cell\" data-hover-text=\"" << c.hoverText << "\" style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+        ostr << "<td class=\"hoverable-cell\" data-hover-text=\"" << c.reason_for_exception << "\" style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
   }
