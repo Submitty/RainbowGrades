@@ -257,7 +257,7 @@ void Table::output(std::ostream& ostr,
       ostr << "    bottom: 85%;";
       ostr << "    width: auto;";
       ostr << "    height: auto;";
-      ostr << "    background-color: rgba(255, 255, 255, 0.9);"; // semi-opaque white background
+      ostr << "    background-color: rgba(255, 255, 255, 0.88);"; // semi-opaque white background
       ostr << "    padding: 5px;";
       ostr << "    border: 1px solid #aaa;";
       ostr << "    z-index: 1;";
