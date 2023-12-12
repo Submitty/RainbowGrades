@@ -132,8 +132,8 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     }
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
-  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
-    
+//  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+        ostr << "<td class=\"hoverable-cell\" data-hover-text=\"" << c.hoverText << "\" style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
   }
@@ -241,10 +241,32 @@ void Table::output(std::ostream& ostr,
       if (last_update != "") {
           ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
       }
+
+      ostr << "<style>";
+      ostr << ".hoverable-cell {";
+      ostr << "    position: relative;";
+      ostr << "}";
+      ostr << ".hoverable-cell:hover::before {";
+      ostr << "    content: attr(data-hover-text);";
+      ostr << "    position: absolute;";
+      ostr << "    top: 50%;";
+      ostr << "    left: 50%;";
+      ostr << "    transform: translate(-50%, -50%);";
+      ostr << "    background-color: #fff;";
+      ostr << "    padding: 5px;";
+      ostr << "    border: 1px solid #aaa;";
+      ostr << "    z-index: 1;";
+      ostr << "    display: block;";
+      ostr << "}";
+      ostr << "</style>";
+
+
       ostr << "&nbsp;<br>\n";
       ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa;\">\n";
   }
-  
+
+
+
   if (transpose) {
     for (std::vector<int>::iterator c = which_data.begin(); c != which_data.end(); c++) {
       ostr << "<tr>\n";
