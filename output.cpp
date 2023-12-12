@@ -1195,7 +1195,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   // Description of border outline that are in effect
   if (s != NULL)
   {
-      if (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity())
+      if (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity() || s->get_event_extension())
       {
         ostr << "<style> .spacer {display: inline-block; width: 66px;} </style>\n";
         ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
@@ -1217,7 +1217,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "<span class=\"spacer\"></span>";
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-          ostr << "<font size = \"-1\"> Grade override </font>";
+          ostr << "<font size = \"-1\"> Grade Override </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }
@@ -1239,7 +1239,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "<span class=\"spacer\"></span>";
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-          ostr << "<font size = \"-1\"> Grade inquiry in progress </font>";
+          ostr << "<font size = \"-1\"> Grade Inquiry in Progress </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }
