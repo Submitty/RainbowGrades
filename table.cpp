@@ -253,14 +253,18 @@ void Table::output(std::ostream& ostr,
       ostr << ".hoverable-cell:hover::before {";
       ostr << "    content: attr(data-hover-text);";
       ostr << "    position: absolute;";
-      ostr << "    top: 50%;";
       ostr << "    left: 50%;";
-      ostr << "    transform: translate(-50%, -50%);";
-      ostr << "    background-color: #fff;";
+      ostr << "    bottom: 85%;";
+      ostr << "    width: auto;";
+      ostr << "    height: auto;";
+      ostr << "    background-color: rgba(255, 255, 255, 0.9);"; // semi-opaque white background
       ostr << "    padding: 5px;";
       ostr << "    border: 1px solid #aaa;";
       ostr << "    z-index: 1;";
-      ostr << "    display: block;";
+      ostr << "    display: flex;";
+      ostr << "    align-items: left;";
+      ostr << "    justify-content: left;";
+      ostr << "    box-sizing: border-box;";
       ostr << "}";
       ostr << "</style>";
 
