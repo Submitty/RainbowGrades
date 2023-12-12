@@ -93,7 +93,10 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   rotate = 0;
   academic_integrity = ai;
   event = e;
-  reason_for_exception = reason;
+  if (reason != "") {
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+reason+"\" ";
+  }
+  else hoverText = "";
   if (event == "Bad"){
     bad_status = true;
     override = inquiry = extension = false;
@@ -134,7 +137,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     
   //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
 //  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
-        ostr << "<td class=\"hoverable-cell\" data-hover-text=\"" << c.reason_for_exception << "\" style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+        ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
   }

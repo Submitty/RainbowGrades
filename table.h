@@ -36,7 +36,7 @@ public:
   bool bad_status = false;
   bool override = false;
   bool extension = false;
-  std::string reason_for_exception = "";
+  std::string hoverText = "";
   std::string align;
   enum CELL_CONTENTS_STATUS visible;
   int span;
