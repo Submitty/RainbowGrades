@@ -1202,15 +1202,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
       {
         ostr << "<style> .spacer {display: inline-block; width: 66px;} </style>\n";
         ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
-        ostr << "<tr>\n";
-        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-        ostr << "<span class=\"spacer\"></span>";
-        ostr << "</td>";
-        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-        ostr << "<font size = \"-1\"> Border-Outline is ranked from top to bottom <br>";
-        ostr << "Higher ranked outline will over-write  </font>";
-        ostr << "</td>";
-        ostr << "</tr>\n";
+ 
         if (for_instructor || (s != NULL && s->get_event_academic_integrity()))
         {
           ostr << "<tr>\n";
