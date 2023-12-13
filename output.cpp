@@ -1262,7 +1262,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "<span class=\"spacer\"></span>";
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-          ostr << "<font size = \"-1\"> Cancelled version </font>";
+          ostr << "<font size = \"-1\"> Cancelled submission </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }
