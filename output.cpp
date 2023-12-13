@@ -1223,7 +1223,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "</tr>\n";
         }
-        if (s->get_event_extension())
+        if (for_instructor || (s != NULL && s->get_event_extension()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0066e0; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
