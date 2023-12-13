@@ -765,7 +765,7 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_INSTRUCTOR_NOTES = true;
     } else if (token == "exam_seating") {
       DISPLAY_EXAM_SEATING = true;
-    } else if (token == "academic_sanction_details") {
+    } else if (token == "academic_sanction_details" || token == "moss_details") {
       DISPLAY_ACADEMIC_SANCTION_DETAILS = true;
     } else if (token == "final_grade") {
       DISPLAY_FINAL_GRADE = true;
@@ -775,12 +775,26 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_GRADE_DETAILS = true;
     } else if (token == "display_rank_to_individual"){
       DISPLAY_RANK_TO_INDIVIDUAL = true;
+    } else if (token == "display_benchmark") {
+      continue;
+    } else if (token == "benchmark_percent") {
+      continue;
+    } else if (token == "section") {
+      continue;
+    } else if (token == "messages") {
+      continue;
+    } else if (token == "warning") {
+      continue;
+    } else if (token == "manual_grade"){
+      continue;
+    } else if (token == "final_cutoff"){
+      continue;
     } else {
       std::cout << "OOPS " << token << std::endl;
       exit(0);
     }
   }
-  
+
   //std::cout << "4" << std::endl;
   
   // Set Display Benchmark
