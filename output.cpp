@@ -1196,13 +1196,13 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   }
 
   // Description of border outline that are in effect
-  if (s != NULL)
+  if (for_instructor || s != NULL)
   {
-      if (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity() || s->get_event_extension())
+      if (for_instructor || (s != NULL && (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity() || s->get_event_extension())))
       {
         ostr << "<style> .spacer {display: inline-block; width: 66px;} </style>\n";
         ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
-        if (s->get_event_academic_integrity())
+        if (for_instructor || (s != NULL && s->get_event_academic_integrity()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0a0a0a; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
@@ -1213,7 +1213,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "</tr>\n";
         }
-        if (s->get_event_overridden())
+        if (for_instructor || (s != NULL && s->get_event_overridden()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fcca03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
@@ -1235,7 +1235,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "</tr>\n";
         }
-        if (s->get_event_grade_inquiry())
+        if (for_instructor || (s != NULL && s->get_event_grade_inquiry()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #1cfc03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
@@ -1246,7 +1246,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "</tr>\n";
         }
-        if (s->get_event_bad_status())
+        if (for_instructor || (s != NULL && s->get_event_bad_status()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fc0303; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
