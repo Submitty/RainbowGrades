@@ -74,7 +74,8 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
 
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, int s, int /*r*/,const std::string& reason) {
+                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, 
+                     int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName) {
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -94,7 +95,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   academic_integrity = ai;
   event = e;
   if (reason != "") {
-    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+reason+"\" ";
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+gID+"\n"+userName+"\n"+reason+"\" ";
   }
   else hoverText = "";
   if (event == "Bad"){
@@ -135,9 +136,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
     
-  //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
-//  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
-        ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+    ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
   }
@@ -253,6 +252,7 @@ void Table::output(std::ostream& ostr,
       ostr << ".hoverable-cell:hover::before {";
       ostr << "    content: attr(data-hover-text);";
       ostr << "    position: absolute;";
+      ostr << "    white-space: pre-line;";
       ostr << "    left: 50%;";
       ostr << "    bottom: 85%;";
       ostr << "    width: auto;";
