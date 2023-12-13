@@ -98,7 +98,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   if (reason != "") {
     hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension due to "+reason+" on "+gID+"\" ";
   } else {
-    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension without specified reason" on "+gID+"\" ";
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension without specified reason on "+gID+"\" ";
   }
 
 // Bool in order of priority - top to bottom
