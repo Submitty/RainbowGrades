@@ -1255,6 +1255,17 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "</tr>\n";
         }
+       if (for_instructor || (s != NULL && s->get_event_cancelled()))
+        {
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #0a0a0a; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+          ostr << "<span class=\"spacer\"></span>";
+          ostr << "</td>";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+          ostr << "<font size = \"-1\"> Cancelled version </font>";
+          ostr << "</td>";
+          ostr << "</tr>\n";
+        }
        if (for_instructor || (s != NULL && s->get_event_version_conflict()))
         {
           ostr << "<tr>\n";

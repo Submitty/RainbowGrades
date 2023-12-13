@@ -1382,6 +1382,10 @@ void load_student_grades(std::vector<Student*> &students) {
                              event = "Version_conflict";
                              s->set_event_version_conflict(true);
                            }
+                           if (status_check == "Cancelled") {
+                             event = "Cancelled";
+                             s->set_event_cancelled(true);
+                           }
                            std::string inquiry = itr2->value("inquiry", "");
                            if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
                              assert(inquiry == "Open");

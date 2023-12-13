@@ -191,6 +191,7 @@ public:
     void set_event_overridden(bool value) {overridden = value;}
     void set_event_extension(bool value) {extension = value;}
     void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
+    void set_event_cancelled(bool value) {cancelled = value;}
     void set_event_version_conflict(bool value) {version_conflict = value;}
     void set_event_bad_status(bool value) {bad_status = value;}
 
@@ -199,6 +200,7 @@ public:
     bool get_event_overridden() {return overridden;}
     bool get_event_extension() {return extension;}
     bool get_event_grade_inquiry() {return grade_inquiry;}
+    bool get_event_cancelled() {return cancelled;}
     bool get_event_version_conflict() {return version_conflict;}
     bool get_event_bad_status() {return bad_status;}
 
@@ -263,6 +265,7 @@ private:
   bool extension = false;
   bool grade_inquiry = false;
   bool version_conflict = false;
+  bool cancelled = false;
   bool bad_status = false;
 
     // registration status

@@ -105,21 +105,24 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
 // Don't think we need this logic, but leaving it as sort of assert
   if (event == "Overridden"){
     override = true;
-    bad_status = inquiry = extension = version_conflict =  false;
+    bad_status = inquiry = extension = version_conflict = cancelled = false;
   } else if (event == "Extension"){
     extension = true;
-    inquiry = bad_status = override = version_conflict = false;
+    inquiry = bad_status = override = version_conflict = cancelled = false;
   } else if (event == "Open"){
     inquiry = true;
-    bad_status = override = extension = version_conflict = false;
+    bad_status = override = extension = version_conflict = cancelled = false;
+  } else if (event == "Cancelled"){
+    cancelled = true;
+    inquiry = bad_status = override = extension = version_conflict = false;
   } else if (event == "Version_conflict"){
     version_conflict = true;
-    inquiry = bad_status = override = false;
+    inquiry = bad_status = override = extension = cancelled = false;
   } else if (event == "Bad"){
     bad_status = true;
-    override = inquiry = extension = version_conflict = false;
+    override = inquiry = extension = version_conflict = cancelled = false;
   } else {
-   inquiry = bad_status = override = extension = version_conflict = false;
+   inquiry = bad_status = override = extension = version_conflict = cancelled = false;
   }
     
 }
@@ -140,13 +143,21 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         outline = "outline:4px solid #0066e0; outline-offset: -4px;";
     } else if (c.inquiry){
         outline = "outline:4px dashed #1cfc03; outline-offset: -4px;";
+    } else if (c.cancelled){
+        outline = "outline:4px dashed #0a0a0a; outline-offset: -4px;";
     } else if (c.version_conflict){
         outline = "outline:4px dashed #fc0303; outline-offset: -4px;";
     } else if (c.bad_status){
         outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
-    
-    ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+
+    if (c.extension){
+        ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+    } else {
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+
+    }
+
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
   }

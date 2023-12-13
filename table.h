@@ -37,6 +37,7 @@ public:
   bool override = false;
   bool extension = false;
   bool inquiry = false;
+  bool cancelled = false;
   bool version_conflict = false;
   bool bad_status = false;
   std::string hoverText = "";
