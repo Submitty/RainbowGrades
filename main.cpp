@@ -765,7 +765,7 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_INSTRUCTOR_NOTES = true;
     } else if (token == "exam_seating") {
       DISPLAY_EXAM_SEATING = true;
-    } else if (token == "academic_sanction_details") {
+    } else if (token == "academic_sanction_details" || token == "moss_details") {
       DISPLAY_ACADEMIC_SANCTION_DETAILS = true;
     } else if (token == "final_grade") {
       DISPLAY_FINAL_GRADE = true;
