@@ -32,11 +32,14 @@ public:
   std::string data;
   std::string event;
   int late_days_used;
+  // Bool in order of priority - top to bottom
   bool academic_integrity = false;
-  bool inquiry = false;
-  bool bad_status = false;
   bool override = false;
   bool extension = false;
+  bool inquiry = false;
+  bool cancelled = false;
+  bool version_conflict = false;
+  bool bad_status = false;
   std::string hoverText = "";
   std::string align;
   enum CELL_CONTENTS_STATUS visible;
