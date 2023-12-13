@@ -182,6 +182,7 @@ public:
     void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
     void set_event_overridden(bool value) {overridden = value;}
     void set_event_bad_status(bool value) {bad_status = value;}
+    void set_event_version_conflict(bool value) {version_conflict = value;}
     bool get_event_academic_integrity() {return academic_integrity;}
     bool get_event_grade_inquiry() {return grade_inquiry;}
     bool get_event_overridden() {return overridden;}
@@ -247,6 +248,7 @@ private:
   bool grade_inquiry = false;
   bool overridden = false;
   bool bad_status = false;
+  bool version_conflict = false;
 
     // registration status
   std::string section;

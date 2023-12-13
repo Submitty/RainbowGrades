@@ -1363,17 +1363,30 @@ void load_student_grades(std::vector<Student*> &students) {
                              event = "Bad";
                              s->set_event_bad_status(true);
                            }
-                           if (status_check == "Overridden") {
-                             event = "Overridden";
-                             s->set_event_overridden(true);
-                           }
                            std::string inquiry = itr2->value("inquiry", "");
                            if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
                              assert(inquiry == "Open");
                              event = "Open";
                              s->set_event_grade_inquiry(true);
                            }
-                          s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status);
+                           std::string version_conflict = itr2->value("version_conflict", "");
+                           if (version_conflict == "true") {
+                             event = "Version_conflict";
+                             s->set_version_conflict(true);
+                           }
+                           int late_day_exceptions = itr2->value("late_day_exceptions",0);
+                           std::string reason_for_exception = itr2->value("reason_for_exception","");
+                           if (late_day_exceptions > 0) {
+                             event = "Extension";
+                             s->set_event_extension(true);
+                           }
+                          // status_check itr from above, event should be ordered in priority
+                           if (status_check == "Overridden") {
+                             event = "Overridden";
+                             s->set_event_overridden(true);
+                           }
+
+                           s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
                         }
       }
 
