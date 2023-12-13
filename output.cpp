@@ -677,6 +677,7 @@ void start_table_output( bool /*for_instructor*/,
       //Late days headers
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED LATE DAYS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","USED LATE DAYS"));
+      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","EXCUSED EXTENSIONS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
     }
   }
@@ -1033,12 +1034,17 @@ void start_table_output( bool /*for_instructor*/,
           std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
           std::string event = this_student->getGradeableItemGrade(g,j).getEvent();
           bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
+          std::string reason = this_student->getGradeableItemGrade(g,j).getReasonForException();
+          std::string gID = GRADEABLES[g].getID(j);
+          std::string userName = this_student->getUserName();
           if (status.find("Bad") != std::string::npos) {
             details += " " + status;
           }
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
+          int daysExtended = this_student->getGradeableItemGrade(g,j).getLateDayExceptions();
           assert (color.size()==6);
-          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity));
+          std::string a = "right";
+          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName,daysExtended));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
@@ -1081,8 +1087,12 @@ void start_table_output( bool /*for_instructor*/,
           int used = this_student->getUsedLateDays();
           color = coloritcolor(allowed-used+2, 5+2, 3+2, 2+2, 1+2, 0+2);
           table.set(myrow,counter++,TableCell(color,used,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          int exceptions = this_student->getLateDayExceptions();
+          color = coloritcolor(exceptions,5,4,3,2,2);
+          table.set(myrow,counter++,TableCell(color,exceptions,"",0,CELL_CONTENTS_VISIBLE,"right"));
         } else {
           color="ffffff"; // default_color;
+          table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
@@ -1188,7 +1198,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   // Description of border outline that are in effect
   if (for_instructor || s != NULL)
   {
-      if (for_instructor || (s != NULL && (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity())))
+      if (for_instructor || (s != NULL && (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity() || s->get_event_extension())))
       {
         ostr << "<style> .spacer {display: inline-block; width: 66px;} </style>\n";
         ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
@@ -1210,7 +1220,18 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "<span class=\"spacer\"></span>";
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-          ostr << "<font size = \"-1\"> Grade override </font>";
+          ostr << "<font size = \"-1\"> Grade Override </font>";
+          ostr << "</td>";
+          ostr << "</tr>\n";
+        }
+        if (for_instructor || (s != NULL && s->get_event_extension()))
+        {
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0066e0; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+          ostr << "<span class=\"spacer\"></span>";
+          ostr << "</td>";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+          ostr << "<font size = \"-1\"> Excused Absence Extension </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }
@@ -1221,7 +1242,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "<span class=\"spacer\"></span>";
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-          ostr << "<font size = \"-1\"> Grade inquiry in progress </font>";
+          ostr << "<font size = \"-1\"> Grade Inquiry in Progress </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }
@@ -1243,6 +1264,13 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
 
 
   if (s != NULL) {
+    std::ifstream istr2("student_extension_reports/"+s->getUserName()+".html");
+    if (istr2.good()) {
+      std::string tmp_s;
+      while (getline(istr2,tmp_s)) {
+        ostr << tmp_s;
+      }
+    }
     std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");
     if (istr.good()) {
       std::string tmp_s;

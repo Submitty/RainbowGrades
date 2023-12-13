@@ -106,13 +106,15 @@ void Student::setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, f
   itr->second[i] = ItemGrade(value,late_days_used,note,status,temp,academic_integrity);
 }
 
-void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event, int late_days_used, const std::string &note, const std::string &status) {
+void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event, 
+                                           int late_days_used, const std::string &note, const std::string &status, int exceptions, const std::string &reason) {
   assert (i >= 0 && i < GRADEABLES[g].getCount());
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
   assert (itr != all_item_grades.end());
   assert (int(itr->second.size()) > i);
+  bool academic_integrity = false;
     
-  itr->second[i] = ItemGrade(value,late_days_used,note,status,event);
+  itr->second[i] = ItemGrade(value,late_days_used,note,status,event,academic_integrity,exceptions,reason);
 }
 
 
@@ -211,7 +213,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     //if(!id.empty() && GRADEABLES[g].isReleased(id)){
     if(!id.empty()){
       m = GRADEABLES[g].getItemMaximum(id);
-      std::cout << "m" << m << std::endl;
+      // std::cout << "m" << m << std::endl;
     }
     float p = GRADEABLES[g].getItemPercentage(id);
     float sm = GRADEABLES[g].getScaleMaximum(id);
@@ -428,6 +430,30 @@ int Student::getUsedLateDays() const {
   }
   return answer;
 }
+
+ int Student::getLateDayExceptions() const {
+  int answer = 0;
+  for (std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator itr = all_item_grades.begin(); itr != all_item_grades.end(); itr++) {
+    for (std::size_t i = 0; i < itr->second.size(); i++) {
+      answer += itr->second[i].getLateDayExceptions();
+    }
+  }
+  return answer;
+ }
+
+ std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > Student::getItemsWithExceptions() const {
+  std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > result;
+  for (std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator itr = all_item_grades.begin(); itr != all_item_grades.end(); itr++) {
+    for (std::size_t i = 0; i < itr->second.size(); i++) {
+      if (itr->second[i].getLateDayExceptions()>0) {
+        std::tuple<GRADEABLE_ENUM,int> indexes{itr->first,i};
+        std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > itemInfo{itr->second[i],indexes};
+        result.push_back(itemInfo);
+      }
+    }
+  }
+  return result;
+ }
 
 // =============================================================================================
 

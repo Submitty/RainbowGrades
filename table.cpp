@@ -74,7 +74,8 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
 
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, int s, int /*r*/) {
+                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, 
+                     int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName, int daysExtended) {
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -93,17 +94,24 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   rotate = 0;
   academic_integrity = ai;
   event = e;
+  if (reason != "") {
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension due to "+reason+" on "+gID+"\" ";
+  }
+  else hoverText = "";
   if (event == "Bad"){
     bad_status = true;
-    override = inquiry = false;
+    override = inquiry = extension = false;
   } else if ( event == "Overridden"){
     override = true;
-    bad_status = inquiry = false;
+    bad_status = inquiry = extension = false;
   } else if (event == "Open"){
     inquiry = true;
-    bad_status = override = false;
+    bad_status = override = extension = false;
+  } else if (event == "Extension"){
+    extension = true;
+    inquiry = bad_status = override = false;
   } else {
-   inquiry = bad_status = override = false; 
+   inquiry = bad_status = override = extension = false; 
   }
     
 }
@@ -120,15 +128,15 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         mark = "@";
     } else if (c.override){
         outline = "outline:4px solid #fcca03; outline-offset: -4px;";
+    } else if (c.extension){
+        outline = "outline:4px solid #0066e0; outline-offset: -4px;";
     } else if (c.inquiry){
         outline = "outline:4px dashed #1cfc03; outline-offset: -4px;";
     } else if (c.bad_status){
         outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
     
-  //  ostr << "<td bgcolor=\"" << c.color << "\" align=\"" << c.align << "\">";
-  ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
-    
+    ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
   if (0) { //rotate == 90) {
     ostr << "<div style=\"position:relative\"><p class=\"rotate\">";
   }
@@ -236,10 +244,37 @@ void Table::output(std::ostream& ostr,
       if (last_update != "") {
           ostr << "<em>Information last updated: " << last_update << "</em><br>\n";
       }
+
+      ostr << "<style>";
+      ostr << ".hoverable-cell {";
+      ostr << "    position: relative;";
+      ostr << "}";
+      ostr << ".hoverable-cell:hover::before {";
+      ostr << "    content: attr(data-hover-text);";
+      ostr << "    position: absolute;";
+      ostr << "    text-align: left;";
+      ostr << "    left: 50%;";
+      ostr << "    bottom: 85%;";
+      ostr << "    width: 500%;";
+      ostr << "    height: auto;";
+      ostr << "    background-color: rgba(255, 255, 255, 0.88);"; // semi-opaque white background
+      ostr << "    padding: 5px;";
+      ostr << "    border: 1px solid #aaa;";
+      ostr << "    z-index: 1;";
+      ostr << "    display: flex;";
+      ostr << "    align-items: left;";
+      ostr << "    justify-content: left;";
+      ostr << "    box-sizing: border-box;";
+      ostr << "}";
+      ostr << "</style>";
+
+
       ostr << "&nbsp;<br>\n";
       ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#aaaaaa;\">\n";
   }
-  
+
+
+
   if (transpose) {
     for (std::vector<int>::iterator c = which_data.begin(); c != which_data.end(); c++) {
       ostr << "<tr>\n";

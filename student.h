@@ -21,12 +21,14 @@ extern std::vector<float> GLOBAL_earned_late_days;
 
 class ItemGrade {
 public:
-  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false) {
+  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false, int de=0, const std::string& r="") {
     value = v;
     late_days_used = ldu;
     note = n;
     event = e;
     academic_integrity = ai;
+    late_day_exceptions = de;
+    reason_for_exception = r;
     
     if (s != "UNKONWN") {
       status = s;
@@ -55,6 +57,8 @@ public:
     return adjusted_value; 
   }
   int getLateDaysUsed() const { return late_days_used; }
+  int getLateDayExceptions() const { return late_day_exceptions; }
+  const std::string& getReasonForException() const { return reason_for_exception; }
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
   const std::string& getEvent() const { return event; }
@@ -63,10 +67,12 @@ public:
 private:
   float value;
   int late_days_used;
+  int late_day_exceptions;
   bool academic_integrity;
   std::string note;
   std::string status;
   std::string event;
+  std::string reason_for_exception;
 };
 
 //====================================================================
@@ -108,6 +114,8 @@ public:
   int getPollsIncorrect() const;
   float getPollPoints() const;
   int getUsedLateDays() const;
+  int getLateDayExceptions() const;
+  std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > getItemsWithExceptions() const;
   float getAcademicSanctionPenalty() const { return academic_sanction_penalty; }
 
   void setCurrentAllowedLateDays(int d) { current_allowed_late_days = d; }
@@ -174,7 +182,7 @@ public:
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
   void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status="");
   void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
-  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="");
+  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="",int exceptions=0, const std::string &reason="");
 
   void academic_sanction(const std::string &gradeable, float penalty);
 
@@ -182,10 +190,12 @@ public:
     void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
     void set_event_overridden(bool value) {overridden = value;}
     void set_event_bad_status(bool value) {bad_status = value;}
+    void set_event_extension(bool value) {extension = value;}
     bool get_event_academic_integrity() {return academic_integrity;}
     bool get_event_grade_inquiry() {return grade_inquiry;}
     bool get_event_overridden() {return overridden;}
     bool get_event_bad_status() {return bad_status;}
+    bool get_event_extension() {return extension;}
 
   // other grade-like data
   void setNumericID(const std::string& r_id) { numeric_id = r_id; }
@@ -247,6 +257,7 @@ private:
   bool grade_inquiry = false;
   bool overridden = false;
   bool bad_status = false;
+  bool extension = false;
 
     // registration status
   std::string section;
