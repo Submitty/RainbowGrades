@@ -1192,6 +1192,15 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
       {
         ostr << "<style> .spacer {display: inline-block; width: 66px;} </style>\n";
         ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
+        ostr << "<tr>\n";
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+        ostr << "<span class=\"spacer\"></span>";
+        ostr << "</td>";
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+        ostr << "<font size = \"-1\"> Border-Outline is ranked from top to bottom </font>";
+        ostr << "<span class=\"spacer\"></span> Higher ranked outline will over-write  </font>";
+        ostr << "</td>";
+        ostr << "</tr>\n";
         if (for_instructor || (s != NULL && s->get_event_academic_integrity()))
         {
           ostr << "<tr>\n";
@@ -1222,6 +1231,18 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
           ostr << "<font size = \"-1\"> Grade inquiry in progress </font>";
+          ostr << "</td>";
+          ostr << "</tr>\n";
+        }
+        if (for_instructor || (s != NULL && s->get_event_version_conflict()))
+        {
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #fc0303; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+          ostr << "<span class=\"spacer\"></span>";
+          ostr << "</td>";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+          ostr << "<font size = \"-1\"> Version conflict = version conflict between <br> ";
+          ostr << "<span class=\"spacer\"></span> TA graded version and Active version  </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }

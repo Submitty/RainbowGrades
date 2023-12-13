@@ -1377,9 +1377,10 @@ void load_student_grades(std::vector<Student*> &students) {
                              event = "Bad";
                              s->set_event_bad_status(true);
                            }
-                           if (status_check == "Overridden") {
-                             event = "Overridden";
-                             s->set_event_overridden(true);
+                           std::string version_conflict = itr2->value("version_conflict", "");
+                           if (version_conflict == "true") {
+                             event = "Version_conflict";
+                             s->set_event_version_conflict(true);
                            }
                            std::string inquiry = itr2->value("inquiry", "");
                            if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
@@ -1387,6 +1388,10 @@ void load_student_grades(std::vector<Student*> &students) {
                              event = "Open";
                              s->set_event_grade_inquiry(true);
                            }
+                           // Above itr2 status check, but in order of priority
+                          if (status_check == "Overridden") {
+                             event = "Overridden";
+                             s->set_event_overridden(true);
                           s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status);
                         }
       }

@@ -93,17 +93,29 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   rotate = 0;
   academic_integrity = ai;
   event = e;
-  if (event == "Bad"){
-    bad_status = true;
-    override = inquiry = false;
-  } else if ( event == "Overridden"){
-    override = true;
-    bad_status = inquiry = false;
+  if (reason != "") {
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+gID+"\n"+userName+"\n"+reason+"\" ";
+  }
+  else hoverText = "";
+  //bool in order of priority - top to bottom
+  // Don't think we need this logic (as it is well handled in initial stage but leaving it as sort of assert)
+  if ( event == "Overridden"){
+      override = true;
+      bad_status = inquiry = extension = version_conflict = false;
+  } else if (event == "Extension"){
+    extension = true;
+    inquiry = bad_status = override = version_conflict = false;
   } else if (event == "Open"){
     inquiry = true;
-    bad_status = override = false;
+    bad_status = override = extension = version_conflict = false;
+  } else if (event == "Version_conflict"){
+    version_conflict = true;
+    inquiry = bad_status = override = extension = false;
+  } else if (event == "Bad"){
+    bad_status = true;
+    override = inquiry = extension = version_conflict = false;
   } else {
-   inquiry = bad_status = override = false; 
+   inquiry = bad_status = override = extension = version_conflict = false;
   }
     
 }
@@ -122,6 +134,8 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         outline = "outline:4px solid #fcca03; outline-offset: -4px;";
     } else if (c.inquiry){
         outline = "outline:4px dashed #1cfc03; outline-offset: -4px;";
+    } else if (c.version_conflict){
+        outline = "outline:4px dashed #fc0303; outline-offset: -4px;";
     } else if (c.bad_status){
         outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
