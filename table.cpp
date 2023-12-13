@@ -75,7 +75,7 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, 
-                     int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName) {
+                     int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName, int daysExtended) {
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -95,7 +95,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   academic_integrity = ai;
   event = e;
   if (reason != "") {
-    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+gID+"\n"+userName+"\n"+reason+"\" ";
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension due to "+reason+" on "+gID+"\" ";
   }
   else hoverText = "";
   if (event == "Bad"){
@@ -252,10 +252,10 @@ void Table::output(std::ostream& ostr,
       ostr << ".hoverable-cell:hover::before {";
       ostr << "    content: attr(data-hover-text);";
       ostr << "    position: absolute;";
-      ostr << "    white-space: pre-line;";
+      ostr << "    text-align: left;";
       ostr << "    left: 50%;";
       ostr << "    bottom: 85%;";
-      ostr << "    width: auto;";
+      ostr << "    width: 500%;";
       ostr << "    height: auto;";
       ostr << "    background-color: rgba(255, 255, 255, 0.88);"; // semi-opaque white background
       ostr << "    padding: 5px;";

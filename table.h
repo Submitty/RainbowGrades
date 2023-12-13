@@ -25,7 +25,7 @@ public:
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0);
   TableCell(float              d   ,const std::string& c         , int precision, const std::string& n="", int ldu=0,
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& e="", bool ai = false, const std::string& a="right",
-            int s=1, int r=0, const std::string& reason="",const std::string& gID="",const std::string& userName="");
+            int s=1, int r=0, const std::string& reason="",const std::string& gID="",const std::string& userName="",int daysExtended=0);
   
   std::string make_cell_string(bool csv_mode) const;
   std::string color;

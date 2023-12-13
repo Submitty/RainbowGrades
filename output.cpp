@@ -1041,9 +1041,10 @@ void start_table_output( bool /*for_instructor*/,
             details += " " + status;
           }
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
+          int daysExtended = this_student->getGradeableItemGrade(g,j).getLateDayExceptions();
           assert (color.size()==6);
           std::string a = "right";
-          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName));
+          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName,daysExtended));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
