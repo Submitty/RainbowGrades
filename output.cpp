@@ -24,6 +24,8 @@
 
 extern std::string OUTPUT_FILE;
 extern std::string OUTPUT_CSV_FILE;
+extern std::string RG_VERSION_FILE;
+
 extern std::string ALL_STUDENTS_OUTPUT_DIRECTORY;
 extern std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV;
 
@@ -1388,6 +1390,35 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   ostr << "</table><p>\n";
 
   }
+
+  // RAINBOW GRADE VERSION DISPLAY
+  std::ifstream istr(RG_VERSION_FILE.c_str());
+  assert (istr.good());
+  nlohmann::json j = nlohmann::json::parse(istr);
+  // current_commit_hash_rg (Full hash) is not used, parsing just for possible future use
+  nlohmann::json current_commit_hash_rg = j["installed_commit_rg"];
+  nlohmann::json current_short_commit_hash_rg = j["short_installed_commit_rg"];
+  nlohmann::json current_git_tag_rg = j["most_recent_git_tag_rg"];
+
+  // Remove double quotation
+  std::string rainbow_short_hash = current_short_commit_hash_rg;
+  std::string rainbow_git_tag = current_git_tag_rg;
+  rainbow_git_tag.erase(std::remove(rainbow_git_tag.begin(), rainbow_git_tag.end(), '\"'), rainbow_git_tag.end());
+  rainbow_short_hash.erase(std::remove(rainbow_short_hash.begin(), rainbow_short_hash.end(), '\"'), rainbow_short_hash.end());
+
+  std::time_t currentTime = std::time(nullptr);
+  // Convert the time to the local time struct
+  std::tm* localTime = std::localtime(&currentTime);
+  // Extract the current year from the local time struct
+  int currentYear = localTime->tm_year + 1900;
+
+
+  ostr << "<p>&copy; " << currentYear << " <a href=\"https://submitty.org/instructor/course_settings/rainbow_grades/index\" target=\"_blank\" class=\"black-btn\">Submitty/RainbowGrades</a> <a href=\"https://github.com/Submitty/RainbowGrades/releases/tag/" << rainbow_git_tag
+               << "\" target=\"_blank\" title=\"" << rainbow_git_tag << " " << rainbow_short_hash
+               << "\" class=\"black-btn\">" << rainbow_git_tag << "</a></p>" << std::endl;
+
+
+
 
   ostr.close();
 }
