@@ -23,3 +23,8 @@ FetchContent_MakeAvailable(json)
 
 add_executable(process_grades.out main.cpp output.cpp table.cpp student.cpp zone.cpp benchmark.cpp submini_polls.cpp)
 target_link_libraries(process_grades.out PRIVATE nlohmann_json::nlohmann_json)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()
