@@ -184,6 +184,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   float nonzero_sum = 0;
   int nonzero_count = 0;
   int non_extra_credit_count = 0;
+
   for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
     //float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
@@ -475,41 +476,6 @@ std::string Student::grade(bool flag_b4_academic_sanction, Student *lowest_d) co
     over = overall_b4_academic_sanction();
   }
 
-
-  // some criteria that might indicate automatic failure of course
-  // (instructor can override with manual grade)
-
-  // 14 lines commented out by Konstantin Kuzmin to prevent Rainbow Grades from auto failing anyone 20230505T090900
-  //Old (pre Su2019) DS method
-  /*int failed_lab   = (GradeablePercent(GRADEABLE_ENUM::LAB)       < 1.01 * lowest_d->GradeablePercent(GRADEABLE_ENUM::LAB)       ) ? true : false;
-  int failed_hw    = (GradeablePercent(GRADEABLE_ENUM::HOMEWORK)  < 0.95 * lowest_d->GradeablePercent(GRADEABLE_ENUM::HOMEWORK)  ) ? true : false;
-  int failed_testA = (GradeablePercent(GRADEABLE_ENUM::TEST)      < 0.90 * lowest_d->GradeablePercent(GRADEABLE_ENUM::TEST)      ) ? true : false;
-  int failed_testB = (GradeablePercent(GRADEABLE_ENUM::EXAM)      < 0.90 * lowest_d->GradeablePercent(GRADEABLE_ENUM::EXAM)      ) ? true : false;
-  int failed_testC = (GradeablePercent(GRADEABLE_ENUM::TEST) + GradeablePercent(GRADEABLE_ENUM::EXAM) <
-                      0.90 * lowest_d->GradeablePercent(GRADEABLE_ENUM::TEST) + lowest_d->GradeablePercent(GRADEABLE_ENUM::EXAM) ) ? true : false;
-  if (failed_lab || failed_hw ||
-      ( failed_testA +
-        failed_testB +
-        failed_testC ) > 1) {
-    std::cout << "SHOULD AUTO FAIL";
-
-    ((Student*)this)->other_note += "SHOULD AUTO FAIL";
-    return "F";
-  }*/
-
-
-  /*
-  for(std::map<GRADEABLE_ENUM,float>::const_iterator it=OVERALL_FAIL_CUTOFFS.begin(); it != OVERALL_FAIL_CUTOFFS.end(); it++){
-      if(GradeablePercent(it->first)/100.0 < GRADEABLES[it->first].getPercent() * it->second){
-        std::cerr << "Failing student " << this->getUserName() << " due to low " << gradeable_to_string(it->first)
-                  << " grade of " << GradeablePercent(it->first)/100.0 << " < "
-                  << GRADEABLES[it->first].getPercent() * it->second << " max is "
-                  << GRADEABLES[it->first].getPercent() << std::endl;
-          return "F";
-      }
-  }
-  */
-
   // otherwise apply the cutoffs
   if (over >= CUTOFFS["A"])  return "A";
   if (over >= CUTOFFS["A-"]) return "A-";
@@ -522,8 +488,6 @@ std::string Student::grade(bool flag_b4_academic_sanction, Student *lowest_d) co
   if (over >= CUTOFFS["D+"]) return "D+";
   if (over >= CUTOFFS["D"])  return "D";
   else return "F";
-
-  return "?";
 }
 
 
