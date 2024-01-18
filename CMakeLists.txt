@@ -1,0 +1,25 @@
+#remove_json_comments: customization.json
+#cpp -xc++ $< | sed -e '/^#/d' > customization_no_comments.json
+#python3 -m json.tool customization_no_comments.json > /dev/null
+#
+#process_grades.out: \
+#${RAINBOW_GRADES_DIRECTORY}/main.cpp \
+#${RAINBOW_GRADES_DIRECTORY}/output.cpp \
+#${RAINBOW_GRADES_DIRECTORY}/table.cpp \
+#${RAINBOW_GRADES_DIRECTORY}/student.cpp \
+#${RAINBOW_GRADES_DIRECTORY}/zone.cpp \
+#${RAINBOW_GRADES_DIRECTORY}/benchmark.cpp \
+#${RAINBOW_GRADES_DIRECTORY}/submini_polls.cpp
+#clang++ -Wall -Wextra ${flags} ${memory_flags} ${json_include} $^ -g -o $@
+#
+cmake_minimum_required(VERSION 3.16)
+project(process_grades LANGUAGES CXX)
+
+CMAKE_POLICY(SET CMP0135 NEW)
+include(FetchContent)
+
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+add_executable(process_grades.out main.cpp output.cpp table.cpp student.cpp zone.cpp benchmark.cpp submini_polls.cpp)
+target_link_libraries(process_grades.out PRIVATE nlohmann_json::nlohmann_json)
