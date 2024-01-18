@@ -38,23 +38,11 @@ public:
 
     float adjusted_value = value;
     if (late_days_used > 0) {
-      //std::cout << "LATE DAYS! " << late_days_used << std::endl;
       // FIXME:  Currently a flat penalty no matter how many days used
       adjusted_value = (1-LATE_DAY_PERCENTAGE_PENALTY)*value;
-      //std::cout << "value " << value << "-> " << adjusted_value << std::endl;
     }
     
-    /*
-    // grab the maximum score for this homework
-    assert (PERFECT_STUDENT_POINTER != NULL);
-    std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator ps_itr = PERFECT_STUDENT_POINTER->all_item_grades.find(g);
-    assert (ps_itr != all_item_grades.end());
-    float ps_value = ps_itr->second[i].getValue();
-    */
-    // adjust the homework score
-    //value = std::max(0.0f, value - d*LATE_DAY_PERCENTAGE_PENALTY*ps_value);
-
-    return adjusted_value; 
+    return adjusted_value;
   }
   int getLateDaysUsed() const { return late_days_used; }
   int getLateDayExceptions() const { return late_day_exceptions; }
