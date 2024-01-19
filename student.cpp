@@ -117,51 +117,6 @@ void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value,
   itr->second[i] = ItemGrade(value,late_days_used,note,status,event,academic_integrity,exceptions,reason);
 }
 
-
-
-
-
-
-// =============================================================================================
-// GRADER CALCULATION HELPER FUNCTIONS
-
-class score_object {
-public:
-  score_object(float s,float m,float p,float sm):score(s),max(m),percentage(p),scale_max(sm){}
-  float score;
-  float max;
-  float percentage;
-  float scale_max;
-};
-
-bool operator<(const score_object &a, const score_object &b) {
-  float s1 = a.score;
-  float m1 = a.max;
-  float p1 = a.percentage;
-  float sm1 = a.scale_max;
-  float my_max1 = std::max(m1,sm1);
-  float s2 = b.score;
-  float m2 = b.max;
-  float p2 = b.percentage;
-  float sm2 = b.scale_max;
-  float my_max2 = std::max(m2,sm2);
-  // Grades should be compared by the normalized grade only, not normalized grade multiplied by percentages. Otherwise, a grade of 90 for the gradeable
-  // with percentage 0.1 will always be considered lower than a grade of 60 for the gradeable with percentage 0.2, since 0.1 * 0.9 < 0.2 * 0.6
-  bool result;
-  // If any of the two scores has a max of 0 (but not both of them), it means it is extra credit, so it will always be considered larger, so that we do not
-  // remove extra credit assignment scores under the "drop the lowest" rule
-  if (((m1 == 0.0) && (m2 != 0.0)) || ((m1 != 0.0) && (m2 == 0.0))) {
-    result = (m1 == 0.0) ? false : true;
-  }
-  else if (std::abs(s1 / my_max1 - s2 / my_max2) > 0.001) {
-    result = (s1 / my_max1 < s2 / my_max2);
-  }
-  // otherwise, order by percentage decreasing, so that if two scores are equal, the gradable with the higher percentage is considered smaller.
-  // For example, for p1==0.1, s1/my_max1 == 0.9 and p2==0.2, s2/my_max2 == 0.9, the operator would return false.
-  else result = (p1 > p2);
-  return result;
-}
-
 float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
   auto & gradeable = GRADEABLES[gradeable_category];
   if (gradeable.getCount() == 0) return 0;
@@ -195,6 +150,17 @@ float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
   }
 
   // collect the scores in a vector
+  std::vector<score_object> scores = fillScoreVector(
+      gradeable_category, gradeable, nonzero_sum, nonzero_count);
+  float percentage =
+      calculateScorePercentages(gradeable, non_extra_credit_count, scores);
+
+  return 100 * percentage;
+}
+std::vector<Student::score_object>
+Student::fillScoreVector(GRADEABLE_ENUM &gradeable_category,
+                         const Gradeable &gradeable, float nonzero_sum,
+                         int nonzero_count) const {
   std::vector<score_object> scores;
   for (int i = 0; i < gradeable.getCount(); i++) {
     float item_grade = getGradeableItemGrade(gradeable_category,i).getValue();
@@ -208,14 +174,20 @@ float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
     float gradeable_scale_maximum = gradeable.getScaleMaximum(id);
     scores.push_back(score_object(item_grade, item_maximum, item_percentage, gradeable_scale_maximum));
   }
-
-  // sort the scores (smallest first)
+  return scores;
+}
+float Student::calculateScorePercentages(Gradeable &gradeable,
+                                         int non_extra_credit_count,
+                                         std::vector<score_object> &scores)
+    const { // sort the scores (smallest first)
   std::sort(scores.begin(),scores.end());
-  //to check that the number of "drop the lowest" is less than the number of non extra credit gradeables,
+  // to check that the number of "drop the lowest" is less than the number of
+  // non extra credit gradeables,
   // i.e., it is not allowed to drop all non extra credit gradeables
-  assert (gradeable.getRemoveLowest() >= 0 && (
-          (non_extra_credit_count > 0 && gradeable.getRemoveLowest() < non_extra_credit_count)) ||
-          (gradeable.getRemoveLowest() == 0));
+  assert(gradeable.getRemoveLowest() >= 0 &&
+             ((non_extra_credit_count > 0 &&
+               gradeable.getRemoveLowest() < non_extra_credit_count)) ||
+         (gradeable.getRemoveLowest() == 0));
 
   // sum the remaining (higher) scores
   float sum_max = 0;
@@ -269,13 +241,12 @@ float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
     sum_percentage = 1.0;
   }
 
-
   float percentage = gradeable.hasSortedWeight() ? sum : gradeable.getPercent() * sum / sum_percentage;
   float percentage_upper_clamp = gradeable.getBucketPercentageUpperClamp();
   if (percentage_upper_clamp > 0) {
     percentage = std::min(percentage, percentage_upper_clamp);
   }
-  return 100 * percentage;
+  return percentage;
 }
 void Student::getNonzeroCounts(const Gradeable &gradeable, float &nonzero_sum,
                                int &nonzero_count,

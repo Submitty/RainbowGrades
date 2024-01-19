@@ -299,8 +299,54 @@ private:
   int polls_correct;
   int polls_incorrect;
   bool earn_late_days_from_polls;
+
+  class score_object {
+  public:
+    score_object(float s,float m,float p,float sm):score(s),max(m),percentage(p),scale_max(sm){}
+    float score;
+    float max;
+    float percentage;
+    float scale_max;
+  private:
+    friend bool operator<(const score_object &a, const score_object &b) {
+      float s1 = a.score;
+      float m1 = a.max;
+      float p1 = a.percentage;
+      float sm1 = a.scale_max;
+      float my_max1 = std::max(m1,sm1);
+      float s2 = b.score;
+      float m2 = b.max;
+      float p2 = b.percentage;
+      float sm2 = b.scale_max;
+      float my_max2 = std::max(m2,sm2);
+      // Grades should be compared by the normalized grade only, not normalized grade multiplied by percentages. Otherwise, a grade of 90 for the gradeable
+      // with percentage 0.1 will always be considered lower than a grade of 60 for the gradeable with percentage 0.2, since 0.1 * 0.9 < 0.2 * 0.6
+      bool result;
+      // If any of the two scores has a max of 0 (but not both of them), it means it is extra credit, so it will always be considered larger, so that we do not
+      // remove extra credit assignment scores under the "drop the lowest" rule
+      if (((m1 == 0.0) && (m2 != 0.0)) || ((m1 != 0.0) && (m2 == 0.0))) {
+        result = (m1 == 0.0) ? false : true;
+      }
+      else if (std::abs(s1 / my_max1 - s2 / my_max2) > 0.001) {
+        result = (s1 / my_max1 < s2 / my_max2);
+      }
+        // otherwise, order by percentage decreasing, so that if two scores are equal, the gradable with the higher percentage is considered smaller.
+        // For example, for p1==0.1, s1/my_max1 == 0.9 and p2==0.2, s2/my_max2 == 0.9, the operator would return false.
+      else result = (p1 > p2);
+      return result;
+    }
+  };
+
+  // TODO make these free functions
   void getNonzeroCounts(const Gradeable &gradeable, float &nonzero_sum,
                         int &nonzero_count, int &non_extra_credit_count) const;
+  float calculateScorePercentages(Gradeable &gradeable,
+                                  int non_extra_credit_count,
+                                  std::vector<score_object> &scores) const;
+  std::vector<score_object> fillScoreVector(GRADEABLE_ENUM &gradeable_category,
+                                            const Gradeable &gradeable,
+                                            float nonzero_sum,
+                                            int nonzero_count) const;
 };
 
 //====================================================================
