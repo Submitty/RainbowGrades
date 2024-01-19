@@ -299,6 +299,8 @@ private:
   int polls_correct;
   int polls_incorrect;
   bool earn_late_days_from_polls;
+  void getNonzeroCounts(const Gradeable &gradeable, float &nonzero_sum,
+                        int &nonzero_count, int &non_extra_credit_count) const;
 };
 
 //====================================================================

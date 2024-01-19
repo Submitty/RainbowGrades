@@ -186,22 +186,10 @@ float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
   int nonzero_count = 0;
   int non_extra_credit_count = 0;
 
-  for (int i = 0; i < gradeable.getCount(); i++) {
-    //float s = getGradeableItemGrade(gradeable_category,i).getValue();
-    std::string id = gradeable.getID(i);
-    if(!id.empty()){
-      if (gradeable.getItemMaximum(id) > 0) {
-        non_extra_credit_count++;
-      }
-      float m = std::max(gradeable.getItemMaximum(id),gradeable.getScaleMaximum(id));
-      if(m > 0){
-        nonzero_sum += m;
-        nonzero_count++;
-      }
-    }
-  }
+  getNonzeroCounts(gradeable, nonzero_sum, nonzero_count,
+                   non_extra_credit_count);
 
-  //If there are no gradeables with a max >0, bucket is 0% anyway
+  // If there are no gradeables with a max >0, bucket is 0% anyway
   if(nonzero_count == 0){
     return 0.0;
   }
@@ -219,7 +207,6 @@ float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
     float item_percentage = gradeable.getItemPercentage(id);
     float gradeable_scale_maximum = gradeable.getScaleMaximum(id);
     scores.push_back(score_object(item_grade, item_maximum, item_percentage, gradeable_scale_maximum));
-    std::cout<<"item_grade: "<<item_grade<<"; item_maximum: "<<item_maximum<<"; item_percentage: "<<item_percentage<<"; gradeable_scale_maximum: "<<gradeable_scale_maximum<<std::endl;
   }
 
   // sort the scores (smallest first)
@@ -290,9 +277,24 @@ float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
   }
   return 100 * percentage;
 }
-
-
-
+void Student::getNonzeroCounts(const Gradeable &gradeable, float &nonzero_sum,
+                               int &nonzero_count,
+                               int &non_extra_credit_count) const {
+  for (int i = 0; i < gradeable.getCount(); i++) {
+    //float s = getGradeableItemGrade(gradeable_category,i).getValue();
+    std::string id = gradeable.getID(i);
+    if(!id.empty()){
+      if (gradeable.getItemMaximum(id) > 0) {
+        non_extra_credit_count++;
+      }
+      float m = std::max(gradeable.getItemMaximum(id),gradeable.getScaleMaximum(id));
+      if(m > 0){
+        nonzero_sum += m;
+        nonzero_count++;
+      }
+    }
+  }
+}
 
 float Student::adjusted_test(int i) const {
   assert (i >= 0 && i <  GRADEABLES[GRADEABLE_ENUM::TEST].getCount());
