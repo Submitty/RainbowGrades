@@ -15,7 +15,7 @@ enum class GRADEABLE_ENUM {
     PROJECT, PARTICIPATION, NOTE,
     NONE };
 
-std::string gradeable_to_string(const GRADEABLE_ENUM &g);
+std::string gradeable_enum_to_string(const GRADEABLE_ENUM &g);
 
 bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value);
 
@@ -95,6 +95,5 @@ extern std::map<GRADEABLE_ENUM,Gradeable>  GRADEABLES;
 
 void LookupGradeable(const std::string &id,
                      GRADEABLE_ENUM &g_e, int &i);
-
 
 #endif

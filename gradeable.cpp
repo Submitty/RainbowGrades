@@ -2,7 +2,7 @@
 #include <gradeable.h>
 #include <iostream>
 
-std::string gradeable_to_string(const GRADEABLE_ENUM &g) {
+std::string gradeable_enum_to_string(const GRADEABLE_ENUM &g) {
   switch (g) {
   case GRADEABLE_ENUM::HOMEWORK: return "HOMEWORK";
   case GRADEABLE_ENUM::ASSIGNMENT: return "ASSIGNMENT";

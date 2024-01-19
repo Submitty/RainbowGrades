@@ -623,7 +623,7 @@ void start_table_output( bool /*for_instructor*/,
         assert (GRADEABLES[g].getPercent() < 0.01);
         continue;
       }
-      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff",gradeable_to_string(g)+" %"));
+      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff", gradeable_enum_to_string(g)+" %"));
     }
     student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
   }
@@ -645,7 +645,7 @@ void start_table_output( bool /*for_instructor*/,
         }
         if (gradeable_name == "")
           gradeable_name = "<em><font color=\"aaaaaa\">future "
-            + tolower(gradeable_to_string(g)) + "</font></em>";
+            + tolower(gradeable_enum_to_string(g)) + "</font></em>";
         table.set(0,counter++,TableCell("ffffff",gradeable_name));
       }
       if (g != GRADEABLE_ENUM::NOTE) {

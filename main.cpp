@@ -1700,7 +1700,7 @@ void suggest_curves(std::vector<Student*> &students) {
       if (gradeable_id == "") continue;
 
       const std::string& gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-      std::cout << gradeable_to_string(g) << " " << gradeable_id << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
+      std::cout << gradeable_enum_to_string(g) << " " << gradeable_id << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
       std::vector<float> scores;
 
       // gather the scores from the valid (non-omitted) sections

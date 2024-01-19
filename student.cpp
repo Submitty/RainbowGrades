@@ -506,7 +506,7 @@ void Student::academic_sanction(const std::string &gradeable, float penalty) {
   } else {
     int which = GRADEABLES[g].getCorrespondence(gradeable).first;
     if (!(getGradeableItemGrade(g,which).getValue() > 0)) {
-      std::cerr << "WARNING:  the grade for this " <<gradeable_to_string(g)<<" is already 0, academic sanction penalty error?" << std::endl;
+      std::cerr << "WARNING:  the grade for this " << gradeable_enum_to_string(g)<<" is already 0, academic sanction penalty error?" << std::endl;
     }
       setGradeableItemGrade_AcademicIntegrity(g,which,0, true);
   }
