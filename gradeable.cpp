@@ -1,6 +1,6 @@
 #include <string>
-#include <gradeable.h>
 #include <iostream>
+#include "gradeable.h"
 
 std::string gradeable_enum_to_string(const GRADEABLE_ENUM &g) {
   switch (g) {
