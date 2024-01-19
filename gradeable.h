@@ -74,6 +74,7 @@ private:
   float percent;
   int remove_lowest;
   float bucket_percentage_upper_clamp;
+  // would it make more sense to have a single map of structs of items?
   std::map<std::string,std::pair<int,std::string> > correspondences;
   std::map<std::string,float> maximums;
   std::map<std::string,float> scale_maximums;

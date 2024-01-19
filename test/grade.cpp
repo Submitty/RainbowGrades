@@ -1,5 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
-#include <grade.h>
+#include "grade.h"
 
 TEST_CASE("grade comparison") {
   Grade a("A");

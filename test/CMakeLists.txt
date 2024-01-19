@@ -11,7 +11,7 @@ list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
 
 add_executable(unit_tests benchmark.cpp student.cpp table.cpp zone.cpp
         grade.cpp)
-target_link_libraries(unit_tests PRIVATE Catch2::Catch2WithMain rainbow_grades)
+target_link_libraries(unit_tests PRIVATE Catch2::Catch2WithMain rainbow_grades nlohmann_json::nlohmann_json)
 
 include(Catch)
 catch_discover_tests(unit_tests)
