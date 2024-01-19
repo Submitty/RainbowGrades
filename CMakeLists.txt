@@ -21,8 +21,12 @@ include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
-add_executable(process_grades.out main.cpp output.cpp table.cpp student.cpp zone.cpp benchmark.cpp submini_polls.cpp)
-target_link_libraries(process_grades.out PRIVATE nlohmann_json::nlohmann_json)
+add_library(rainbow_grades output.cpp table.cpp student.cpp zone.cpp benchmark.cpp submini_polls.cpp)
+target_link_libraries(rainbow_grades PRIVATE nlohmann_json::nlohmann_json)
+target_include_directories(rainbow_grades PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(process_grades.out main.cpp )
+target_link_libraries(process_grades.out PRIVATE nlohmann_json::nlohmann_json rainbow_grades)
 
 include(CTest)
 if(BUILD_TESTING)
