@@ -221,7 +221,7 @@ public:
 
 
   // HELPER FUNCTIONS
-  float GradeablePercent(GRADEABLE_ENUM g) const;
+  float GradeablePercent(GRADEABLE_ENUM gradeable_category) const;
   float overall() const { return overall_b4_academic_sanction() + academic_sanction_penalty; }
   float adjusted_test(int i) const;
   float adjusted_test_pct() const;

@@ -162,21 +162,21 @@ bool operator<(const score_object &a, const score_object &b) {
   return result;
 }
 
-float Student::GradeablePercent(GRADEABLE_ENUM g) const {
-  if (GRADEABLES[g].getCount() == 0) return 0;
-  assert (GRADEABLES[g].getPercent() >= 0);
+float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
+  if (GRADEABLES[gradeable_category].getCount() == 0) return 0;
+  assert (GRADEABLES[gradeable_category].getPercent() >= 0);
 
   // special rules for tests
-  if (g == GRADEABLE_ENUM::TEST && TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT) {
+  if (gradeable_category == GRADEABLE_ENUM::TEST && TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT) {
     return adjusted_test_pct();
   }
 
   // normalize & drop lowest #
-  if (g == GRADEABLE_ENUM::QUIZ && QUIZ_NORMALIZE_AND_DROP > 0) {
+  if (gradeable_category == GRADEABLE_ENUM::QUIZ && QUIZ_NORMALIZE_AND_DROP > 0) {
     return quiz_normalize_and_drop(QUIZ_NORMALIZE_AND_DROP);
   }
 
-  if (g == GRADEABLE_ENUM::TEST && LOWEST_TEST_COUNTS_HALF) {
+  if (gradeable_category == GRADEABLE_ENUM::TEST && LOWEST_TEST_COUNTS_HALF) {
     return lowest_test_counts_half_pct();
   }
 
@@ -185,14 +185,14 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   int nonzero_count = 0;
   int non_extra_credit_count = 0;
 
-  for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
-    //float s = getGradeableItemGrade(g,i).getValue();
-    std::string id = GRADEABLES[g].getID(i);
+  for (int i = 0; i < GRADEABLES[gradeable_category].getCount(); i++) {
+    //float s = getGradeableItemGrade(gradeable_category,i).getValue();
+    std::string id = GRADEABLES[gradeable_category].getID(i);
     if(!id.empty()){
-      if (GRADEABLES[g].getItemMaximum(id) > 0) {
+      if (GRADEABLES[gradeable_category].getItemMaximum(id) > 0) {
         non_extra_credit_count++;
       }
-      float m = std::max(GRADEABLES[g].getItemMaximum(id),GRADEABLES[g].getScaleMaximum(id));
+      float m = std::max(GRADEABLES[gradeable_category].getItemMaximum(id),GRADEABLES[gradeable_category].getScaleMaximum(id));
       if(m > 0){
         nonzero_sum += m;
         nonzero_count++;
@@ -207,37 +207,37 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
 
   // collect the scores in a vector
   std::vector<score_object> scores;
-  for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
-    float s = getGradeableItemGrade(g,i).getValue();
-    std::string id = GRADEABLES[g].getID(i);
-    float m = nonzero_sum/nonzero_count;
-    //if(!id.empty() && GRADEABLES[g].isReleased(id)){
+  for (int i = 0; i < GRADEABLES[gradeable_category].getCount(); i++) {
+    float item_grade = getGradeableItemGrade(gradeable_category,i).getValue();
+    std::string id = GRADEABLES[gradeable_category].getID(i);
+    // this is used for extra credit gradeables to get the maximum score
+    float item_maximum = nonzero_sum/nonzero_count;
     if(!id.empty()){
-      m = GRADEABLES[g].getItemMaximum(id);
-      // std::cout << "m" << m << std::endl;
+      item_maximum = GRADEABLES[gradeable_category].getItemMaximum(id);
     }
-    float p = GRADEABLES[g].getItemPercentage(id);
-    float sm = GRADEABLES[g].getScaleMaximum(id);
-    scores.push_back(score_object(s,m,p,sm));
+    float item_percentage = GRADEABLES[gradeable_category].getItemPercentage(id);
+    float gradeable_scale_maximum = GRADEABLES[gradeable_category].getScaleMaximum(id);
+    scores.push_back(score_object(item_grade, item_maximum, item_percentage, gradeable_scale_maximum));
+    std::cout<<"item_grade: "<<item_grade<<"; item_maximum: "<<item_maximum<<"; item_percentage: "<<item_percentage<<"; gradeable_scale_maximum: "<<gradeable_scale_maximum<<std::endl;
   }
 
   // sort the scores (smallest first)
   std::sort(scores.begin(),scores.end());
   //to check that the number of "drop the lowest" is less than the number of non extra credit gradeables,
   // i.e., it is not allowed to drop all non extra credit gradeables
-  assert (GRADEABLES[g].getRemoveLowest() >= 0 && (
-          (non_extra_credit_count > 0 && GRADEABLES[g].getRemoveLowest() < non_extra_credit_count)) ||
-          (GRADEABLES[g].getRemoveLowest() == 0));
+  assert (GRADEABLES[gradeable_category].getRemoveLowest() >= 0 && (
+          (non_extra_credit_count > 0 && GRADEABLES[gradeable_category].getRemoveLowest() < non_extra_credit_count)) ||
+          (GRADEABLES[gradeable_category].getRemoveLowest() == 0));
 
   // sum the remaining (higher) scores
   float sum_max = 0;
-  for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
+  for (int i = GRADEABLES[gradeable_category].getRemoveLowest(); i < GRADEABLES[gradeable_category].getCount(); i++) {
     float m = scores[i].max;
     sum_max += m;
   }
 
   float sum_scaled_max = 0;
-  for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
+  for (int i = GRADEABLES[gradeable_category].getRemoveLowest(); i < GRADEABLES[gradeable_category].getCount(); i++) {
     if(scores[i].max > 0){
       continue;
     }
@@ -249,7 +249,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   float sum = 0;
   // to also sum the remaining (higher) percentages
   float sum_percentage = 0;
-  for (int i = GRADEABLES[g].getRemoveLowest(); i < GRADEABLES[g].getCount(); i++) {
+  for (int i = GRADEABLES[gradeable_category].getRemoveLowest(); i < GRADEABLES[gradeable_category].getCount(); i++) {
     float s = scores[i].score;
     float m = scores[i].max;
     float p = scores[i].percentage;
@@ -259,8 +259,8 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     if (p < 0) {
       if (sum_max > 0) {
         p = std::max(m,sm) / sum_max;
-        if(GRADEABLES[g].hasSortedWeight()){
-          p = GRADEABLES[g].getSortedWeight(i);
+        if(GRADEABLES[gradeable_category].hasSortedWeight()){
+          p = GRADEABLES[gradeable_category].getSortedWeight(i);
         }
       } else {
         // pure extra credit category
@@ -282,12 +282,12 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
   }
 
 
-  //float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum;
-  float percentage = GRADEABLES[g].hasSortedWeight() ? sum : GRADEABLES[g].getPercent() * sum / sum_percentage;
-  // std::cout << "sum: " << sum << "; GRADEABLES[g].getPercent() * sum / sum_percentage: " << (GRADEABLES[g].getPercent() * sum / sum_percentage) << "; sum_percentage: " << sum_percentage << std::endl;
-  float percentage_upper_clamp = GRADEABLES[g].getBucketPercentageUpperClamp();
+  //float percentage = GRADEABLES[gradeable_category].hasSortedWeight() ? sum : GRADEABLES[gradeable_category].getPercent() * sum;
+  float percentage = GRADEABLES[gradeable_category].hasSortedWeight() ? sum : GRADEABLES[gradeable_category].getPercent() * sum / sum_percentage;
+  // std::cout << "sum: " << sum << "; GRADEABLES[gradeable_category].getPercent() * sum / sum_percentage: " << (GRADEABLES[gradeable_category].getPercent() * sum / sum_percentage) << "; sum_percentage: " << sum_percentage << std::endl;
+  float percentage_upper_clamp = GRADEABLES[gradeable_category].getBucketPercentageUpperClamp();
   // 1 line added by Konstantin Kuzmin 20230823T181400
-  // std::cout << "percentage: " << percentage << "; percentage_upper_clamp: " << (percentage_upper_clamp) << "; GRADEABLES[g].hasSortedWeight():" << GRADEABLES[g].hasSortedWeight() << std::endl;
+  // std::cout << "percentage: " << percentage << "; percentage_upper_clamp: " << (percentage_upper_clamp) << "; GRADEABLES[gradeable_category].hasSortedWeight():" << GRADEABLES[gradeable_category].hasSortedWeight() << std::endl;
   if (percentage_upper_clamp > 0) {
     percentage = std::min(percentage, percentage_upper_clamp);
   }
