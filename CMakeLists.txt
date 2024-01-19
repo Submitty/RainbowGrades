@@ -22,7 +22,8 @@ FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download
 FetchContent_MakeAvailable(json)
 
 add_library(rainbow_grades output.cpp table.cpp student.cpp zone.cpp benchmark.cpp submini_polls.cpp
-        grade.cpp)
+        grade.cpp
+        gradeable.cpp)
 target_link_libraries(rainbow_grades PRIVATE nlohmann_json::nlohmann_json)
 target_include_directories(rainbow_grades PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -243,31 +243,6 @@ bool by_section(const Student *s1, const Student *s2) {
 
 //====================================================================
 
-bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value) {
-  std::string s2;
-  for (unsigned int i = 0; i < s.size(); ++i) {
-    s2.push_back(std::tolower(s[i]));
-  }
-  std::replace( s2.begin(), s2.end(), '-', '_');
-  if (s2 == "hw" || s2 == "homework")          { return_value = GRADEABLE_ENUM::HOMEWORK;          return true;  }
-  if (s2 == "assignment")                      { return_value = GRADEABLE_ENUM::ASSIGNMENT;        return true;  }
-  if (s2 == "problem_set")                     { return_value = GRADEABLE_ENUM::PROBLEM_SET;       return true;  }
-  if (s2 == "quiz" || s2 == "quizze")          { return_value = GRADEABLE_ENUM::QUIZ;              return true;  }
-  if (s2 == "test")                            { return_value = GRADEABLE_ENUM::TEST;              return true;  }
-  if (s2 == "exam")                            { return_value = GRADEABLE_ENUM::EXAM;              return true;  }
-  if (s2 == "exercise")                        { return_value = GRADEABLE_ENUM::EXERCISE;          return true;  }
-  if (s2 == "lecture_exercise")                { return_value = GRADEABLE_ENUM::LECTURE_EXERCISE;  return true;  }
-  if (s2 == "reading")                         { return_value = GRADEABLE_ENUM::READING;           return true;  }
-  if (s2 == "worksheet")                       { return_value = GRADEABLE_ENUM::WORKSHEET;         return true;  }
-  if (s2 == "lab")                             { return_value = GRADEABLE_ENUM::LAB;               return true;  }
-  if (s2 == "recitation")                      { return_value = GRADEABLE_ENUM::RECITATION;        return true;  }
-  if (s2 == "project")                         { return_value = GRADEABLE_ENUM::PROJECT;           return true;  }
-  if (s2 == "participation")                   { return_value = GRADEABLE_ENUM::PARTICIPATION;     return true;  }
-  if (s2 == "instructor_note" || s2 == "note") { return_value = GRADEABLE_ENUM::NOTE;              return true;  }
-  if (s2 == "note")                            { return_value = GRADEABLE_ENUM::NOTE;              return true;  }
-  if (s2.substr(0,4) == "none")                { return_value = GRADEABLE_ENUM::NOTE;              return true;  }
-  return false;
-}
 
 //====================================================================
 

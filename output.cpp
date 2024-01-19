@@ -21,6 +21,7 @@
 #define grey_divider "aaaaaa"
 
 #include "constants_and_globals.h"
+#include "string_utility.h"
 
 extern std::string OUTPUT_FILE;
 extern std::string OUTPUT_CSV_FILE;

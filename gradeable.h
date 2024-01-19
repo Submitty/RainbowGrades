@@ -4,53 +4,20 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <iostream>
+#include <cassert>
 
 
-enum class GRADEABLE_ENUM { 
+enum class GRADEABLE_ENUM {
   HOMEWORK, ASSIGNMENT, PROBLEM_SET,
-    QUIZ, TEST, EXAM, 
+    QUIZ, TEST, EXAM,
     EXERCISE, LECTURE_EXERCISE, READING, WORKSHEET, LAB, RECITATION,
     PROJECT, PARTICIPATION, NOTE,
     NONE };
 
+std::string gradeable_to_string(const GRADEABLE_ENUM &g);
 
-inline std::string gradeable_to_string(const GRADEABLE_ENUM &g) {
-  if (g == GRADEABLE_ENUM::HOMEWORK)         { return "HOMEWORK"; }
-  if (g == GRADEABLE_ENUM::ASSIGNMENT)       { return "ASSIGNMENT"; }
-  if (g == GRADEABLE_ENUM::PROBLEM_SET)      { return "PROBLEM_SET"; }
-  if (g == GRADEABLE_ENUM::QUIZ)             { return "QUIZ"; }
-  if (g == GRADEABLE_ENUM::TEST)             { return "TEST"; }
-  if (g == GRADEABLE_ENUM::EXAM)             { return "EXAM"; }
-  if (g == GRADEABLE_ENUM::EXERCISE)         { return "EXERCISE"; }
-  if (g == GRADEABLE_ENUM::LECTURE_EXERCISE) { return "LECTURE_EXERCISE"; }
-  if (g == GRADEABLE_ENUM::READING)          { return "READING"; }
-  if (g == GRADEABLE_ENUM::WORKSHEET)        { return "WORKSHEET"; }
-  if (g == GRADEABLE_ENUM::LAB)              { return "LAB"; }
-  if (g == GRADEABLE_ENUM::RECITATION)       { return "RECITATION"; }
-  if (g == GRADEABLE_ENUM::PROJECT)          { return "PROJECT"; }
-  if (g == GRADEABLE_ENUM::PARTICIPATION)    { return "PARTICIPATION"; }
-  if (g == GRADEABLE_ENUM::NOTE)             { return "NOTE"; }
-  if (g == GRADEABLE_ENUM::NONE)             { return "NONE"; } 
-  std::cerr << "ERROR!  UNKNOWN GRADEABLE" << std::endl;
-  exit(0);
-}
-
-inline std::string tolower(const std::string &s) {
-  std::string answer;
-  for (unsigned int i = 0; i < s.size(); i++) {
-    answer += tolower(s[i]);
-  }
-  return answer;
-}
-
-inline std::string spacify(const std::string &s) {
-  std::string tmp = "";
-  for (unsigned int i = 0; i < s.size(); i++) {
-    tmp += std::string(1,s[i]) + " ";
-  }
-  return tmp;
-}
-  
+bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value);
 
 // ===============================================================================
 
@@ -66,7 +33,7 @@ public:
   int getCount() const { return count; }
   float getPercent() const { return percent; }
   float getBucketPercentageUpperClamp() const { return this->bucket_percentage_upper_clamp; }
-  float getMaximum() const { 
+  float getMaximum() const {
     if (maximums.size() == 0) return 0;
     assert (maximums.size() > 0);
     float max_sum = 0;
