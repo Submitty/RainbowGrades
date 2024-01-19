@@ -423,11 +423,11 @@ void preprocesscustomizationfile(const std::string &now_string,
 
     nlohmann::json one_gradeable_type = all_gradeables[i];
 
-    GRADEABLE_ENUM g;
+    GRADEABLE_ENUM gradeable_category;
     nlohmann::json::iterator itr = one_gradeable_type.find("type");
     assert (itr != one_gradeable_type.end());
     std::string gradeable_type = itr->get<std::string>();
-    bool success = string_to_gradeable_enum(gradeable_type, g);
+    bool success = string_to_gradeable_enum(gradeable_type, gradeable_category);
     if (!success) {
       std::cout << "UNKNOWN GRADEABLE: " << gradeable_type << std::endl;
       exit(0);
@@ -440,7 +440,7 @@ void preprocesscustomizationfile(const std::string &now_string,
       //std::cout << token_key << std::endl;
       assert (token_key != "");
 
-      int which = GRADEABLES[g].setCorrespondence(token_key);
+      int correspondence_index = GRADEABLES[gradeable_category].setCorrespondence(token_key);
       p_score = grade_id.value("max", 0.0);
 
       std::vector<float> curve = grade_id.value("curve",std::vector<float>());
@@ -469,32 +469,32 @@ void preprocesscustomizationfile(const std::string &now_string,
         //std::cout << "RELEASE DATE " << release_date << std::endl;
         if (release_date < now_string) {
           //std::cout << "RELEASED!" << std::endl;
-          GRADEABLES[g].setReleased(token_key,true);
+          GRADEABLES[gradeable_category].setReleased(token_key,true);
         } else {
           //std::cout << "not released" << std::endl;
-          GRADEABLES[g].setReleased(token_key,false);
+          GRADEABLES[gradeable_category].setReleased(token_key,false);
         }
       } else {
-        GRADEABLES[g].setReleased(token_key,released);
+        GRADEABLES[gradeable_category].setReleased(token_key,released);
       }
 
       float maximum = grade_id.value("max",0.0);
-      GRADEABLES[g].setMaximum(token_key,maximum);
+      GRADEABLES[gradeable_category].setMaximum(token_key,maximum);
 
       if (grade_id.find("scale_max") != grade_id.end()) {
         float scale_maximum = grade_id.value("scale_max",0.0);
         assert (scale_maximum > 0);
-        GRADEABLES[g].setScaleMaximum(token_key,scale_maximum);
+        GRADEABLES[gradeable_category].setScaleMaximum(token_key,scale_maximum);
       }
       if (grade_id.find("percent") != grade_id.end()) {
-        assert(!GRADEABLES[g].hasSortedWeight() &&
+        assert(!GRADEABLES[gradeable_category].hasSortedWeight() &&
                "GRADE CATEGORY HAS sorted_weights FIELD WHICH WOULD OVERRIDE GRADEABLE-SPECIFIC percent FIELD");
         float item_percentage = grade_id.value("percent",-1.0);
         assert (item_percentage >= 0 && item_percentage <= 1.0);
-        GRADEABLES[g].setItemPercentage(token_key,item_percentage);
+        GRADEABLES[gradeable_category].setItemPercentage(token_key,item_percentage);
       }
       float clamp = grade_id.value("clamp",-1);
-      GRADEABLES[g].setClamp(token_key,clamp);
+      GRADEABLES[gradeable_category].setClamp(token_key,clamp);
 
       if (grade_id.find("autograde_replacement_percentage") != grade_id.end()) {
         assert (grade_id.find("original_id") != grade_id.end());
@@ -506,7 +506,7 @@ void preprocesscustomizationfile(const std::string &now_string,
         std::string t = grade_id.value("title","");
         float a_r_p = grade_id.value("autograde_replacement_percentage",0.5);
 
-        GRADEABLES[g].setResubmissionValues(token_key,o_id,r_id,t,a_r_p);
+        GRADEABLES[gradeable_category].setResubmissionValues(token_key,o_id,r_id,t,a_r_p);
       }
 
       assert (p_score >= a_score &&
@@ -514,13 +514,18 @@ void preprocesscustomizationfile(const std::string &now_string,
               b_score >= c_score &&
               c_score >= d_score);
       
-      assert (which >= 0 && which < GRADEABLES[g].getCount());
-      if (GRADEABLES[g].isReleased(token_key)) {
-        perfect->setGradeableItemGrade(g,which, p_score);
-        lowest_a->setGradeableItemGrade(g,which, a_score);
-        lowest_b->setGradeableItemGrade(g,which, b_score);
-        lowest_c->setGradeableItemGrade(g,which, c_score);
-        lowest_d->setGradeableItemGrade(g,which, d_score);
+      assert (correspondence_index >= 0 &&
+             correspondence_index < GRADEABLES[gradeable_category].getCount());
+      if (GRADEABLES[gradeable_category].isReleased(token_key)) {
+        perfect->setGradeableItemGrade(gradeable_category, correspondence_index, p_score);
+        lowest_a->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, a_score);
+        lowest_b->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, b_score);
+        lowest_c->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, c_score);
+        lowest_d->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, d_score);
       }
     
     //std::cout << "it makes it to exam data" << std::endl;
@@ -985,7 +990,7 @@ void load_student_grades(std::vector<Student*> &students) {
   assert(istr.good());
   nlohmann::json j = nlohmann::json::parse(istr);
 
-  Student *s = new Student();
+  Student *student = new Student();
   
   count++;
 
@@ -1015,73 +1020,74 @@ void load_student_grades(std::vector<Student*> &students) {
           if (!gradeable_enum_success && token != "Other" && token != "rubric" && token != "Test") {
     // non gradeables
     if (token == "user_id") {
-      s->setUserName(j[token].get<std::string>());
+      student->setUserName(j[token].get<std::string>());
     } else if (token == "legal_first_name" || token == "legal_given_name") {
-      s->setLegalFirstName(j[token].get<std::string>());
+      student->setLegalFirstName(j[token].get<std::string>());
     } else if (token == "legal_last_name" || token == "legal_family_name") {
-      s->setLegalLastName(j[token].get<std::string>());
+      student->setLegalLastName(j[token].get<std::string>());
     } else if (token == "preferred_first_name" || token == "preferred_given_name") {
       if (!j[token].is_null()) {
-        s->setPreferredFirstName(j[token].get<std::string>());
+        student->setPreferredFirstName(j[token].get<std::string>());
       }
     } else if (token == "preferred_last_name" || token == "preferred_family_name") {
       if (!j[token].is_null()) {
-        s->setPreferredLastName(j[token].get<std::string>());
+        student->setPreferredLastName(j[token].get<std::string>());
       }
     } else if (token == "user_numeric_id") {
 
       if (j[token].is_string()) {
-        s->setNumericID(j[token].get<std::string>());
+        student->setNumericID(j[token].get<std::string>());
       }
       else {
-        s->setNumericID("");
+        student->setNumericID("");
       }
     } else if (token == "last_update") {
-      s->setLastUpdate(j[token].get<std::string>());
+      student->setLastUpdate(j[token].get<std::string>());
     } else if (token == "registration_section") {
-          std::string a;
+          std::string registration_section;
           if(!j[token].is_null()) {
-           a = j[token].get<std::string>();
-            if (!validSection(a)) {
+            registration_section = j[token].get<std::string>();
+            if (!validSection(registration_section)) {
               // the "drop" section is 0 (really should be NULL)
-              if (a != "null") {
-                std::cerr << "WARNING: invalid section " << a << std::endl;
+              if (registration_section != "null") {
+                std::cerr << "WARNING: invalid section " << registration_section
+                          << std::endl;
               }
             }
           }
           else{
-            a = "null";
+            registration_section = "null";
           }
-          s->setSection(a);
+          student->setSection(registration_section);
     } else if (token == "course_section_id") {
-          std::string a;
+          std::string course_section_id;
           if(!j[token].is_null()) {
-           a = j[token].get<std::string>();
+            course_section_id = j[token].get<std::string>();
           }
           else{
-            a = "null";
+            course_section_id = "null";
           }
-          s->setCourseSectionId(a);
+          student->setCourseSectionId(course_section_id);
     } else if (token == "rotating_section") {
-      int a = -1;
+      int rotating_section = -1;
       if (!j[token].is_null()) {
-        a = j[token].get<int>();
+        rotating_section = j[token].get<int>();
       }
-      s->setRotatingSection(a);
+      student->setRotatingSection(rotating_section);
     } else if (token == "registration_type") {
       // Skip this token for now
     } else if (token == "default_allowed_late_days") {
-                  int value = 0;
+                  int default_allowed_late_days = 0;
                   if (!j[token].is_null()) {
                     if (j[token].is_string()) {
                       std::string s_value = j[token].get<std::string>();
-                      value = std::stoi(s_value);
+                      default_allowed_late_days = std::stoi(s_value);
                     } else {
-                      value = j[token].get<int>();
+                      default_allowed_late_days = j[token].get<int>();
                     }
                   }
-                  s->setDefaultAllowedLateDays(value);
-                  if (value > 0) {
+                  student->setDefaultAllowedLateDays(default_allowed_late_days);
+                  if (default_allowed_late_days > 0) {
                     DISPLAY_LATE_DAYS = true;
                   }
                 } else {
@@ -1167,7 +1173,7 @@ void load_student_grades(std::vector<Student*> &students) {
                       for (std::size_t i = 0; i < (*rec).size(); i++) {
                         for (auto itr8 = (*rec)[i].begin(); itr8 != (*rec)[i].end(); itr8++) {
                           std::string r = itr8.value();
-                          s->addRecommendation(std::string(" ") + r);
+                          student->addRecommendation(std::string(" ") + r);
                         }
                       }
                     }
@@ -1179,7 +1185,7 @@ void load_student_grades(std::vector<Student*> &students) {
                         int late_days_charged = itr2->value("days_charged",0);
                         if (itr3 != itr2->end()) {
                           if (score <= 0) {
-                            if (s->getUserName() != "") {
+                            if (student->getUserName() != "") {
                               assert (late_days_charged == 0);
                             }
                           }
@@ -1197,35 +1203,35 @@ void load_student_grades(std::vector<Student*> &students) {
                            std::string status_check = itr2->value("status", "");
                            if (status_check == "Bad") {
                              event = "Bad";
-                             s->set_event_bad_status(true);
+                             student->set_event_bad_status(true);
                            }
                            std::string version_conflict = itr2->value("version_conflict", "");
                            if (version_conflict == "true") {
                              event = "Version_conflict";
-                             s->set_event_version_conflict(true);
+                             student->set_event_version_conflict(true);
                            }
                            if (status_check == "Cancelled") {
                              event = "Cancelled";
-                             s->set_event_cancelled(true);
+                             student->set_event_cancelled(true);
                            }
                            std::string inquiry = itr2->value("inquiry", "");
                            if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
                              assert(inquiry == "Open");
                              event = "Open";
-                             s->set_event_grade_inquiry(true);
+                             student->set_event_grade_inquiry(true);
                            }
                            int late_day_exceptions = itr2->value("late_day_exceptions",0);
                            std::string reason_for_exception = itr2->value("reason_for_exception","");
                            if (late_day_exceptions > 0) {
                              event = "Extension";
-                             s->set_event_extension(true);
+                             student->set_event_extension(true);
                            }
                            // Above itr2 status check, but in order of priority
                            if (status_check == "Overridden") {
                              event = "Overridden";
-                             s->set_event_overridden(true);
+                             student->set_event_overridden(true);
                              }
-                           s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
+                             student->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
                         }
       }
 
@@ -1293,7 +1299,7 @@ void load_student_grades(std::vector<Student*> &students) {
             if (values[y]["comment"].is_string()) {
               recommendation += "<br>[" + std::to_string(x) + "] " + values[y]["comment"].get<std::string>();
             } else {
-              std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
+              std::cout << "error in recommendation text type for " << student->getUserName() << std::endl;
             }
           }
         }
@@ -1301,21 +1307,22 @@ void load_student_grades(std::vector<Student*> &students) {
     }
   }
 
-  s->setParticipation(participation);
-  s->setUnderstanding(understanding);
+  student->setParticipation(participation);
+  student->setUnderstanding(understanding);
   if (recommendation != "") {
-    s->addRecommendation(recommendation);
+    student->addRecommendation(recommendation);
   }
 
 
   // lookup and compute resubmit/replacement gradeable items
   for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
     GRADEABLE_ENUM g = ALL_GRADEABLES[i];
-    for (int which = 0; which < GRADEABLES[g].getCount(); which++) {
+    for (int gradeable_id = 0; gradeable_id < GRADEABLES[g].getCount();
+         gradeable_id++) {
       std::string original_id;
       std::string resubmit_id;
       float autograde_replacement_percentage;
-      GRADEABLES[g].isResubmit(which,original_id,resubmit_id,autograde_replacement_percentage);
+      GRADEABLES[g].isResubmit(gradeable_id,original_id,resubmit_id,autograde_replacement_percentage);
       if (original_id == "") continue;
 
       float original_autograde = 0;
@@ -1363,7 +1370,7 @@ void load_student_grades(std::vector<Student*> &students) {
         original_tagrade +
         std::max(original_autograde,new_autograde);
       if (original_autograde < new_autograde) {
-        std::cout << "student " << std::left << std::setw(10) << s->getUserName() << " had grade increase for ";
+        std::cout << "student " << std::left << std::setw(10) << student->getUserName() << " had grade increase for ";
         std::cout << original_id << ": "
                   << std::right << std::setw(5) << original_tagrade << " + "
                   << std::right << std::setw(5) << original_autograde << " / "
@@ -1371,11 +1378,11 @@ void load_student_grades(std::vector<Student*> &students) {
                   << std::right << std::setw(5) << new_autograde << " = "
                   << std::right << std::setw(5) << score << std::endl;
       }
-      s->setGradeableItemGrade(g,which,score);
+      student->setGradeableItemGrade(g, gradeable_id,score);
     }
   }
 
-  students.push_back(s);
+  students.push_back(student);
   }
 
 }
