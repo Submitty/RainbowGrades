@@ -4,6 +4,8 @@
 #define MAX_STRING_LENGTH 10000
 
 #include <map>
+#include <nlohmann/json.hpp>
+
 #include "grade.h"
 class Student;
 
@@ -52,10 +54,6 @@ extern int dropped;
 extern int auditors;
 extern float LATE_DAY_PERCENTAGE_PENALTY;
 
-// ==========================================================
-// PROTOTYPES 
-
-bool validSection(std::string section);
-bool OmitSectionFromStats(const std::string &section);
+extern nlohmann::json GLOBAL_CUSTOMIZATION_JSON;
 
 #endif // __CONSTANTS_H__

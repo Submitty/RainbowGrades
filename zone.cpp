@@ -6,6 +6,7 @@
 
 #include "student.h"
 #include "constants_and_globals.h"
+#include "section.h"
 
 //==========================================================================
 

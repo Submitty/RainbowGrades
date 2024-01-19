@@ -11,6 +11,7 @@
 #include <cmath>
 #include "benchmark.h"
 #include "submini_polls.h"
+#include "section.h"
 
 std::string GLOBAL_sort_order;
 
@@ -77,29 +78,6 @@ Student* STDDEV_STUDENT_POINTER;
 
 std::map<std::string,std::string> sectionNames;
 std::map<std::string,std::string> sectionColors;
-
-bool validSection(std::string section) {
-
-  nlohmann::json::iterator itr = GLOBAL_CUSTOMIZATION_JSON.find("section");
-  assert (itr != GLOBAL_CUSTOMIZATION_JSON.end());
-  assert (itr->is_object());
-
-  nlohmann::json::iterator itr2 = itr->find(section);
-  if (itr2 == itr->end()) return false;
-  return true;
-  
-}
-
-
-std::string sectionName(std::string section) {
-  std::map<std::string,std::string>::const_iterator itr = sectionNames.find(section);
-  if (itr == sectionNames.end()) 
-    return "NONE";
-  return itr->second;
-}
-
-
-
 
 //====================================================================
  
@@ -655,15 +633,6 @@ void preprocesscustomizationfile(const std::string &now_string,
   }
   
 }
-
-
-bool OmitSectionFromStats(const std::string &section) {
-  for (std::vector<std::string>::size_type i = 0; i < OMIT_SECTION_FROM_STATS.size(); i++) {
-    if (OMIT_SECTION_FROM_STATS[i] == section) return true;
-  }
-  return false;
-}
-
 
 // defined in zone.cpp
 void LoadExamSeatingFile(const std::string &zone_counts_filename,

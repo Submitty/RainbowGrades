@@ -22,6 +22,7 @@
 
 #include "constants_and_globals.h"
 #include "string_utility.h"
+#include "section.h"
 
 extern std::string OUTPUT_FILE;
 extern std::string OUTPUT_CSV_FILE;

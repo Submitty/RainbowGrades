@@ -81,7 +81,8 @@ process_grades.out: \
 	${RAINBOW_GRADES_DIRECTORY}/benchmark.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/submini_polls.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/grade.cpp \
-	${RAINBOW_GRADES_DIRECTORY}/gradeable.cpp
+	${RAINBOW_GRADES_DIRECTORY}/gradeable.cpp \
+	${RAINBOW_GRADES_DIRECTORY}/section.cpp
 	clang++ -Wall -Wextra ${flags} ${memory_flags} ${json_include} $^ -g -o $@
 
 individual_summary_html all_students_summary_csv all_students_summary_html:
