@@ -5,7 +5,9 @@
 
 class Grade {
 public:
-  Grade(const std::string &v) : value(v) {}
+  explicit Grade(const std::string &v);
+private:
+  friend bool operator< (const Grade &a, const Grade &b);
   std::string value;
 };
 

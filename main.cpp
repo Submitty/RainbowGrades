@@ -241,41 +241,6 @@ bool by_section(const Student *s1, const Student *s2) {
     return by_name(s1,s2);
 }
 
-
-// sorting function for letter grades
-bool operator< (const Grade &a, const Grade &b) {
-  if (a.value == b.value) return false;
-
-  if (a.value == "A") return true;
-  if (b.value == "A") return false;
-  if (a.value == "A-") return true;
-  if (b.value == "A-") return false;
-
-  if (a.value == "B+") return true;
-  if (b.value == "B+") return false;
-  if (a.value == "B") return true;
-  if (b.value == "B") return false;
-  if (a.value == "B-") return true;
-  if (b.value == "B-") return false;
-
-  if (a.value == "C+") return true;
-  if (b.value == "C+") return false;
-  if (a.value == "C") return true;
-  if (b.value == "C") return false;
-  if (a.value == "C-") return true;
-  if (b.value == "C-") return false;
-
-  if (a.value == "D+") return true;
-  if (b.value == "D+") return false;
-  if (a.value == "D") return true;
-  if (b.value == "D") return false;
-
-  if (a.value == "F") return true;
-  if (b.value == "F") return false;
-
-  return false;
-}
-
 //====================================================================
 
 bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value) {
@@ -1708,7 +1673,7 @@ int main(int argc, char* argv[]) {
     Student *sd = GetStudent(students,"LOWEST D");
 
     if (validSection(this_student->getSection())) {
-      std::string student_grade = this_student->grade(false,sd);
+      Grade student_grade{this_student->grade(false,sd)};
       grade_counts[student_grade]++;
       grade_avg[student_grade]+=this_student->overall();
     } else {
