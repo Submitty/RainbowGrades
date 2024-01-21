@@ -105,12 +105,12 @@ struct Gradeable {
    * Returns true if this gradeable is extra credit.
    * Extra credit items are those that have a maximum of <= 0.
    */
-  [[nodiscard]] bool isExtraCredit() const { return maximum <= 0;}
+  [[nodiscard]] bool isExtraCredit() const noexcept { return maximum <= 0;}
   /*
    * returns value that should be used as the maximum for the gradeable.
    */
-  [[nodiscard]] float getScaledMaximum() const {return std::max(maximum,scale_maximum);}
-
+  [[nodiscard]] float getScaledMaximum() const noexcept {return std::max(maximum,scale_maximum);}
+  [[nodiscard]] bool isActive() const noexcept {return getScaledMaximum() > 0; }
 };
 
 class GradeableList {
@@ -174,11 +174,8 @@ public:
    */
   [[nodiscard]] float getTotalPoints() const;
 
-  size_t getZeroMaxCount() const;
-  size_t getNonExtraCreditCount() const;
-  size_t getNonZeroCount() const;
-  float getNonZeroSum() const;
-
+  [[nodiscard]] size_t getActiveCount() const;
+  [[nodiscard]] float getActivePoints() const;
 
   // MODIFIERS
   void setRemoveLowest(int r);

@@ -181,7 +181,9 @@ size_t GradeableList::getExtraCreditCount() const {
                          });
 }
 size_t GradeableList::getNormalCount() const {
-  return count - getExtraCreditCount();
+  // note: we need to use the size of the gradeables, not the count
+  // which may be higher
+  return gradeables_.size() - getExtraCreditCount();
 }
 float GradeableList::getExtraCreditPoints() const {
   return std::accumulate(gradeables_.begin(), gradeables_.end(), 0.0f,
@@ -191,6 +193,23 @@ float GradeableList::getExtraCreditPoints() const {
                                              : 0.0f);
                          });
 }
+
+float GradeableList::getActivePoints() const {
+  return std::accumulate(gradeables_.begin(), gradeables_.end(), 0.0f,
+                         [](float sum, const auto &g) -> float {
+                           return sum + (g.second.isActive()
+                                         ? g.second.getScaledMaximum()
+                                         : 0.0f);
+                         });
+}
+size_t GradeableList::getActiveCount() const {
+  return std::accumulate(gradeables_.begin(), gradeables_.end(), (size_t)0,
+                         [](size_t sum, const auto &g) -> size_t {
+                           return sum + (g.second.isActive());
+                         });
+}
+
+
 float GradeableList::getTotalPoints() const {
   return std::accumulate(gradeables_.begin(), gradeables_.end(), 0.0f,
                          [](float sum, const auto &g) -> float {

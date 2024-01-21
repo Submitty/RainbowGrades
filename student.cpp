@@ -254,23 +254,9 @@ float calculateScorePercentages(GradeableList &gradeable,
 void getNonzeroCounts(const GradeableList &gradeable, float &nonzero_sum,
                                int &nonzero_count,
                                int &non_extra_credit_count) {
-  for (int i = 0; i < gradeable.getCount(); i++) {
-    //float s = getGradeableItemGrade(gradeable_category,i).getValue();
-    auto id = gradeable.getID(GradeableIndex{(size_t)i});
-    // if the gradeable has a name
-    if(!id.value().empty()) {
-      // extra credit points
-      if (gradeable.getItemMaximum(id) > 0) {
-        non_extra_credit_count++;
-      }
-      // all points including extra credit
-      float m = std::max(gradeable.getItemMaximum(id),gradeable.getScaleMaximum(id));
-      if(m > 0){
-        nonzero_sum += m;
-        nonzero_count++;
-      }
-    }
-  }
+  nonzero_sum = gradeable.getActivePoints();
+  nonzero_count = (int)gradeable.getActiveCount();
+  non_extra_credit_count = (int)gradeable.getNormalCount();
 }
 
 float Student::adjusted_test(GradeableIndex i) const {
