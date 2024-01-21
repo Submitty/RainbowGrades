@@ -159,7 +159,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM gradeable_category) const {
 }
 std::vector<score_object>
 Student::fillScoreVector(GRADEABLE_ENUM &gradeable_category,
-                         const Gradeable &gradeable, float nonzero_sum,
+                         const GradeableList &gradeable, float nonzero_sum,
                          int nonzero_count) const {
   std::vector<score_object> scores;
   for (int i = 0; i < gradeable.getCount(); i++) {
@@ -176,7 +176,7 @@ Student::fillScoreVector(GRADEABLE_ENUM &gradeable_category,
   }
   return scores;
 }
-float calculateScorePercentages(Gradeable &gradeable,
+float calculateScorePercentages(GradeableList &gradeable,
                                          int non_extra_credit_count,
                                          std::vector<score_object> &scores)
 {
@@ -249,7 +249,7 @@ float calculateScorePercentages(Gradeable &gradeable,
   }
   return percentage;
 }
-void getNonzeroCounts(const Gradeable &gradeable, float &nonzero_sum,
+void getNonzeroCounts(const GradeableList &gradeable, float &nonzero_sum,
                                int &nonzero_count,
                                int &non_extra_credit_count) {
   for (int i = 0; i < gradeable.getCount(); i++) {

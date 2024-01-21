@@ -8,10 +8,10 @@ using Catch::Matchers::WithinRel;
 // constexpr double rtol = 1E-6;
 constexpr double abs_tol = 1E-8;
 
-TEST_CASE("Gradeable no correspondence") {
+TEST_CASE("GradeableList no correspondence") {
   // functions have inconsistent behavior when getting
   // a gradeable that doesn't currently exist.
-  Gradeable g;
+  GradeableList g;
   REQUIRE(g.getCount() == 0);
   REQUIRE(g.getPercent() == 0.0f);
   REQUIRE_THAT(g.getBucketPercentageUpperClamp(), WithinAbs(0.0f, abs_tol));
@@ -32,8 +32,8 @@ TEST_CASE("Gradeable no correspondence") {
   REQUIRE_THAT(g.getSortedWeight(0), WithinAbs(0.5f, abs_tol));
   // apis that take ID are not tested as they need a correspondence to be set
 }
-TEST_CASE("Gradeable with correspondence") {
-  Gradeable g(10, 1);
+TEST_CASE("GradeableList with correspondence") {
+  GradeableList g(10, 1);
   g.setCorrespondence("test");
   g.setMaximum("test", 100);
   g.setScaleMaximum("test", 90);

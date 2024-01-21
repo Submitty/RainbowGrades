@@ -21,13 +21,13 @@ bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value
 
 // ===============================================================================
 
-class Gradeable {
+class GradeableList {
 
 public:
 
   // CONSTRUTORS
-  Gradeable() { count=0;percent=0;remove_lowest=0; }
-  Gradeable(int c, float p) : count(c),percent(p) { remove_lowest=0; }
+  GradeableList() { count=0;percent=0;remove_lowest=0; }
+  GradeableList(int c, float p) : count(c),percent(p) { remove_lowest=0; }
 
   // ACCESSORS
   int getCount() const;
@@ -81,7 +81,7 @@ private:
 
 extern std::vector<GRADEABLE_ENUM>    ALL_GRADEABLES;
 
-extern std::map<GRADEABLE_ENUM,Gradeable>  GRADEABLES;
+extern std::map<GRADEABLE_ENUM, GradeableList>  GRADEABLES;
 
 
 void LookupGradeable(const std::string &id,

@@ -339,16 +339,16 @@ private:
 
 
   std::vector<score_object> fillScoreVector(GRADEABLE_ENUM &gradeable_category,
-                                            const Gradeable &gradeable,
+                                            const GradeableList &gradeable,
                                             float nonzero_sum,
                                             int nonzero_count) const;
 };
 
-// TODO: move this to be 3 member functions of Gradeable
-void getNonzeroCounts(const Gradeable &gradeable, float &nonzero_sum,
+// TODO: move this to be 3 member functions of GradeableList
+void getNonzeroCounts(const GradeableList &gradeable, float &nonzero_sum,
                       int &nonzero_count, int &non_extra_credit_count);
 
-float calculateScorePercentages(Gradeable &gradeable,
+float calculateScorePercentages(GradeableList &gradeable,
                                 int non_extra_credit_count,
                                 std::vector<score_object> &scores);
 

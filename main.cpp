@@ -52,7 +52,7 @@ nlohmann::json GLOBAL_CUSTOMIZATION_JSON;
 
 std::vector<GRADEABLE_ENUM> ALL_GRADEABLES;
 
-std::map<GRADEABLE_ENUM,Gradeable>  GRADEABLES;
+std::map<GRADEABLE_ENUM, GradeableList>  GRADEABLES;
 
 float LATE_DAY_PERCENTAGE_PENALTY = 0;
 bool  TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT = false;
@@ -287,7 +287,7 @@ void preprocesscustomizationfile(const std::string &now_string,
 
     assert (ids_list.size() <= count);
 
-    Gradeable answer (count,gradeable_total_percent); //,m);
+    GradeableList answer (count,gradeable_total_percent); //,m);
     GRADEABLES.insert(std::make_pair(g,answer));
     assert (GRADEABLES[g].getCount() >= 0);
     assert (GRADEABLES[g].getPercent() >= 0.0 && GRADEABLES[g].getPercent() <= 1.0);
@@ -1432,7 +1432,7 @@ void SaveExtensionReports(const std::vector<Student*> &students) {
     }
     student_ostr << "<h3> Excused Absence Extensions for: " << username << "</h3>" << std::endl;
     student_ostr << "<table cellpadding=5 style=\"border:1px solid #aaaaaa; background-color:#ffffff;\">" << std::endl;
-    student_ostr << "<tr><td>Gradeable</td><td align=center>Days Extended</td><td align=center>Reason</td><td></td></tr>" << std::endl;
+    student_ostr << "<tr><td>GradeableList</td><td align=center>Days Extended</td><td align=center>Reason</td><td></td></tr>" << std::endl;
     for (size_t i2=0;i2<gradeablesWithExtensions.size();i2++) {
       ItemGrade item = std::get<0>(gradeablesWithExtensions[i2]);
       GRADEABLE_ENUM g = std::get<0>(std::get<1>(gradeablesWithExtensions[i2]));

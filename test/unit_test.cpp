@@ -23,7 +23,7 @@ std::string ALL_STUDENTS_OUTPUT_DIRECTORY_CSV     = "./all_students_summary_csv/
 
 std::vector<GRADEABLE_ENUM> ALL_GRADEABLES;
 
-std::map<GRADEABLE_ENUM,Gradeable>  GRADEABLES;
+std::map<GRADEABLE_ENUM, GradeableList>  GRADEABLES;
 
 float LATE_DAY_PERCENTAGE_PENALTY = 0;
 bool  TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT = false;

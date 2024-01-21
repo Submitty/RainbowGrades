@@ -8,7 +8,7 @@ using Catch::Matchers::WithinRel;
 constexpr double rtol = 1E-6;
 
 TEST_CASE("nonzero counts") {
-  Gradeable  g(10, 1);
+  GradeableList g(10, 1);
   g.setCorrespondence("1");
   g.setCorrespondence("2");
   g.setCorrespondence("3");
@@ -29,7 +29,7 @@ TEST_CASE("nonzero counts") {
 }
 
 TEST_CASE("calculate score percentages") {
-  Gradeable  g(10, 1);
+  GradeableList g(10, 1);
   g.setCorrespondence("1");
   g.setCorrespondence("2");
   g.setCorrespondence("3");

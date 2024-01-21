@@ -53,12 +53,12 @@ bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value
   return false;
 }
 
-int Gradeable::getCount() const {
+int GradeableList::getCount() const {
   return count;
 }
-float Gradeable::getBucketPercentageUpperClamp() const { return this->bucket_percentage_upper_clamp; }
-float Gradeable::getPercent() const { return percent; }
-float Gradeable::getMaximum() const {
+float GradeableList::getBucketPercentageUpperClamp() const { return this->bucket_percentage_upper_clamp; }
+float GradeableList::getPercent() const { return percent; }
+float GradeableList::getMaximum() const {
   if (maximums.size() == 0) return 0;
   assert (maximums.size() > 0);
   float max_sum = 0;
@@ -68,8 +68,8 @@ float Gradeable::getMaximum() const {
   }
   return max_sum * getCount() / maximums.size();
 }
-int Gradeable::getRemoveLowest() const { return remove_lowest; }
-std::string Gradeable::getID(int index) const {
+int GradeableList::getRemoveLowest() const { return remove_lowest; }
+std::string GradeableList::getID(int index) const {
   std::map<std::string,std::pair<int,std::string> >::const_iterator itr = correspondences.begin();
   while (itr != correspondences.end()) {
     if (itr->second.first == index) return itr->first;
@@ -77,7 +77,7 @@ std::string Gradeable::getID(int index) const {
   }
   return "";
 }
-bool Gradeable::hasCorrespondence(const std::string &id) const {
+bool GradeableList::hasCorrespondence(const std::string &id) const {
   /*
   for (std::map<std::string,std::pair<int,std::string> >::const_iterator itr = correspondences.begin();
        itr != correspondences.end(); itr++) {
@@ -88,45 +88,45 @@ bool Gradeable::hasCorrespondence(const std::string &id) const {
   return (itr != correspondences.end());
 }
 const std::pair<int, std::string> &
-Gradeable::getCorrespondence(const std::string &id) {
+GradeableList::getCorrespondence(const std::string &id) {
   assert (hasCorrespondence(id));
   return correspondences.find(id)->second;
 }
-bool Gradeable::isReleased(const std::string &id) const {
+bool GradeableList::isReleased(const std::string &id) const {
   assert (released.find(id) != released.end());
   return released.find(id)->second;
 }
-float Gradeable::getItemMaximum(const std::string &id) const {
+float GradeableList::getItemMaximum(const std::string &id) const {
   if (maximums.find(id) == maximums.end()){
     return 0;
   }
   return maximums.find(id)->second;
 }
-float Gradeable::getScaleMaximum(const std::string &id) const {
+float GradeableList::getScaleMaximum(const std::string &id) const {
   if (scale_maximums.find(id) == scale_maximums.end()) {
     return -1;
   }
   return scale_maximums.find(id)->second;
 }
-float Gradeable::getItemPercentage(const std::string &id) const {
+float GradeableList::getItemPercentage(const std::string &id) const {
   if (item_percentages.find(id) == item_percentages.end())
     return -1;
   else
     return item_percentages.find(id)->second;
 }
-float Gradeable::getClamp(const std::string &id) const {
+float GradeableList::getClamp(const std::string &id) const {
   assert (clamps.find(id) != clamps.end());
   return clamps.find(id)->second;
 }
-float Gradeable::getSortedWeight(unsigned int position) {
+float GradeableList::getSortedWeight(unsigned int position) {
   assert(position < sorted_weights.size());
   return sorted_weights[position];
 }
-bool Gradeable::hasSortedWeight() {
+bool GradeableList::hasSortedWeight() {
   return !sorted_weights.empty();
 }
-void Gradeable::setRemoveLowest(int r) { remove_lowest=r; }
-int Gradeable::setCorrespondence(const std::string &id) {
+void GradeableList::setRemoveLowest(int r) { remove_lowest=r; }
+int GradeableList::setCorrespondence(const std::string &id) {
   assert (!hasCorrespondence(id));
   //std::cout << "SET CORR " << id << std::endl;
   assert (int(correspondences.size()) < count);
@@ -134,43 +134,43 @@ int Gradeable::setCorrespondence(const std::string &id) {
   correspondences[id] = std::make_pair(index,"");
   return index;
 }
-void Gradeable::setBucketPercentageUpperClamp(
+void GradeableList::setBucketPercentageUpperClamp(
     float bucket_percentage_upper_clamp) {
   this->bucket_percentage_upper_clamp = bucket_percentage_upper_clamp;
 }
-void Gradeable::setCorrespondenceName(const std::string &id,
+void GradeableList::setCorrespondenceName(const std::string &id,
                                       const std::string &name) {
   assert (hasCorrespondence(id));
   assert (correspondences[id].second == "");
   correspondences[id].second = name;
 }
-void Gradeable::setReleased(const std::string &id, bool is_released) {
+void GradeableList::setReleased(const std::string &id, bool is_released) {
   assert (hasCorrespondence(id));
   assert (released.find(id) == released.end());
   released[id] = is_released;
 }
-void Gradeable::setMaximum(const std::string &id, float maximum) {
+void GradeableList::setMaximum(const std::string &id, float maximum) {
   assert (hasCorrespondence(id));
   assert (maximums.find(id) == maximums.end());
   maximums[id] = maximum;
 }
-void Gradeable::setScaleMaximum(const std::string &id, float scale_maximum) {
+void GradeableList::setScaleMaximum(const std::string &id, float scale_maximum) {
   assert (hasCorrespondence(id));
   assert (scale_maximums.find(id) == scale_maximums.end());
   scale_maximums[id] = scale_maximum;
 }
-void Gradeable::setItemPercentage(const std::string &id,
+void GradeableList::setItemPercentage(const std::string &id,
                                   float item_percentage) {
   assert (hasCorrespondence(id));
   assert (item_percentages.find(id) == item_percentages.end());
   item_percentages[id] = item_percentage;
 }
-void Gradeable::setClamp(const std::string &id, float clamp) {
+void GradeableList::setClamp(const std::string &id, float clamp) {
   assert (hasCorrespondence(id));
   assert (clamps.find(id) == clamps.end());
   clamps[id] = clamp;
 }
-void Gradeable::addSortedWeight(float weight) {
+void GradeableList::addSortedWeight(float weight) {
   sorted_weights.push_back(weight);
 }
 
@@ -178,7 +178,7 @@ void LookupGradeable(const std::string &id,
                      GRADEABLE_ENUM &g_e, int &i) {
   for (std::size_t k = 0; k < ALL_GRADEABLES.size(); k++) {
     GRADEABLE_ENUM e = ALL_GRADEABLES[k];
-    Gradeable g = GRADEABLES[e];
+    GradeableList g = GRADEABLES[e];
     if (g.hasCorrespondence(id)) {
       g_e = e;
       i = g.getCorrespondence(id).first;
