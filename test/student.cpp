@@ -9,14 +9,18 @@ constexpr double rtol = 1E-6;
 
 TEST_CASE("nonzero counts") {
   GradeableList g(10, 1);
-  g.setCorrespondence("1");
-  g.setCorrespondence("2");
-  g.setCorrespondence("3");
-  g.setMaximum("1", 1);
-  g.setMaximum("2", 1);
+  GradeableID one{"1"};
+  GradeableID two{"2"};
+  GradeableID three{"3"};
+
+  g.setCorrespondence(one);
+  g.setCorrespondence(two);
+  g.setCorrespondence(three);
+  g.setMaximum(one, 1);
+  g.setMaximum(two, 1);
   // setting maximum score to <=0 means that the item is extra credit
-  g.setMaximum("3", 0);
-  g.setScaleMaximum("3", 1);
+  g.setMaximum(three, 0);
+  g.setScaleMaximum(three, 1);
   float nonzero_sum =0;
   int nonzero_count = 0;
   int non_extra_credit_count = 0;
@@ -29,14 +33,4 @@ TEST_CASE("nonzero counts") {
 }
 
 TEST_CASE("calculate score percentages") {
-  GradeableList g(10, 1);
-  g.setCorrespondence("1");
-  g.setCorrespondence("2");
-  g.setCorrespondence("3");
-  g.setMaximum("1", 1);
-  g.setMaximum("2", 1);
-  //g.setMaximum("3", 0);
-  g.setScaleMaximum("3", 1);
-
-
 }

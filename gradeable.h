@@ -21,10 +21,78 @@ bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value
 
 // ===============================================================================
 
-struct Correspondence {
-  int index;
-  std::string name;
+// Gradeable Type
+struct GradeableID {
+public:
+  GradeableID() = default;
+  explicit GradeableID(std::string id) : value_(std::move(id)) {}
+  GradeableID(const GradeableID &) = default;
+  GradeableID &operator=(const GradeableID &) = default;
+  GradeableID(GradeableID &&) = default;
+  GradeableID &operator=(GradeableID &&) = default;
+  ~GradeableID() = default;
+  const std::string &value() const { return value_; }
+  std::string &value() { return value_; }
+
+  friend bool operator==(const GradeableID &a, const GradeableID &b) {
+    return a.value_ == b.value_;
+  }
+  friend bool operator==(const GradeableID &a, const std::string &b) {
+    return a.value_ == b;
+  }
+  friend bool operator==(const std::string &a, const GradeableID &b) {
+    return a == b.value_;
+  }
+  friend bool operator<(const GradeableID &a, const GradeableID &b) {
+    return a.value_ < b.value_;
+  }
+
+private:
+  std::string value_;
 };
+// gradeable index strong type
+struct GradeableIndex {
+public:
+  GradeableIndex() = default;
+  explicit GradeableIndex(size_t index) : value_(index) {}
+  GradeableIndex(const GradeableIndex &) = default;
+  GradeableIndex &operator=(const GradeableIndex &) = default;
+  GradeableIndex(GradeableIndex &&) = default;
+  GradeableIndex &operator=(GradeableIndex &&) = default;
+  ~GradeableIndex() = default;
+
+  size_t value() const { return value_; }
+  size_t &value() { return value_; }
+  friend bool operator==(GradeableIndex a, GradeableIndex b) {
+    return a.value_ == b.value_;
+  }
+  friend bool operator==(GradeableIndex a, size_t b) {
+    return a.value_ == b;
+  }
+  friend bool operator==(size_t &a, GradeableIndex b) {
+    return a == b.value_;
+  }
+  friend bool operator<(GradeableIndex a, GradeableIndex b) {
+    return a.value_ < b.value_;
+  }
+
+private:
+  size_t value_;
+};
+
+struct Correspondence {
+
+  GradeableIndex index;
+  std::string name;
+
+  friend bool operator==(const Correspondence &a, const Correspondence &b) {
+    return a.index == b.index;
+  }
+  friend bool operator<(const Correspondence &a, const Correspondence &b) {
+    return a.index < b.index;
+  }
+};
+
 
 class GradeableList {
 
@@ -40,29 +108,29 @@ public:
   float getBucketPercentageUpperClamp() const;
   float getMaximum() const;
   int getRemoveLowest() const;
-  std::string getID(int index) const;
-  bool hasCorrespondence(const std::string &id) const;
-  const Correspondence& getCorrespondence(const std::string& id) const;
-  bool isReleased(const std::string &id) const;
-  float getItemMaximum(const std::string &id) const;
-  float getScaleMaximum(const std::string &id) const;
-  float getItemPercentage(const std::string &id) const;
-  float getClamp(const std::string &id) const;
+  GradeableID getID(GradeableIndex index) const;
+  bool hasCorrespondence(const GradeableID &id) const;
+  const Correspondence& getCorrespondence(const GradeableID& id) const;
+  bool isReleased(const GradeableID &id) const;
+  float getItemMaximum(const GradeableID &id) const;
+  float getScaleMaximum(const GradeableID &id) const;
+  float getItemPercentage(const GradeableID &id) const;
+  float getClamp(const GradeableID &id) const;
   float getSortedWeight(unsigned int position);
   bool hasSortedWeight();
 
   // MODIFIERS
   void setRemoveLowest(int r);
-  int setCorrespondence(const std::string& id);
+  GradeableIndex setCorrespondence(const GradeableID& id);
   // Set the max percentage that can be received for a gradeable type.
   // If the value is less than 0, it should be ignored.
   void setBucketPercentageUpperClamp(float bucket_percentage_upper_clamp);
-  void setCorrespondenceName(const std::string& id, const std::string& name);
-  void setReleased(const std::string&id, bool is_released);
-  void setMaximum(const std::string&id, float maximum);
-  void setScaleMaximum(const std::string&id, float scale_maximum);
-  void setItemPercentage(const std::string&id, float item_percentage);
-  void setClamp(const std::string&id, float clamp);
+  void setCorrespondenceName(const GradeableID& id, const std::string& name);
+  void setReleased(const GradeableID& id, bool is_released);
+  void setMaximum(const GradeableID &id, float maximum);
+  void setScaleMaximum(const GradeableID&id, float scale_maximum);
+  void setItemPercentage(const GradeableID&id, float item_percentage);
+  void setClamp(const GradeableID& id, float clamp);
   void addSortedWeight(float weight);
 
 private:
@@ -75,13 +143,13 @@ private:
   // correspondences are a map from the id which corresponds to a gradeables
   // unique id (name) to a pair containing the index of the gradeable along
   // with it's human readable name or "title"
-  std::map<std::string,Correspondence> correspondences;
-  std::map<std::string,float> maximums;
-  std::map<std::string,float> scale_maximums;
-  std::map<std::string,float> item_percentages;
+  std::map<GradeableID,Correspondence> correspondences;
+  std::map<GradeableID,float> maximums;
+  std::map<GradeableID,float> scale_maximums;
+  std::map<GradeableID,float> item_percentages;
   std::vector<float> sorted_weights;
-  std::map<std::string,float> clamps;
-  std::map<std::string,bool> released;
+  std::map<GradeableID,float> clamps;
+  std::map<GradeableID,bool> released;
 };
 
 // ===============================================================================
@@ -91,7 +159,7 @@ extern std::vector<GRADEABLE_ENUM>    ALL_GRADEABLES;
 extern std::map<GRADEABLE_ENUM, GradeableList>  GRADEABLES;
 
 
-void LookupGradeable(const std::string &id,
-                     GRADEABLE_ENUM &g_e, int &i);
+void LookupGradeable(const GradeableID &id,
+                     GRADEABLE_ENUM &g_e, GradeableIndex &i);
 
 #endif

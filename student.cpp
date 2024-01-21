@@ -70,40 +70,42 @@ Student* GetStudent(const std::vector<Student*> &students, const std::string& us
 // =============================================================================================
 // accessor & modifier for grade data
 
-const ItemGrade& Student::getGradeableItemGrade(GRADEABLE_ENUM g, int i) const {
+const ItemGrade& Student::getGradeableItemGrade(GRADEABLE_ENUM g, GradeableIndex i) const {
   static ItemGrade emptyItemGrade(0);
   //std::cout << "i " << i << "   count " << GRADEABLES[g].getCount() << std::endl;
-  if (i >= GRADEABLES[g].getCount()) {
+  if (i.value() >= GRADEABLES[g].getCount()) {
     return emptyItemGrade;
   }
-  assert (i >= 0 && i < GRADEABLES[g].getCount());
-  std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator itr = all_item_grades.find(g);
+  assert (i.value() >= 0 && i.value() < GRADEABLES[g].getCount());
+  //std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator itr = all_item_grades.find(g);
+  auto itr = all_item_grades.find(g);
   assert (itr != all_item_grades.end());
-  assert (int(itr->second.size()) > i);
-  
-  return itr->second[i]; //return value; 
+  auto& grades = itr->second;
+  assert (grades.size() > i.value());
+  return grades[i.value()]; //return value;
 }
 
 
 
-void Student::setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, 
+void Student::setGradeableItemGrade(GRADEABLE_ENUM g, GradeableIndex i, float value,
                                     int late_days_used, const std::string &note, const std::string &status) {
-  assert (i >= 0 && i < GRADEABLES[g].getCount());
-  std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
+  assert (i.value() >= 0 && i.value() < GRADEABLES[g].getCount());
+  auto itr = all_item_grades.find(g);
   assert (itr != all_item_grades.end());
-  assert (int(itr->second.size()) > i);
-  itr->second[i] = ItemGrade(value,late_days_used,note,status);
+  auto& grades = itr->second;
+  assert (grades.size() > i.value());
+  grades[i.value()] = ItemGrade(value,late_days_used,note,status);
 }
 
-void Student::setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity,
+void Student::setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, GradeableIndex i, float value, bool academic_integrity,
                                     int late_days_used, const std::string &note, const std::string &status) {
-  assert (i >= 0 && i < GRADEABLES[g].getCount());
-  std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::iterator itr = all_item_grades.find(g);
+  assert (i.value() >= 0 && i.value() < GRADEABLES[g].getCount());
+  auto itr = all_item_grades.find(g);
   assert (itr != all_item_grades.end());
-  assert (int(itr->second.size()) > i);
+  auto& grades = itr->second;
+  assert (grades.size() > i.value());
   std::string temp = "";
-    
-  itr->second[i] = ItemGrade(value,late_days_used,note,status,temp,academic_integrity);
+  itr->second[i.value()] = ItemGrade(value,late_days_used,note,status,temp,academic_integrity);
 }
 
 void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event, 
@@ -163,11 +165,11 @@ Student::fillScoreVector(GRADEABLE_ENUM &gradeable_category,
                          int nonzero_count) const {
   std::vector<score_object> scores;
   for (int i = 0; i < gradeable.getCount(); i++) {
-    float item_grade = getGradeableItemGrade(gradeable_category,i).getValue();
-    std::string id = gradeable.getID(i);
+    float item_grade = getGradeableItemGrade(gradeable_category,GradeableIndex{(size_t)i}).getValue();
+    auto id = gradeable.getID(GradeableIndex{(size_t)i});
     // this is used for extra credit gradeables to get the maximum score
     float item_maximum = nonzero_sum/nonzero_count;
-    if(!id.empty()){
+    if(!id.value().empty()){
       item_maximum = gradeable.getItemMaximum(id);
     }
     float item_percentage = gradeable.getItemPercentage(id);
@@ -254,8 +256,8 @@ void getNonzeroCounts(const GradeableList &gradeable, float &nonzero_sum,
                                int &non_extra_credit_count) {
   for (int i = 0; i < gradeable.getCount(); i++) {
     //float s = getGradeableItemGrade(gradeable_category,i).getValue();
-    std::string id = gradeable.getID(i);
-    if(!id.empty()){
+    auto id = gradeable.getID(GradeableIndex{(size_t)i});
+    if(!id.value().empty()){
       if (gradeable.getItemMaximum(id) > 0) {
         non_extra_credit_count++;
       }
@@ -268,15 +270,15 @@ void getNonzeroCounts(const GradeableList &gradeable, float &nonzero_sum,
   }
 }
 
-float Student::adjusted_test(int i) const {
-  assert (i >= 0 && i <  GRADEABLES[GRADEABLE_ENUM::TEST].getCount());
+float Student::adjusted_test(GradeableIndex i) const {
+  assert (i.value() >= 0 && i.value() <  GRADEABLES[GRADEABLE_ENUM::TEST].getCount());
   float a = getGradeableItemGrade(GRADEABLE_ENUM::TEST,i).getValue();
   float b;
-  if (i+1 < GRADEABLES[GRADEABLE_ENUM::TEST].getCount()) {
-    b = getGradeableItemGrade(GRADEABLE_ENUM::TEST,i+1).getValue();
+  if (i.value()+1 < GRADEABLES[GRADEABLE_ENUM::TEST].getCount()) {
+    b = getGradeableItemGrade(GRADEABLE_ENUM::TEST,GradeableIndex{i.value()+1}).getValue();
   } else {
     assert (GRADEABLES[GRADEABLE_ENUM::EXAM].getCount() == 1);
-    b = getGradeableItemGrade(GRADEABLE_ENUM::EXAM,0).getValue();
+    b = getGradeableItemGrade(GRADEABLE_ENUM::EXAM,GradeableIndex{0}).getValue();
     // HACK  need to scale the final exam!
     b *= 0.6667;
   }
@@ -289,7 +291,7 @@ float Student::adjusted_test(int i) const {
 float Student::adjusted_test_pct() const {
   float sum = 0;
   for (int i = 0; i < GRADEABLES[GRADEABLE_ENUM::TEST].getCount(); i++) {
-    sum += adjusted_test(i);
+    sum += adjusted_test(GradeableIndex{(size_t)i});
   }
   float answer =  100 * GRADEABLES[GRADEABLE_ENUM::TEST].getPercent() * sum / float (GRADEABLES[GRADEABLE_ENUM::TEST].getMaximum());
   return answer;
@@ -304,10 +306,11 @@ float Student::quiz_normalize_and_drop(int num) const {
   // collect the normalized quiz scores in a vector
   std::vector<float> scores;
   for (int i = 0; i < GRADEABLES[GRADEABLE_ENUM::QUIZ].getCount(); i++) {
+    auto index = GradeableIndex{(size_t)i};
     // the max for this quiz
-    float p = PERFECT_STUDENT_POINTER->getGradeableItemGrade(GRADEABLE_ENUM::QUIZ,i).getValue();
+    float p = PERFECT_STUDENT_POINTER->getGradeableItemGrade(GRADEABLE_ENUM::QUIZ,index).getValue();
     // this students score
-    float v = getGradeableItemGrade(GRADEABLE_ENUM::QUIZ,i).getValue();
+    float v = getGradeableItemGrade(GRADEABLE_ENUM::QUIZ,index).getValue();
     scores.push_back(v/p);
   }
 
@@ -335,7 +338,7 @@ float Student::lowest_test_counts_half_pct() const {
   // first, collect & sort the scores
   std::vector<float> scores;
   for (int i = 0; i < num_tests; i++) {
-    scores.push_back(getGradeableItemGrade(GRADEABLE_ENUM::TEST,i).getValue());
+    scores.push_back(getGradeableItemGrade(GRADEABLE_ENUM::TEST,GradeableIndex{(size_t)i}).getValue());
   }
   std::sort(scores.begin(),scores.end());
 
@@ -463,19 +466,19 @@ std::string Student::grade(bool flag_b4_academic_sanction, Student *lowest_d) co
 
 
 
-void Student::academic_sanction(const std::string &gradeable, float penalty) {
+void Student::academic_sanction(const GradeableID &gradeable, float penalty) {
 
   // if the penalty is "a whole or partial letter grade"....
   float average_letter_grade = (CUTOFFS["A"]-CUTOFFS["B"] +
                                  CUTOFFS["B"]-CUTOFFS["C"] +
                                  CUTOFFS["C"]-CUTOFFS["D"]) / 3.0;
   GRADEABLE_ENUM g;
-  int item;
+  GradeableIndex item;
   LookupGradeable(gradeable,g,item);
   if (!GRADEABLES[g].hasCorrespondence(gradeable)) {
     std::cerr << "WARNING -- NO GRADEABLE TO ACADEMIC SANCTION" << std::endl;
   } else {
-    int which = GRADEABLES[g].getCorrespondence(gradeable).index;
+    auto which = GRADEABLES[g].getCorrespondence(gradeable).index;
     if (!(getGradeableItemGrade(g,which).getValue() > 0)) {
       std::cerr << "WARNING:  the grade for this " << gradeable_enum_to_string(g)<<" is already 0, academic sanction penalty error?" << std::endl;
     }
@@ -491,7 +494,7 @@ void Student::academic_sanction(const std::string &gradeable, float penalty) {
   std::stringstream foo;
   foo << std::setprecision(2) << std::fixed << penalty;
 
-  addWarning("[PLAGIARISM " + gradeable + " " + foo.str() + "]<br>");
+  addWarning("[PLAGIARISM " + gradeable.value() + " " + foo.str() + "]<br>");
 }
 
 

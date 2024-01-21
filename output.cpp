@@ -638,7 +638,7 @@ void start_table_output( bool /*for_instructor*/,
         if (g != GRADEABLE_ENUM::NOTE) {
           student_data.push_back(counter);
         }
-        std::string gradeable_id = GRADEABLES[g].getID(j);
+        const auto& gradeable_id = GRADEABLES[g].getID(GradeableIndex{(size_t)j});
         std::string gradeable_name = "";
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
@@ -657,7 +657,7 @@ void start_table_output( bool /*for_instructor*/,
       if (g == GRADEABLE_ENUM::TEST && TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT) {
         for (int j = 0; j < GRADEABLES[g].getCount(); j++) {
           student_data.push_back(counter);
-          std::string gradeable_id = GRADEABLES[g].getID(j);
+          const auto& gradeable_id = GRADEABLES[g].getID(GradeableIndex{(size_t)j});
           std::string gradeable_name = "";
           if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
             gradeable_name = "Adjusted " + GRADEABLES[g].getCorrespondence(gradeable_id).name;
@@ -1023,43 +1023,45 @@ void start_table_output( bool /*for_instructor*/,
           visible = CELL_CONTENTS_NO_DETAILS;
         }
         for (int j = 0; j < GRADEABLES[g].getCount(); j++) {
-          float grade = this_student->getGradeableItemGrade(g,j).getValue();
+          auto index = GradeableIndex{(size_t)j};
+          float grade = this_student->getGradeableItemGrade(g,index).getValue();
           std::string color = coloritcolor(grade,
-                                           sp->getGradeableItemGrade(g,j).getValue(),
-                                           sa->getGradeableItemGrade(g,j).getValue(),
-                                           sb->getGradeableItemGrade(g,j).getValue(),
-                                           sc->getGradeableItemGrade(g,j).getValue(),
-                                           sd->getGradeableItemGrade(g,j).getValue());
+                                           sp->getGradeableItemGrade(g,index).getValue(),
+                                           sa->getGradeableItemGrade(g,index).getValue(),
+                                           sb->getGradeableItemGrade(g,index).getValue(),
+                                           sc->getGradeableItemGrade(g,index).getValue(),
+                                           sd->getGradeableItemGrade(g,index).getValue());
           if (this_student == STDDEV_STUDENT_POINTER) color="ffffff";
           std::string details;
-          details = this_student->getGradeableItemGrade(g,j).getNote();
-          std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
-          std::string event = this_student->getGradeableItemGrade(g,j).getEvent();
-          bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
-          std::string reason = this_student->getGradeableItemGrade(g,j).getReasonForException();
-          std::string gID = GRADEABLES[g].getID(j);
+          details = this_student->getGradeableItemGrade(g,index).getNote();
+          std::string status = this_student->getGradeableItemGrade(g,index).getStatus();
+          std::string event = this_student->getGradeableItemGrade(g,index).getEvent();
+          bool Academic_integrity = this_student->getGradeableItemGrade(g,index).getAcademicIntegrity();
+          std::string reason = this_student->getGradeableItemGrade(g,index).getReasonForException();
+          const auto& gID = GRADEABLES[g].getID(index);
           std::string userName = this_student->getUserName();
           if (status.find("Bad") != std::string::npos) {
             details += " " + status;
           }
-          int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
-          int daysExtended = this_student->getGradeableItemGrade(g,j).getLateDayExceptions();
+          int late_days_used = this_student->getGradeableItemGrade(g,index).getLateDaysUsed();
+          int daysExtended = this_student->getGradeableItemGrade(g,index).getLateDayExceptions();
           assert (color.size()==6);
           std::string a = "right";
-          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName,daysExtended));
+          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID.value(),userName,daysExtended));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
         // FIXME
         if (g == GRADEABLE_ENUM::TEST && TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT) {
           for (int j = 0; j < GRADEABLES[g].getCount(); j++) {
-            float grade = this_student->adjusted_test(j);
-            std::string color = coloritcolor(this_student->adjusted_test(j),
-                                             sp->adjusted_test(j),
-                                             sa->adjusted_test(j),
-                                             sb->adjusted_test(j),
-                                             sc->adjusted_test(j),
-                                             sd->adjusted_test(j));
+            auto index = GradeableIndex{(size_t)j};
+            float grade = this_student->adjusted_test(index);
+            std::string color = coloritcolor(this_student->adjusted_test(index),
+                                             sp->adjusted_test(index),
+                                             sa->adjusted_test(index),
+                                             sb->adjusted_test(index),
+                                             sc->adjusted_test(index),
+                                             sd->adjusted_test(index));
             if (this_student == STDDEV_STUDENT_POINTER) color="ffffff";
             assert (color.size()==6);
             table.set(myrow,counter++,TableCell(color,grade,1,"",0,visible));

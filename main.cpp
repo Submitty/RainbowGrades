@@ -392,8 +392,8 @@ void preprocesscustomizationfile(const std::string &now_string,
       std::string token_key = grade_id.value("id","");
       //std::cout << token_key << std::endl;
       assert (token_key != "");
-
-      int correspondence_index = GRADEABLES[gradeable_category].setCorrespondence(token_key);
+      GradeableID token_key_id = GradeableID{token_key};
+      auto correspondence_index = GRADEABLES[gradeable_category].setCorrespondence(token_key_id);
       p_score = grade_id.value("max", 0.0);
 
       std::vector<float> curve = grade_id.value("curve",std::vector<float>());
@@ -422,41 +422,41 @@ void preprocesscustomizationfile(const std::string &now_string,
         //std::cout << "RELEASE DATE " << release_date << std::endl;
         if (release_date < now_string) {
           //std::cout << "RELEASED!" << std::endl;
-          GRADEABLES[gradeable_category].setReleased(token_key,true);
+          GRADEABLES[gradeable_category].setReleased(token_key_id,true);
         } else {
           //std::cout << "not released" << std::endl;
-          GRADEABLES[gradeable_category].setReleased(token_key,false);
+          GRADEABLES[gradeable_category].setReleased(token_key_id,false);
         }
       } else {
-        GRADEABLES[gradeable_category].setReleased(token_key,released);
+        GRADEABLES[gradeable_category].setReleased(token_key_id,released);
       }
 
       float maximum = grade_id.value("max",0.0);
-      GRADEABLES[gradeable_category].setMaximum(token_key,maximum);
+      GRADEABLES[gradeable_category].setMaximum(token_key_id,maximum);
 
       if (grade_id.find("scale_max") != grade_id.end()) {
         float scale_maximum = grade_id.value("scale_max",0.0);
         assert (scale_maximum > 0);
-        GRADEABLES[gradeable_category].setScaleMaximum(token_key,scale_maximum);
+        GRADEABLES[gradeable_category].setScaleMaximum(token_key_id,scale_maximum);
       }
       if (grade_id.find("percent") != grade_id.end()) {
         assert(!GRADEABLES[gradeable_category].hasSortedWeight() &&
                "GRADE CATEGORY HAS sorted_weights FIELD WHICH WOULD OVERRIDE GRADEABLE-SPECIFIC percent FIELD");
         float item_percentage = grade_id.value("percent",-1.0);
         assert (item_percentage >= 0 && item_percentage <= 1.0);
-        GRADEABLES[gradeable_category].setItemPercentage(token_key,item_percentage);
+        GRADEABLES[gradeable_category].setItemPercentage(token_key_id,item_percentage);
       }
       float clamp = grade_id.value("clamp",-1);
-      GRADEABLES[gradeable_category].setClamp(token_key,clamp);
+      GRADEABLES[gradeable_category].setClamp(token_key_id,clamp);
 
       assert (p_score >= a_score &&
               a_score >= b_score &&
               b_score >= c_score &&
               c_score >= d_score);
       
-      assert (correspondence_index >= 0 &&
-             correspondence_index < GRADEABLES[gradeable_category].getCount());
-      if (GRADEABLES[gradeable_category].isReleased(token_key)) {
+      assert (correspondence_index.value() >= 0 &&
+             correspondence_index.value() < GRADEABLES[gradeable_category].getCount());
+      if (GRADEABLES[gradeable_category].isReleased(token_key_id)) {
         perfect->setGradeableItemGrade(gradeable_category, correspondence_index, p_score);
         lowest_a->setGradeableItemGrade(gradeable_category,
                                         correspondence_index, a_score);
@@ -729,11 +729,11 @@ void processcustomizationfile(const std::string &now_string,
             nlohmann::json warning = warning_list[i];
       //std::string username = warning_user["user"].get<std::string>();
             std::string message = warning["msg"].get<std::string>();
-            std::vector<std::string> ids;
+            std::vector<GradeableID> ids;
             float value = warning["value"].get<float>();
             nlohmann::json j_ids = warning["ids"];
             for (std::size_t k = 0; k < j_ids.size(); k++) {
-              ids.push_back(j_ids[k].get<std::string>());
+              ids.emplace_back(j_ids[k].get<std::string>());
             }
 
             std::cout << "search for " << message << std::endl;
@@ -743,7 +743,7 @@ void processcustomizationfile(const std::string &now_string,
               float v = 0;
               for (std::size_t k = 0; k < ids.size(); k++) {
                 GRADEABLE_ENUM g;
-                int item;
+                GradeableIndex item;
                 LookupGradeable(ids[k],g,item);
                 v += s->getGradeableItemGrade(g,item).getValue();
               }
@@ -840,7 +840,7 @@ void processcustomizationfile(const std::string &now_string,
   } else if (token == "plagiarism") {
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
       std::string username = (itr2.value())["user"].get<std::string>();
-      std::string hw = (itr2.value())["gradeable"].get<std::string>();
+      auto hw = GradeableID{(itr2.value())["gradeable"].get<std::string>()};
       float penalty = (itr2.value())["penalty"].get<float>();
       //assert (hw >= 1 && hw <= 10);
       assert (penalty >= -0.01 && penalty <= 1.01);
@@ -1027,10 +1027,10 @@ void load_student_grades(std::vector<Student*> &students) {
     }
     } else {
       for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
-      int which;
+      size_t which;
       bool invalid = false;
-      std::string gradeable_id = (*itr2).value("id","ERROR BAD ID");
-      std::string gradeable_name = (*itr2).value("name",gradeable_id);
+      GradeableID gradeable_id{(*itr2).value("id","ERROR BAD ID")};
+      std::string gradeable_name = (*itr2).value("name",gradeable_id.value());
       std::string status;
       if (itr2 != (itr.value()).end() && (*itr2).is_string()) {
         status = (*itr2).value("status","NOT ELECTRONIC");
@@ -1090,7 +1090,7 @@ void load_student_grades(std::vector<Student*> &students) {
       } else {
       invalid = false;
       const auto& c = GRADEABLES[g].getCorrespondence(gradeable_id);
-                        which = c.index;
+                        which = c.index.value();
       if (c.name == "") {
                           GRADEABLES[g].setCorrespondenceName(gradeable_id,gradeable_name); 
                         } else {
@@ -1436,8 +1436,8 @@ void SaveExtensionReports(const std::vector<Student*> &students) {
     for (size_t i2=0;i2<gradeablesWithExtensions.size();i2++) {
       ItemGrade item = std::get<0>(gradeablesWithExtensions[i2]);
       GRADEABLE_ENUM g = std::get<0>(std::get<1>(gradeablesWithExtensions[i2]));
-      int index = std::get<1>(std::get<1>(gradeablesWithExtensions[i2]));
-      std::string gradeable_id = GRADEABLES[g].getID(index);
+      auto index = GradeableIndex{(size_t)std::get<1>(std::get<1>(gradeablesWithExtensions[i2]))};
+      auto gradeable_id = GRADEABLES[g].getID(index);
       std::string gradeable_name = "";
       if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
         gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
@@ -1548,7 +1548,7 @@ int main(int argc, char* argv[]) {
       dropped++;
     }
     if (GRADEABLES[GRADEABLE_ENUM::EXAM].getCount() != 0) {
-      if (this_student->getGradeableItemGrade(GRADEABLE_ENUM::EXAM,GRADEABLES[GRADEABLE_ENUM::EXAM].getCount()-1).getValue() > 0) {
+      if (this_student->getGradeableItemGrade(GRADEABLE_ENUM::EXAM,GradeableIndex{(size_t)GRADEABLES[GRADEABLE_ENUM::EXAM].getCount()-1}).getValue() > 0) {
         took_final++;
       }
     }
@@ -1582,11 +1582,12 @@ void suggest_curves(std::vector<Student*> &students) {
 
     // LOOP OVER ALL ITEMS IN THE GRADEABLE
     for (int item = 0; item < GRADEABLES[g].getCount(); item++) {
-      std::string gradeable_id = GRADEABLES[g].getID(item);
-      if (gradeable_id == "") continue;
+      auto item_index = GradeableIndex{(size_t)item};
+      const auto& gradeable_id = GRADEABLES[g].getID(item_index);
+      if (gradeable_id.value() == "") continue;
 
       const std::string& gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
-      std::cout << gradeable_enum_to_string(g) << " " << gradeable_id << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
+      std::cout << gradeable_enum_to_string(g) << " " << gradeable_id.value() << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
       std::vector<float> scores;
 
       // gather the scores from the valid (non-omitted) sections
@@ -1594,8 +1595,8 @@ void suggest_curves(std::vector<Student*> &students) {
       for (unsigned int S = 0; S < students.size(); S++) {
         if (students[S]->getSection() != "null" &&
             (!OmitSectionFromStats(students[S]->getSection())) &&
-            students[S]->getGradeableItemGrade(g,item).getValue() > 0) {
-          scores.push_back(students[S]->getGradeableItemGrade(g,item).getValue());
+            students[S]->getGradeableItemGrade(g,item_index).getValue() > 0) {
+          scores.push_back(students[S]->getGradeableItemGrade(g,item_index).getValue());
           section_counts[students[S]->getSection()]++;
         }
       }
@@ -1607,14 +1608,14 @@ void suggest_curves(std::vector<Student*> &students) {
         }
         float average = sum / float(scores.size());
         std::cout << "    average=" << std::setprecision(2) << std::fixed << average;
-        student_average->setGradeableItemGrade(g,item,average);
+        student_average->setGradeableItemGrade(g,item_index,average);
         sum = 0;
         for (unsigned int x = 0; x < scores.size(); x++) {
           sum+=(average-scores[x])*(average-scores[x]);
         }
         float stddev = sqrt(sum/float(scores.size()));
         std::cout << "    stddev=" << std::setprecision(2) << std::fixed << stddev;
-        student_stddev->setGradeableItemGrade(g,item,stddev);
+        student_stddev->setGradeableItemGrade(g,item_index,stddev);
         std::cout << "    suggested curve:";
         std::cout << "    A- cutoff=" << scores[int(0.70*scores.size())];
         std::cout << "    B- cutoff=" << scores[int(0.45*scores.size())];
