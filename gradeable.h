@@ -93,6 +93,25 @@ struct Correspondence {
   }
 };
 
+struct Gradeable {
+  Correspondence correspondence;
+  float maximum{0};
+  float scale_maximum{-1};
+  float item_percentage{-1};
+  float clamp{0};
+  bool released{false};
+
+  /*
+   * Returns true if this gradeable is extra credit.
+   * Extra credit items are those that have a maximum of <= 0.
+   */
+  [[nodiscard]] bool isExtraCredit() const { return maximum <= 0;}
+  /*
+   * returns value that should be used as the maximum for the gradeable.
+   */
+  [[nodiscard]] float getScaledMaximum() const {return std::max(maximum,scale_maximum);}
+
+};
 
 class GradeableList {
 
@@ -103,43 +122,92 @@ public:
   GradeableList(int c, float p) : count(c),percent(p) { remove_lowest=0; }
 
   // ACCESSORS
-  int getCount() const;
-  float getPercent() const;
-  float getBucketPercentageUpperClamp() const;
-  float getMaximum() const;
-  int getRemoveLowest() const;
-  GradeableID getID(GradeableIndex index) const;
-  bool hasCorrespondence(const GradeableID &id) const;
-  const Correspondence& getCorrespondence(const GradeableID& id) const;
-  bool isReleased(const GradeableID &id) const;
-  float getItemMaximum(const GradeableID &id) const;
-  float getScaleMaximum(const GradeableID &id) const;
-  float getItemPercentage(const GradeableID &id) const;
-  float getClamp(const GradeableID &id) const;
-  float getSortedWeight(unsigned int position);
-  bool hasSortedWeight();
+  [[nodiscard]] size_t getCount() const;
+  [[nodiscard]] float getPercent() const;
+  [[nodiscard]] float getBucketPercentageUpperClamp() const;
+
+  /*
+   * Get the maximum percentage that can be received for a gradeable type.
+   * If the value is less than 0, it should be ignored.
+   */
+  [[nodiscard]] float getExpectedTotalPoints() const;
+  [[nodiscard]] int getRemoveLowest() const;
+  [[nodiscard]] float getSortedWeight(unsigned int position);
+  [[nodiscard]] bool hasSortedWeight();
+
+  [[nodiscard]] Gradeable& getGradeable(const GradeableID& id);
+  [[nodiscard]] const Gradeable& getGradeable(const GradeableID& id) const;
+  
+  // functions that operate on gradeable
+  [[nodiscard]] GradeableID getID(GradeableIndex index) const;
+  [[nodiscard]] bool hasCorrespondence(const GradeableID &id) const;
+  [[nodiscard]] const Correspondence& getCorrespondence(const GradeableID& id) const;
+  [[nodiscard]] bool isReleased(const GradeableID &id) const;
+  [[nodiscard]] float getItemMaximum(const GradeableID &id) const;
+  [[nodiscard]] float getScaleMaximum(const GradeableID &id) const;
+  [[nodiscard]] float getItemPercentage(const GradeableID &id) const;
+  [[nodiscard]] float getClamp(const GradeableID &id) const;
+
+  /*
+   * Get the number of items that are extra credit.
+   * Extra credit items are those that have a maximum of <= 0.
+   */
+  [[nodiscard]] size_t getExtraCreditCount() const;
+  /*
+   * Get the number of items that are not extra credit.
+   * Non-extra credit items are those that have a maximum of > 0.
+   */
+  [[nodiscard]] size_t getNormalCount() const;
+
+  /*
+   * Get the number of points that are extra credit
+   */
+  [[nodiscard]] float getExtraCreditPoints() const;
+
+  /*
+   * Get the number of points that are not extra credit
+   */
+  [[nodiscard]] float getNormalPoints() const;
+
+  /*
+   * Get the total number of points
+   */
+  [[nodiscard]] float getTotalPoints() const;
+
+  size_t getZeroMaxCount() const;
+  size_t getNonExtraCreditCount() const;
+  size_t getNonZeroCount() const;
+  float getNonZeroSum() const;
+
 
   // MODIFIERS
   void setRemoveLowest(int r);
-  GradeableIndex setCorrespondence(const GradeableID& id);
+  void addSortedWeight(float weight);
   // Set the max percentage that can be received for a gradeable type.
   // If the value is less than 0, it should be ignored.
   void setBucketPercentageUpperClamp(float bucket_percentage_upper_clamp);
+  
+  // functions that operate on gradeable
+  GradeableIndex setCorrespondence(const GradeableID& id);
   void setCorrespondenceName(const GradeableID& id, const std::string& name);
   void setReleased(const GradeableID& id, bool is_released);
   void setMaximum(const GradeableID &id, float maximum);
   void setScaleMaximum(const GradeableID&id, float scale_maximum);
   void setItemPercentage(const GradeableID&id, float item_percentage);
   void setClamp(const GradeableID& id, float clamp);
-  void addSortedWeight(float weight);
 
 private:
 
   // REPRESENTATION
-  int count;
+  size_t count;
   float percent;
   int remove_lowest;
   float bucket_percentage_upper_clamp;
+  std::vector<float> sorted_weights;
+
+  std::map<GradeableID, Gradeable> gradeables_;
+
+  /*
   // correspondences are a map from the id which corresponds to a gradeables
   // unique id (name) to a pair containing the index of the gradeable along
   // with it's human readable name or "title"
@@ -147,9 +215,9 @@ private:
   std::map<GradeableID,float> maximums;
   std::map<GradeableID,float> scale_maximums;
   std::map<GradeableID,float> item_percentages;
-  std::vector<float> sorted_weights;
   std::map<GradeableID,float> clamps;
   std::map<GradeableID,bool> released;
+  */
 };
 
 // ===============================================================================

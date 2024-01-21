@@ -16,7 +16,7 @@ TEST_CASE("GradeableList no correspondence") {
   REQUIRE(g.getCount() == 0);
   REQUIRE(g.getPercent() == 0.0f);
   REQUIRE_THAT(g.getBucketPercentageUpperClamp(), WithinAbs(0.0f, abs_tol));
-  REQUIRE_THAT(g.getMaximum(), WithinAbs(0.0f, abs_tol));
+  REQUIRE_THAT(g.getExpectedTotalPoints(), WithinAbs(0.0f, abs_tol));
   REQUIRE(g.getRemoveLowest() == 0);
   REQUIRE(g.getID(GradeableIndex{0}) == GradeableID{""});
   REQUIRE(g.hasCorrespondence(testID) == false);

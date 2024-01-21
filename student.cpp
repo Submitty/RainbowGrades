@@ -257,10 +257,13 @@ void getNonzeroCounts(const GradeableList &gradeable, float &nonzero_sum,
   for (int i = 0; i < gradeable.getCount(); i++) {
     //float s = getGradeableItemGrade(gradeable_category,i).getValue();
     auto id = gradeable.getID(GradeableIndex{(size_t)i});
-    if(!id.value().empty()){
+    // if the gradeable has a name
+    if(!id.value().empty()) {
+      // extra credit points
       if (gradeable.getItemMaximum(id) > 0) {
         non_extra_credit_count++;
       }
+      // all points including extra credit
       float m = std::max(gradeable.getItemMaximum(id),gradeable.getScaleMaximum(id));
       if(m > 0){
         nonzero_sum += m;
@@ -293,7 +296,7 @@ float Student::adjusted_test_pct() const {
   for (int i = 0; i < GRADEABLES[GRADEABLE_ENUM::TEST].getCount(); i++) {
     sum += adjusted_test(GradeableIndex{(size_t)i});
   }
-  float answer =  100 * GRADEABLES[GRADEABLE_ENUM::TEST].getPercent() * sum / float (GRADEABLES[GRADEABLE_ENUM::TEST].getMaximum());
+  float answer =  100 * GRADEABLES[GRADEABLE_ENUM::TEST].getPercent() * sum / float (GRADEABLES[GRADEABLE_ENUM::TEST].getExpectedTotalPoints());
   return answer;
 }
 
@@ -354,7 +357,7 @@ float Student::lowest_test_counts_half_pct() const {
   sum *= float(num_tests) / weight_total;
 
   // scale to percent;
-  return 100 * GRADEABLES[GRADEABLE_ENUM::TEST].getPercent() * sum / float (GRADEABLES[GRADEABLE_ENUM::TEST].getMaximum());
+  return 100 * GRADEABLES[GRADEABLE_ENUM::TEST].getPercent() * sum / float (GRADEABLES[GRADEABLE_ENUM::TEST].getExpectedTotalPoints());
 }
 
 

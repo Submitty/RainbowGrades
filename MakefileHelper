@@ -54,15 +54,15 @@ memory_debug : memory_flags = -m32
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-     flags = -g -std=c++11
+     flags = -g -std=c++17
 endif
 
 ifeq ($(UNAME_S),Linux)
-     flags = -g -std=c++0x
+     flags = -g -std=c++17
 endif
 
 ifeq ($(findstring CYGWIN,$(UNAME_S)),CYGWIN)
-    flags = -g -std=c++11
+    flags = -g -std=c++17
 endif
 
 json_include = -I${nlohmann_json_dir}/include/
@@ -83,7 +83,7 @@ process_grades.out: \
 	${RAINBOW_GRADES_DIRECTORY}/grade.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/gradeable.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/section.cpp
-	clang++ -Wall -Wextra ${flags} ${memory_flags} ${json_include} $^ -g -o $@
+	clang++  -Wall -Wextra ${flags} ${memory_flags} ${json_include} $^ -g -o $@
 
 individual_summary_html all_students_summary_csv all_students_summary_html:
 	mkdir -p $@

@@ -15,6 +15,10 @@ class OutOfRange : public RainbowGradesException {
 public:
   using RainbowGradesException::RainbowGradesException;
 };
+class InvalidID : public RainbowGradesException {
+public:
+  using RainbowGradesException::RainbowGradesException;
+};
 class InvalidArgument : public RainbowGradesException {
 public:
   using RainbowGradesException::RainbowGradesException;
