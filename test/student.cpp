@@ -14,7 +14,8 @@ TEST_CASE("nonzero counts") {
   g.setCorrespondence("3");
   g.setMaximum("1", 1);
   g.setMaximum("2", 1);
-  //g.setMaximum("3", 0);
+  // setting maximum score to <=0 means that the item is extra credit
+  g.setMaximum("3", 0);
   g.setScaleMaximum("3", 1);
   float nonzero_sum =0;
   int nonzero_count = 0;
