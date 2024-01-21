@@ -2,6 +2,7 @@
 #include <map>
 #include <iomanip>
 #include <set>
+#include <random>
 
 
 #include "student.h"
@@ -87,10 +88,6 @@ private:
   std::vector<std::pair<std::string,std::string> > available_lefty_seats;
   std::vector<std::pair<std::string,std::string> > available_nonlefty_seats;
 };
-
-
-// random generator function:
-int myrandomzone (int i) { return std::rand()%i;}
 
 //==========================================================================
 
@@ -369,8 +366,10 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
   }
   std::cout << "AVAILABLE LEFTY SEATS " << randomized_lefty_available.size() << std::endl;
   std::cout << "AVAILABLE NONLEFTY SEATS " << randomized_nonlefty_available.size() << std::endl;
-  std::random_shuffle ( randomized_lefty_available.begin(), randomized_lefty_available.end(), myrandomzone );
-  std::random_shuffle ( randomized_nonlefty_available.begin(), randomized_nonlefty_available.end(), myrandomzone );
+  std::random_device rd;
+  std::mt19937 g(rd());
+  std::shuffle(randomized_lefty_available.begin(), randomized_lefty_available.end(), g);
+  std::shuffle(randomized_nonlefty_available.begin(), randomized_nonlefty_available.end(), g);
 
   // ============================================================
   // do the assignments!

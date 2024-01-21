@@ -33,6 +33,7 @@ add_library(rainbow_grades
             section.cpp)
 target_link_libraries(rainbow_grades PRIVATE nlohmann_json::nlohmann_json)
 target_include_directories(rainbow_grades PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(rainbow_grades PUBLIC cxx_std_17)
 
 add_executable(process_grades.out main.cpp )
 target_link_libraries(process_grades.out PRIVATE nlohmann_json::nlohmann_json rainbow_grades)
