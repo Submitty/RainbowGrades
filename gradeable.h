@@ -36,9 +36,6 @@ public:
   float getMaximum() const;
   int getRemoveLowest() const;
   std::string getID(int index) const;
-  void isResubmit(int index,
-                  std::string &original_id, std::string &resubmit_id,
-                  float &autograde_replacement_percentage);
   bool hasCorrespondence(const std::string &id) const;
   const std::pair<int,std::string>& getCorrespondence(const std::string& id);
   bool isReleased(const std::string &id) const;
@@ -61,10 +58,6 @@ public:
   void setScaleMaximum(const std::string&id, float scale_maximum);
   void setItemPercentage(const std::string&id, float item_percentage);
   void setClamp(const std::string&id, float clamp);
-  void setResubmissionValues(const std::string &id,
-                             const std::string &original_id, const std::string &resubmit_id,
-                             const std::string &title,
-                             float autograde_replacement_percentage);
   void addSortedWeight(float weight);
 
 private:
@@ -82,9 +75,6 @@ private:
   std::vector<float> sorted_weights;
   std::map<std::string,float> clamps;
   std::map<std::string,bool> released;
-  std::map<std::string,std::string> original_ids;
-  std::map<std::string,std::string> resubmit_ids;
-  std::map<std::string,float> autograde_replacement_percentages;
 };
 
 // ===============================================================================

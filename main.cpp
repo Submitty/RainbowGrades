@@ -449,19 +449,6 @@ void preprocesscustomizationfile(const std::string &now_string,
       float clamp = grade_id.value("clamp",-1);
       GRADEABLES[gradeable_category].setClamp(token_key,clamp);
 
-      if (grade_id.find("autograde_replacement_percentage") != grade_id.end()) {
-        assert (grade_id.find("original_id") != grade_id.end());
-        assert (grade_id.find("resubmit_id") != grade_id.end());
-        assert (grade_id.find("title") != grade_id.end());
-
-        std::string o_id = grade_id.value("original_id","");
-        std::string r_id = grade_id.value("resubmit_id","");
-        std::string t = grade_id.value("title","");
-        float a_r_p = grade_id.value("autograde_replacement_percentage",0.5);
-
-        GRADEABLES[gradeable_category].setResubmissionValues(token_key,o_id,r_id,t,a_r_p);
-      }
-
       assert (p_score >= a_score &&
               a_score >= b_score &&
               b_score >= c_score &&
@@ -1256,76 +1243,6 @@ void load_student_grades(std::vector<Student*> &students) {
   if (recommendation != "") {
     student->addRecommendation(recommendation);
   }
-
-
-  // lookup and compute resubmit/replacement gradeable items
-  for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
-    GRADEABLE_ENUM g = ALL_GRADEABLES[i];
-    for (int gradeable_id = 0; gradeable_id < GRADEABLES[g].getCount();
-         gradeable_id++) {
-      std::string original_id;
-      std::string resubmit_id;
-      float autograde_replacement_percentage;
-      GRADEABLES[g].isResubmit(gradeable_id,original_id,resubmit_id,autograde_replacement_percentage);
-      if (original_id == "") continue;
-
-      float original_autograde = 0;
-      float original_tagrade = 0;
-      float resubmit_autograde = 0;
-
-      for (nlohmann::json::iterator itr = j.begin(); itr != j.end(); itr++) {
-        std::string token = itr.key();
-
-        if (itr.value().is_array()) {
-          for (unsigned int e = 0; e < itr.value().size(); e++) {
-            if (!itr.value()[e].is_object()) continue;
-            if (itr.value()[e].value("id","") == original_id) {
-              original_autograde = itr.value()[e].value("autograding_score",0.0);
-              original_tagrade = itr.value()[e].value("tagrading_score",0.0);
-
-              // WORKAROUND -- bug in gradesummaries tagrading for unsubmitted assignment
-              // ALSO NEED TO DEAL WITH VERSION CONFLICTS BETTER
-              float original_score = itr.value()[e].value("score",0.0);
-              if (original_score < original_tagrade + original_autograde) {
-                original_tagrade = 0;
-                original_autograde = 0;
-              }
-              assert (fabs( original_score -( original_autograde + original_tagrade)) < 0.1);
-              // END WORKAROUND
-
-            }
-            if (itr.value()[e].value("id","") == resubmit_id) {
-              resubmit_autograde = itr.value()[e].value("autograding_score",0);
-              // SIMILAR WORKAROUND
-              float resubmit_score = itr.value()[e].value("score",0);
-              if (resubmit_score == 0) {
-                resubmit_autograde = 0;
-              }
-              // END WORKAROUND
-
-            }
-          }
-        }
-      }
-      float new_autograde =
-        original_autograde*(1-autograde_replacement_percentage) +
-        resubmit_autograde*(autograde_replacement_percentage);
-      float score =
-        original_tagrade +
-        std::max(original_autograde,new_autograde);
-      if (original_autograde < new_autograde) {
-        std::cout << "student " << std::left << std::setw(10) << student->getUserName() << " had grade increase for ";
-        std::cout << original_id << ": "
-                  << std::right << std::setw(5) << original_tagrade << " + "
-                  << std::right << std::setw(5) << original_autograde << " / "
-                  << std::right << std::setw(5) << resubmit_autograde << " -> "
-                  << std::right << std::setw(5) << new_autograde << " = "
-                  << std::right << std::setw(5) << score << std::endl;
-      }
-      student->setGradeableItemGrade(g, gradeable_id,score);
-    }
-  }
-
   students.push_back(student);
   }
 

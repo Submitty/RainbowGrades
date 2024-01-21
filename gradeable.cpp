@@ -77,17 +77,6 @@ std::string Gradeable::getID(int index) const {
   }
   return "";
 }
-void Gradeable::isResubmit(int index, std::string &original_id,
-                           std::string &resubmit_id,
-                           float &autograde_replacement_percentage) {
-  std::string id = getID(index);
-  if (original_ids.find(id) == original_ids.end()) return;
-  assert (resubmit_ids.find(id) != resubmit_ids.end());
-  assert (autograde_replacement_percentages.find(id) != autograde_replacement_percentages.end());
-  original_id = original_ids.find(id)->second;
-  resubmit_id = resubmit_ids.find(id)->second;
-  autograde_replacement_percentage = autograde_replacement_percentages.find(id)->second;
-}
 bool Gradeable::hasCorrespondence(const std::string &id) const {
   /*
   for (std::map<std::string,std::pair<int,std::string> >::const_iterator itr = correspondences.begin();
@@ -180,16 +169,6 @@ void Gradeable::setClamp(const std::string &id, float clamp) {
   assert (hasCorrespondence(id));
   assert (clamps.find(id) == clamps.end());
   clamps[id] = clamp;
-}
-void Gradeable::setResubmissionValues(const std::string &id,
-                                      const std::string &original_id,
-                                      const std::string &resubmit_id,
-                                      const std::string &title,
-                                      float autograde_replacement_percentage) {
-  setCorrespondenceName(id,title);
-  original_ids[id] = original_id;
-  resubmit_ids[id] = resubmit_id;
-  autograde_replacement_percentages[id] = autograde_replacement_percentage;
 }
 void Gradeable::addSortedWeight(float weight) {
   sorted_weights.push_back(weight);
