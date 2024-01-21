@@ -641,7 +641,7 @@ void start_table_output( bool /*for_instructor*/,
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
-          gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
+          gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
           //gradeable_name = spacify(gradeable_name);
         }
         if (gradeable_name == "")
@@ -660,7 +660,7 @@ void start_table_output( bool /*for_instructor*/,
           std::string gradeable_id = GRADEABLES[g].getID(j);
           std::string gradeable_name = "";
           if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
-            gradeable_name = "Adjusted " + GRADEABLES[g].getCorrespondence(gradeable_id).second;
+            gradeable_name = "Adjusted " + GRADEABLES[g].getCorrespondence(gradeable_id).name;
           }
           table.set(0,counter++,TableCell("ffffff",gradeable_name));
         }

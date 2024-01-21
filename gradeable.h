@@ -21,6 +21,11 @@ bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value
 
 // ===============================================================================
 
+struct Correspondence {
+  int index;
+  std::string name;
+};
+
 class GradeableList {
 
 public:
@@ -37,7 +42,7 @@ public:
   int getRemoveLowest() const;
   std::string getID(int index) const;
   bool hasCorrespondence(const std::string &id) const;
-  const std::pair<int,std::string>& getCorrespondence(const std::string& id);
+  const Correspondence& getCorrespondence(const std::string& id) const;
   bool isReleased(const std::string &id) const;
   float getItemMaximum(const std::string &id) const;
   float getScaleMaximum(const std::string &id) const;
@@ -67,8 +72,10 @@ private:
   float percent;
   int remove_lowest;
   float bucket_percentage_upper_clamp;
-  // would it make more sense to have a single map of structs of items?
-  std::map<std::string,std::pair<int,std::string> > correspondences;
+  // correspondences are a map from the id which corresponds to a gradeables
+  // unique id (name) to a pair containing the index of the gradeable along
+  // with it's human readable name or "title"
+  std::map<std::string,Correspondence> correspondences;
   std::map<std::string,float> maximums;
   std::map<std::string,float> scale_maximums;
   std::map<std::string,float> item_percentages;

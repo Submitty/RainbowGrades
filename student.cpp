@@ -475,7 +475,7 @@ void Student::academic_sanction(const std::string &gradeable, float penalty) {
   if (!GRADEABLES[g].hasCorrespondence(gradeable)) {
     std::cerr << "WARNING -- NO GRADEABLE TO ACADEMIC SANCTION" << std::endl;
   } else {
-    int which = GRADEABLES[g].getCorrespondence(gradeable).first;
+    int which = GRADEABLES[g].getCorrespondence(gradeable).index;
     if (!(getGradeableItemGrade(g,which).getValue() > 0)) {
       std::cerr << "WARNING:  the grade for this " << gradeable_enum_to_string(g)<<" is already 0, academic sanction penalty error?" << std::endl;
     }

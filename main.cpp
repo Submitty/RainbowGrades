@@ -1089,12 +1089,12 @@ void load_student_grades(std::vector<Student*> &students) {
       invalid = true;
       } else {
       invalid = false;
-      const std::pair<int,std::string>& c = GRADEABLES[g].getCorrespondence(gradeable_id);
-                        which = c.first;
-      if (c.second == "") {
+      const auto& c = GRADEABLES[g].getCorrespondence(gradeable_id);
+                        which = c.index;
+      if (c.name == "") {
                           GRADEABLES[g].setCorrespondenceName(gradeable_id,gradeable_name); 
                         } else {
-                          assert (c.second == gradeable_name);
+                          assert (c.name == gradeable_name);
                         }
       }
       
@@ -1440,7 +1440,7 @@ void SaveExtensionReports(const std::vector<Student*> &students) {
       std::string gradeable_id = GRADEABLES[g].getID(index);
       std::string gradeable_name = "";
       if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
-        gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
+        gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
       }
       student_ostr << "<tr><td>" << gradeable_name << "</td><td align=center>"
                    << item.getLateDayExceptions() << "</td><td align=center>"
@@ -1585,7 +1585,7 @@ void suggest_curves(std::vector<Student*> &students) {
       std::string gradeable_id = GRADEABLES[g].getID(item);
       if (gradeable_id == "") continue;
 
-      const std::string& gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
+      const std::string& gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
       std::cout << gradeable_enum_to_string(g) << " " << gradeable_id << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
       std::vector<float> scores;
 
