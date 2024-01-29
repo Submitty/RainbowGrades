@@ -11,6 +11,7 @@
 #include <cmath>
 #include "benchmark.h"
 #include "submini_polls.h"
+#include "section.h"
 
 std::string GLOBAL_sort_order;
 
@@ -51,7 +52,7 @@ nlohmann::json GLOBAL_CUSTOMIZATION_JSON;
 
 std::vector<GRADEABLE_ENUM> ALL_GRADEABLES;
 
-std::map<GRADEABLE_ENUM,Gradeable>  GRADEABLES;
+std::map<GRADEABLE_ENUM, GradeableList>  GRADEABLES;
 
 float LATE_DAY_PERCENTAGE_PENALTY = 0;
 bool  TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT = false;
@@ -77,30 +78,6 @@ Student* STDDEV_STUDENT_POINTER;
 
 std::map<std::string,std::string> sectionNames;
 std::map<std::string,std::string> sectionColors;
-
-bool validSection(std::string section) {
-
-  nlohmann::json::iterator itr = GLOBAL_CUSTOMIZATION_JSON.find("section");
-  assert (itr != GLOBAL_CUSTOMIZATION_JSON.end());
-  assert (itr->is_object());
-
-  nlohmann::json::iterator itr2 = itr->find(section);
-  if (itr2 == itr->end()) return false;
-  return true;
-  
-  //return (sectionNames.find(section) != sectionNames.end());
-}
-
-
-std::string sectionName(std::string section) {
-  std::map<std::string,std::string>::const_iterator itr = sectionNames.find(section);
-  if (itr == sectionNames.end()) 
-    return "NONE";
-  return itr->second;
-}
-
-
-
 
 //====================================================================
  
@@ -242,204 +219,14 @@ bool by_section(const Student *s1, const Student *s2) {
     return by_name(s1,s2);
 }
 
-
-// sorting function for letter grades
-bool operator< (const Grade &a, const Grade &b) {
-  if (a.value == b.value) return false;
-
-  if (a.value == "A") return true;
-  if (b.value == "A") return false;
-  if (a.value == "A-") return true;
-  if (b.value == "A-") return false;
-
-  if (a.value == "B+") return true;
-  if (b.value == "B+") return false;
-  if (a.value == "B") return true;
-  if (b.value == "B") return false;
-  if (a.value == "B-") return true;
-  if (b.value == "B-") return false;
-
-  if (a.value == "C+") return true;
-  if (b.value == "C+") return false;
-  if (a.value == "C") return true;
-  if (b.value == "C") return false;
-  if (a.value == "C-") return true;
-  if (b.value == "C-") return false;
-
-  if (a.value == "D+") return true;
-  if (b.value == "D+") return false;
-  if (a.value == "D") return true;
-  if (b.value == "D") return false;
-
-  if (a.value == "F") return true;
-  if (b.value == "F") return false;
-
-  return false;
-}
-
 //====================================================================
-/*
-void gradeable_helper(std::ifstream& istr, GRADEABLE_ENUM g) {
-  int c; float p, m;
-  istr >> c >> p >> m;
-  assert (GRADEABLES.find(g) == GRADEABLES.end());
 
-  Gradeable answer (c,p,m);
-  GRADEABLES.insert(std::make_pair(g,answer));
-  assert (GRADEABLES[g].getCount() >= 0);
-  assert (GRADEABLES[g].getPercent() >= 0.0 && GRADEABLES[g].getPercent() <= 1.0);
-  assert (GRADEABLES[g].getMaximum() >= 0.0);
-}
-*/
-
-bool string_to_gradeable_enum(const std::string &s, GRADEABLE_ENUM &return_value) {
-  std::string s2;
-  for (unsigned int i = 0; i < s.size(); ++i) {
-    s2.push_back(std::tolower(s[i]));
-  }
-  std::replace( s2.begin(), s2.end(), '-', '_');
-  if (s2 == "hw" || s2 == "homework")          { return_value = GRADEABLE_ENUM::HOMEWORK;          return true;  }
-  if (s2 == "assignment")                      { return_value = GRADEABLE_ENUM::ASSIGNMENT;        return true;  }
-  if (s2 == "problem_set")                     { return_value = GRADEABLE_ENUM::PROBLEM_SET;       return true;  }
-  if (s2 == "quiz" || s2 == "quizze")          { return_value = GRADEABLE_ENUM::QUIZ;              return true;  }
-  if (s2 == "test")                            { return_value = GRADEABLE_ENUM::TEST;              return true;  }
-  if (s2 == "exam")                            { return_value = GRADEABLE_ENUM::EXAM;              return true;  }
-  if (s2 == "exercise")                        { return_value = GRADEABLE_ENUM::EXERCISE;          return true;  }
-  if (s2 == "lecture_exercise")                { return_value = GRADEABLE_ENUM::LECTURE_EXERCISE;  return true;  }
-  if (s2 == "reading")                         { return_value = GRADEABLE_ENUM::READING;           return true;  }
-  if (s2 == "worksheet")                       { return_value = GRADEABLE_ENUM::WORKSHEET;         return true;  }
-  if (s2 == "lab")                             { return_value = GRADEABLE_ENUM::LAB;               return true;  }
-  if (s2 == "recitation")                      { return_value = GRADEABLE_ENUM::RECITATION;        return true;  }
-  if (s2 == "project")                         { return_value = GRADEABLE_ENUM::PROJECT;           return true;  }
-  if (s2 == "participation")                   { return_value = GRADEABLE_ENUM::PARTICIPATION;     return true;  }
-  if (s2 == "instructor_note" || s2 == "note") { return_value = GRADEABLE_ENUM::NOTE;              return true;  }
-  if (s2 == "note")                            { return_value = GRADEABLE_ENUM::NOTE;              return true;  }
-  if (s2.substr(0,4) == "none")                { return_value = GRADEABLE_ENUM::NOTE;              return true;  }
-  return false;
-}
 
 //====================================================================
 
 
 void preprocesscustomizationfile(const std::string &now_string,
                                  std::vector<Student*> &students) {
-  /*
-  std::ifstream istr(CUSTOMIZATION_FILE.c_str());
-  assert (istr);
-  std::string token;
-
-  while (istr >> token) {
-    if (token[0] == '#') {
-      // comment line!
-      char line[MAX_STRING_LENGTH];
-      istr.getline(line,MAX_STRING_LENGTH);
-
-    } else if (token.size() > 4 && token.substr(0,4) == "num_") {
-      
-      GRADEABLE_ENUM g;
-      // also take 's' off the end
-      bool success = string_to_gradeable_enum(token.substr(4,token.size()-5),g);
-      
-      if (success) {
-        gradeable_helper(istr,g);
-
-        ALL_GRADEABLES.push_back(g);
-
-      } else {
-        std::cout << "UNKNOWN GRADEABLE: " << token.substr(4,token.size()-5) << std::endl;
-        exit(0);
-      }
-
-    } else if (token == "hackmaxprojects") {
-
-      char line[MAX_STRING_LENGTH];
-      istr.getline(line,MAX_STRING_LENGTH);
-      std::stringstream ss(line);
-      std::vector<std::string> items;
-      std::string i;
-      while (ss >> i) {
-        items.push_back(i);
-      }
-      std::cout << "HACK MAX " << items.size() << std::endl;
-
-      std::cout <<  "   HMP=" << HACKMAXPROJECTS.size() << std::endl;
-
-      HACKMAXPROJECTS.push_back(items);
-
-    } else if (token == "display") {
-      istr >> token;
-
-      if (token == "instructor_notes") {
-        DISPLAY_INSTRUCTOR_NOTES = true;
-      } else if (token == "exam_seating") {
-        DISPLAY_EXAM_SEATING = true;
-      } else if (token == "academic_sanction_details") {
-        DISPLAY_ACADEMIC_SANCTION_DETAILS = true;
-      } else if (token == "final_grade") {
-        DISPLAY_FINAL_GRADE = true;
-      } else if (token == "grade_summary") {
-        DISPLAY_GRADE_SUMMARY = true;
-      } else if (token == "grade_details") {
-        DISPLAY_GRADE_DETAILS = true;
-
-      } else {
-        std::cout << "OOPS " << token << std::endl;
-        exit(0);
-      }
-      char line[MAX_STRING_LENGTH];
-      istr.getline(line,MAX_STRING_LENGTH);
-
-    } else if (token == "display_benchmark") {
-      istr >> token;
-      DisplayBenchmark(token);
-
-    } else if (token == "benchmark_percent") {
-      istr >> token;
-      float value;
-      istr >> value;
-
-      SetBenchmarkPercentage(token,value);
-
-    } else if (token == "benchmark_color") {
-      istr >> token;
-      std::string color;
-      istr >> color;
-
-      SetBenchmarkColor(token,color);
-      
-    } else if (token == "use") {
-      
-      istr >> token;
-
-      if (token == "late_day_penalty") {
-        istr >> LATE_DAY_PERCENTAGE_PENALTY;
-        assert (LATE_DAY_PERCENTAGE_PENALTY >= 0.0 && LATE_DAY_PERCENTAGE_PENALTY < 0.25);
-        char line[MAX_STRING_LENGTH];
-        istr.getline(line,MAX_STRING_LENGTH);
-      } else if (token == "test_improvement_averaging_adjustment") {
-        TEST_IMPROVEMENT_AVERAGING_ADJUSTMENT = true;
-      } else if (token == "quiz_normalize_and_drop_two") {
-        QUIZ_NORMALIZE_AND_DROP_TWO = true;
-      } else if (token == "lowest_test_counts_half") {
-        LOWEST_TEST_COUNTS_HALF = true;
-      } else {
-        std::cout << "ERROR: unknown use " << token << std::endl;
-        exit(0);
-      }
-
-    } else if (token == "remove_lowest") {
-      istr >> token;
-      if (token == "HOMEWORK") {
-        int num;
-        istr >> num;
-        assert (num >= 0 && num < GRADEABLES[GRADEABLE_ENUM::HOMEWORK].getCount());
-        GRADEABLES[GRADEABLE_ENUM::HOMEWORK].setRemoveLowest(num);
-      }
-    }
-  }
-  */
-  // ---------------------------------------------------------------------------------------
-  
   std::ifstream istr(CUSTOMIZATION_FILE.c_str());
   assert (istr.good());
   nlohmann::json j = nlohmann::json::parse(istr);
@@ -454,9 +241,6 @@ void preprocesscustomizationfile(const std::string &now_string,
   Student *lowest_b = GetStudent(students,"LOWEST B-");
   Student *lowest_c = GetStudent(students,"LOWEST C-");
   Student *lowest_d = GetStudent(students,"LOWEST D");
-  
-  //std::cout << "0" << std::endl;
-  
   
   // load gradeables
   nlohmann::json all_gradeables = j["gradeables"];
@@ -503,7 +287,7 @@ void preprocesscustomizationfile(const std::string &now_string,
 
     assert (ids_list.size() <= count);
 
-    Gradeable answer (count,gradeable_total_percent); //,m);
+    GradeableList answer (count,gradeable_total_percent); //,m);
     GRADEABLES.insert(std::make_pair(g,answer));
     assert (GRADEABLES[g].getCount() >= 0);
     assert (GRADEABLES[g].getPercent() >= 0.0 && GRADEABLES[g].getPercent() <= 1.0);
@@ -592,11 +376,11 @@ void preprocesscustomizationfile(const std::string &now_string,
 
     nlohmann::json one_gradeable_type = all_gradeables[i];
 
-    GRADEABLE_ENUM g;
+    GRADEABLE_ENUM gradeable_category;
     nlohmann::json::iterator itr = one_gradeable_type.find("type");
     assert (itr != one_gradeable_type.end());
     std::string gradeable_type = itr->get<std::string>();
-    bool success = string_to_gradeable_enum(gradeable_type, g);
+    bool success = string_to_gradeable_enum(gradeable_type, gradeable_category);
     if (!success) {
       std::cout << "UNKNOWN GRADEABLE: " << gradeable_type << std::endl;
       exit(0);
@@ -608,8 +392,8 @@ void preprocesscustomizationfile(const std::string &now_string,
       std::string token_key = grade_id.value("id","");
       //std::cout << token_key << std::endl;
       assert (token_key != "");
-
-      int which = GRADEABLES[g].setCorrespondence(token_key);
+      GradeableID token_key_id = GradeableID{token_key};
+      auto correspondence_index = GRADEABLES[gradeable_category].setCorrespondence(token_key_id);
       p_score = grade_id.value("max", 0.0);
 
       std::vector<float> curve = grade_id.value("curve",std::vector<float>());
@@ -638,58 +422,50 @@ void preprocesscustomizationfile(const std::string &now_string,
         //std::cout << "RELEASE DATE " << release_date << std::endl;
         if (release_date < now_string) {
           //std::cout << "RELEASED!" << std::endl;
-          GRADEABLES[g].setReleased(token_key,true);
+          GRADEABLES[gradeable_category].setReleased(token_key_id,true);
         } else {
           //std::cout << "not released" << std::endl;
-          GRADEABLES[g].setReleased(token_key,false);
+          GRADEABLES[gradeable_category].setReleased(token_key_id,false);
         }
       } else {
-        GRADEABLES[g].setReleased(token_key,released);
+        GRADEABLES[gradeable_category].setReleased(token_key_id,released);
       }
 
       float maximum = grade_id.value("max",0.0);
-      GRADEABLES[g].setMaximum(token_key,maximum);
+      GRADEABLES[gradeable_category].setMaximum(token_key_id,maximum);
 
       if (grade_id.find("scale_max") != grade_id.end()) {
         float scale_maximum = grade_id.value("scale_max",0.0);
         assert (scale_maximum > 0);
-        GRADEABLES[g].setScaleMaximum(token_key,scale_maximum);
+        GRADEABLES[gradeable_category].setScaleMaximum(token_key_id,scale_maximum);
       }
       if (grade_id.find("percent") != grade_id.end()) {
-        assert(!GRADEABLES[g].hasSortedWeight() &&
+        assert(!GRADEABLES[gradeable_category].hasSortedWeight() &&
                "GRADE CATEGORY HAS sorted_weights FIELD WHICH WOULD OVERRIDE GRADEABLE-SPECIFIC percent FIELD");
         float item_percentage = grade_id.value("percent",-1.0);
         assert (item_percentage >= 0 && item_percentage <= 1.0);
-        GRADEABLES[g].setItemPercentage(token_key,item_percentage);
+        GRADEABLES[gradeable_category].setItemPercentage(token_key_id,item_percentage);
       }
       float clamp = grade_id.value("clamp",-1);
-      GRADEABLES[g].setClamp(token_key,clamp);
-
-      if (grade_id.find("autograde_replacement_percentage") != grade_id.end()) {
-        assert (grade_id.find("original_id") != grade_id.end());
-        assert (grade_id.find("resubmit_id") != grade_id.end());
-        assert (grade_id.find("title") != grade_id.end());
-
-        std::string o_id = grade_id.value("original_id","");
-        std::string r_id = grade_id.value("resubmit_id","");
-        std::string t = grade_id.value("title","");
-        float a_r_p = grade_id.value("autograde_replacement_percentage",0.5);
-
-        GRADEABLES[g].setResubmissionValues(token_key,o_id,r_id,t,a_r_p);
-      }
+      GRADEABLES[gradeable_category].setClamp(token_key_id,clamp);
 
       assert (p_score >= a_score &&
               a_score >= b_score &&
               b_score >= c_score &&
               c_score >= d_score);
       
-      assert (which >= 0 && which < GRADEABLES[g].getCount());
-      if (GRADEABLES[g].isReleased(token_key)) {
-        perfect->setGradeableItemGrade(g,which, p_score);
-        lowest_a->setGradeableItemGrade(g,which, a_score);
-        lowest_b->setGradeableItemGrade(g,which, b_score);
-        lowest_c->setGradeableItemGrade(g,which, c_score);
-        lowest_d->setGradeableItemGrade(g,which, d_score);
+      assert (correspondence_index.value() >= 0 &&
+             correspondence_index.value() < GRADEABLES[gradeable_category].getCount());
+      if (GRADEABLES[gradeable_category].isReleased(token_key_id)) {
+        perfect->setGradeableItemGrade(gradeable_category, correspondence_index, p_score);
+        lowest_a->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, a_score);
+        lowest_b->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, b_score);
+        lowest_c->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, c_score);
+        lowest_d->setGradeableItemGrade(gradeable_category,
+                                        correspondence_index, d_score);
       }
     
     //std::cout << "it makes it to exam data" << std::endl;
@@ -825,10 +601,6 @@ void preprocesscustomizationfile(const std::string &now_string,
     SetBenchmarkColor(token,color);
   }
   
-  //std::cout << "7" << std::endl;
-
-  //std::cout << "8" << std::endl;
-  
   nlohmann::json useJSON = j["use"];
   for (nlohmann::json::iterator itr = useJSON.begin(); itr != useJSON.end(); itr++) {
   token = itr.key();
@@ -847,17 +619,7 @@ void preprocesscustomizationfile(const std::string &now_string,
   }
   }
   
-  //std::cout << "9" << std::endl;
 }
-
-
-bool OmitSectionFromStats(const std::string &section) {
-  for (std::vector<std::string>::size_type i = 0; i < OMIT_SECTION_FROM_STATS.size(); i++) {
-    if (OMIT_SECTION_FROM_STATS[i] == section) return true;
-  }
-  return false;
-}
-
 
 // defined in zone.cpp
 void LoadExamSeatingFile(const std::string &zone_counts_filename,
@@ -967,23 +729,21 @@ void processcustomizationfile(const std::string &now_string,
             nlohmann::json warning = warning_list[i];
       //std::string username = warning_user["user"].get<std::string>();
             std::string message = warning["msg"].get<std::string>();
-            std::vector<std::string> ids;
+            std::vector<GradeableID> ids;
             float value = warning["value"].get<float>();
             nlohmann::json j_ids = warning["ids"];
             for (std::size_t k = 0; k < j_ids.size(); k++) {
-              ids.push_back(j_ids[k].get<std::string>());
+              ids.emplace_back(j_ids[k].get<std::string>());
             }
 
             std::cout << "search for " << message << std::endl;
             for (unsigned int S = 0; S < students.size(); S++) {
               Student *s = students[S];
               if (!validSection(students[S]->getSection())) continue;
-              //std::cout << "student " << s->getUserName() << std::endl;
               float v = 0;
               for (std::size_t k = 0; k < ids.size(); k++) {
                 GRADEABLE_ENUM g;
-                int item;
-                //std::cout << "GRADEABLE_ENUM " << (int)g << " " << item << std::endl;
+                GradeableIndex item;
                 LookupGradeable(ids[k],g,item);
                 v += s->getGradeableItemGrade(g,item).getValue();
               }
@@ -1080,12 +840,11 @@ void processcustomizationfile(const std::string &now_string,
   } else if (token == "plagiarism") {
     for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
       std::string username = (itr2.value())["user"].get<std::string>();
-      std::string hw = (itr2.value())["gradeable"].get<std::string>();
+      auto hw = GradeableID{(itr2.value())["gradeable"].get<std::string>()};
       float penalty = (itr2.value())["penalty"].get<float>();
       //assert (hw >= 1 && hw <= 10);
       assert (penalty >= -0.01 && penalty <= 1.01);
       Student *s = GetStudent(students,username);
-      //std::cout << "USERNAME " << username << std::endl;
       assert (s != NULL);
       s->academic_sanction(hw,penalty);
       s->set_event_academic_integrity(true);
@@ -1162,7 +921,7 @@ void load_student_grades(std::vector<Student*> &students) {
   assert(istr.good());
   nlohmann::json j = nlohmann::json::parse(istr);
 
-  Student *s = new Student();
+  Student *student = new Student();
   
   count++;
 
@@ -1192,73 +951,74 @@ void load_student_grades(std::vector<Student*> &students) {
           if (!gradeable_enum_success && token != "Other" && token != "rubric" && token != "Test") {
     // non gradeables
     if (token == "user_id") {
-      s->setUserName(j[token].get<std::string>());
+      student->setUserName(j[token].get<std::string>());
     } else if (token == "legal_first_name" || token == "legal_given_name") {
-      s->setLegalFirstName(j[token].get<std::string>());
+      student->setLegalFirstName(j[token].get<std::string>());
     } else if (token == "legal_last_name" || token == "legal_family_name") {
-      s->setLegalLastName(j[token].get<std::string>());
+      student->setLegalLastName(j[token].get<std::string>());
     } else if (token == "preferred_first_name" || token == "preferred_given_name") {
       if (!j[token].is_null()) {
-        s->setPreferredFirstName(j[token].get<std::string>());
+        student->setPreferredFirstName(j[token].get<std::string>());
       }
     } else if (token == "preferred_last_name" || token == "preferred_family_name") {
       if (!j[token].is_null()) {
-        s->setPreferredLastName(j[token].get<std::string>());
+        student->setPreferredLastName(j[token].get<std::string>());
       }
     } else if (token == "user_numeric_id") {
 
       if (j[token].is_string()) {
-        s->setNumericID(j[token].get<std::string>());
+        student->setNumericID(j[token].get<std::string>());
       }
       else {
-        s->setNumericID("");
+        student->setNumericID("");
       }
     } else if (token == "last_update") {
-      s->setLastUpdate(j[token].get<std::string>());
+      student->setLastUpdate(j[token].get<std::string>());
     } else if (token == "registration_section") {
-          std::string a;
+          std::string registration_section;
           if(!j[token].is_null()) {
-           a = j[token].get<std::string>();
-            if (!validSection(a)) {
+            registration_section = j[token].get<std::string>();
+            if (!validSection(registration_section)) {
               // the "drop" section is 0 (really should be NULL)
-              if (a != "null") {
-                std::cerr << "WARNING: invalid section " << a << std::endl;
+              if (registration_section != "null") {
+                std::cerr << "WARNING: invalid section " << registration_section
+                          << std::endl;
               }
             }
           }
           else{
-            a = "null";
+            registration_section = "null";
           }
-          s->setSection(a);
+          student->setSection(registration_section);
     } else if (token == "course_section_id") {
-          std::string a;
+          std::string course_section_id;
           if(!j[token].is_null()) {
-           a = j[token].get<std::string>();
+            course_section_id = j[token].get<std::string>();
           }
           else{
-            a = "null";
+            course_section_id = "null";
           }
-          s->setCourseSectionId(a);
+          student->setCourseSectionId(course_section_id);
     } else if (token == "rotating_section") {
-      int a = -1;
+      int rotating_section = -1;
       if (!j[token].is_null()) {
-        a = j[token].get<int>();
+        rotating_section = j[token].get<int>();
       }
-      s->setRotatingSection(a);
+      student->setRotatingSection(rotating_section);
     } else if (token == "registration_type") {
       // Skip this token for now
     } else if (token == "default_allowed_late_days") {
-                  int value = 0;
+                  int default_allowed_late_days = 0;
                   if (!j[token].is_null()) {
                     if (j[token].is_string()) {
                       std::string s_value = j[token].get<std::string>();
-                      value = std::stoi(s_value);
+                      default_allowed_late_days = std::stoi(s_value);
                     } else {
-                      value = j[token].get<int>();
+                      default_allowed_late_days = j[token].get<int>();
                     }
                   }
-                  s->setDefaultAllowedLateDays(value);
-                  if (value > 0) {
+                  student->setDefaultAllowedLateDays(default_allowed_late_days);
+                  if (default_allowed_late_days > 0) {
                     DISPLAY_LATE_DAYS = true;
                   }
                 } else {
@@ -1267,10 +1027,10 @@ void load_student_grades(std::vector<Student*> &students) {
     }
     } else {
       for (nlohmann::json::iterator itr2 = (itr.value()).begin(); itr2 != (itr.value()).end(); itr2++) {
-      int which;
+      size_t which;
       bool invalid = false;
-      std::string gradeable_id = (*itr2).value("id","ERROR BAD ID");
-      std::string gradeable_name = (*itr2).value("name",gradeable_id);
+      GradeableID gradeable_id{(*itr2).value("id","ERROR BAD ID")};
+      std::string gradeable_name = (*itr2).value("name",gradeable_id.value());
       std::string status;
       if (itr2 != (itr.value()).end() && (*itr2).is_string()) {
         status = (*itr2).value("status","NOT ELECTRONIC");
@@ -1327,15 +1087,14 @@ void load_student_grades(std::vector<Student*> &students) {
       }
       if (!GRADEABLES[g].hasCorrespondence(gradeable_id)) {
       invalid = true;
-      //std::cerr << "ERROR! cannot find a category for this item " << gradeable_id << std::endl;
       } else {
       invalid = false;
-      const std::pair<int,std::string>& c = GRADEABLES[g].getCorrespondence(gradeable_id);
-                        which = c.first;
-      if (c.second == "") {
+      const auto& c = GRADEABLES[g].getCorrespondence(gradeable_id);
+                        which = c.index.value();
+      if (c.name == "") {
                           GRADEABLES[g].setCorrespondenceName(gradeable_id,gradeable_name); 
                         } else {
-                          assert (c.second == gradeable_name);
+                          assert (c.name == gradeable_name);
                         }
       }
       
@@ -1345,7 +1104,7 @@ void load_student_grades(std::vector<Student*> &students) {
                       for (std::size_t i = 0; i < (*rec).size(); i++) {
                         for (auto itr8 = (*rec)[i].begin(); itr8 != (*rec)[i].end(); itr8++) {
                           std::string r = itr8.value();
-                          s->addRecommendation(std::string(" ") + r);
+                          student->addRecommendation(std::string(" ") + r);
                         }
                       }
                     }
@@ -1357,7 +1116,7 @@ void load_student_grades(std::vector<Student*> &students) {
                         int late_days_charged = itr2->value("days_charged",0);
                         if (itr3 != itr2->end()) {
                           if (score <= 0) {
-                            if (s->getUserName() != "") {
+                            if (student->getUserName() != "") {
                               assert (late_days_charged == 0);
                             }
                           }
@@ -1375,35 +1134,35 @@ void load_student_grades(std::vector<Student*> &students) {
                            std::string status_check = itr2->value("status", "");
                            if (status_check == "Bad") {
                              event = "Bad";
-                             s->set_event_bad_status(true);
+                             student->set_event_bad_status(true);
                            }
                            std::string version_conflict = itr2->value("version_conflict", "");
                            if (version_conflict == "true") {
                              event = "Version_conflict";
-                             s->set_event_version_conflict(true);
+                             student->set_event_version_conflict(true);
                            }
                            if (status_check == "Cancelled") {
                              event = "Cancelled";
-                             s->set_event_cancelled(true);
+                             student->set_event_cancelled(true);
                            }
                            std::string inquiry = itr2->value("inquiry", "");
                            if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
                              assert(inquiry == "Open");
                              event = "Open";
-                             s->set_event_grade_inquiry(true);
+                             student->set_event_grade_inquiry(true);
                            }
                            int late_day_exceptions = itr2->value("late_day_exceptions",0);
                            std::string reason_for_exception = itr2->value("reason_for_exception","");
                            if (late_day_exceptions > 0) {
                              event = "Extension";
-                             s->set_event_extension(true);
+                             student->set_event_extension(true);
                            }
                            // Above itr2 status check, but in order of priority
                            if (status_check == "Overridden") {
                              event = "Overridden";
-                             s->set_event_overridden(true);
+                             student->set_event_overridden(true);
                              }
-                           s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
+                             student->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
                         }
       }
 
@@ -1417,13 +1176,9 @@ void load_student_grades(std::vector<Student*> &students) {
 
   int p_count = 0;
   for (auto j2 = participation_json.begin(); j2 < participation_json.end(); j2++) {
-    //std::cout << "IN PARTICIPATION PARSE" << std::endl;
     std::string participation_gradeable_id = (*j2)["id"];
-    //std::cout << "a" << participation_gradeable_id << std::endl;
     std::string participation_component = (*j2)["component"];
-    //std::cout << "b" << participation_component << std::endl;
     std::vector<nlohmann::json> notes = j["Note"];
-    //std::cout << "c" << std::endl;
     for (std::vector<nlohmann::json>::size_type x = 0; x < notes.size(); x++) {
       if (notes[x]["id"] == participation_gradeable_id) {
         nlohmann::json scores = notes[x]["components"];
@@ -1475,7 +1230,7 @@ void load_student_grades(std::vector<Student*> &students) {
             if (values[y]["comment"].is_string()) {
               recommendation += "<br>[" + std::to_string(x) + "] " + values[y]["comment"].get<std::string>();
             } else {
-              std::cout << "error in recommendation text type for " << s->getUserName() << std::endl;
+              std::cout << "error in recommendation text type for " << student->getUserName() << std::endl;
             }
           }
         }
@@ -1483,92 +1238,15 @@ void load_student_grades(std::vector<Student*> &students) {
     }
   }
 
-  s->setParticipation(participation);
-  s->setUnderstanding(understanding);
+  student->setParticipation(participation);
+  student->setUnderstanding(understanding);
   if (recommendation != "") {
-    s->addRecommendation(recommendation);
+    student->addRecommendation(recommendation);
   }
-
-
-  // lookup and compute resubmit/replacement gradeable items
-  for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
-    GRADEABLE_ENUM g = ALL_GRADEABLES[i];
-    for (int which = 0; which < GRADEABLES[g].getCount(); which++) {
-      std::string original_id;
-      std::string resubmit_id;
-      float autograde_replacement_percentage;
-      GRADEABLES[g].isResubmit(which,original_id,resubmit_id,autograde_replacement_percentage);
-      if (original_id == "") continue;
-
-      float original_autograde = 0;
-      float original_tagrade = 0;
-      float resubmit_autograde = 0;
-
-      for (nlohmann::json::iterator itr = j.begin(); itr != j.end(); itr++) {
-        std::string token = itr.key();
-
-        if (itr.value().is_array()) {
-          for (unsigned int e = 0; e < itr.value().size(); e++) {
-            if (!itr.value()[e].is_object()) continue;
-            if (itr.value()[e].value("id","") == original_id) {
-              original_autograde = itr.value()[e].value("autograding_score",0.0);
-              original_tagrade = itr.value()[e].value("tagrading_score",0.0);
-
-              // WORKAROUND -- bug in gradesummaries tagrading for unsubmitted assignment
-              // ALSO NEED TO DEAL WITH VERSION CONFLICTS BETTER
-              float original_score = itr.value()[e].value("score",0.0);
-              if (original_score < original_tagrade + original_autograde) {
-                original_tagrade = 0;
-                original_autograde = 0;
-              }
-              //std::cout << "student " << std::left << std::setw(10) << s->getUserName() << std::endl;
-              //std::cout << " CHECK " << original_score << " " << original_autograde << " " << original_tagrade << std::endl;
-              assert (fabs( original_score -( original_autograde + original_tagrade)) < 0.1);
-              // END WORKAROUND
-
-            }
-            if (itr.value()[e].value("id","") == resubmit_id) {
-              resubmit_autograde = itr.value()[e].value("autograding_score",0);
-              // SIMILAR WORKAROUND
-              float resubmit_score = itr.value()[e].value("score",0);
-              if (resubmit_score == 0) {
-                resubmit_autograde = 0;
-              }
-              // END WORKAROUND
-
-            }
-          }
-        }
-      }
-      float new_autograde =
-        original_autograde*(1-autograde_replacement_percentage) +
-        resubmit_autograde*(autograde_replacement_percentage);
-      float score =
-        original_tagrade +
-        std::max(original_autograde,new_autograde);
-      if (original_autograde < new_autograde) {
-        std::cout << "student " << std::left << std::setw(10) << s->getUserName() << " had grade increase for ";
-        std::cout << original_id << ": "
-                  << std::right << std::setw(5) << original_tagrade << " + "
-                  << std::right << std::setw(5) << original_autograde << " / "
-                  << std::right << std::setw(5) << resubmit_autograde << " -> "
-                  << std::right << std::setw(5) << new_autograde << " = "
-                  << std::right << std::setw(5) << score << std::endl;
-      }
-      s->setGradeableItemGrade(g,which,score);
-    }
-  }
-
-  students.push_back(s);
+  students.push_back(student);
   }
 
 }
-
-
-/*void start_table_open_file(bool full_details,
-                 const std::vector<Student*> &students, int S, int month, int day, int year,
-                 enum GRADEABLE_ENUM which_gradeable_enum);
-*/
 
 void start_table_output(bool full_details,
                         const std::vector<Student*> &students, int S, int month, int day, int year,
@@ -1649,17 +1327,8 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
 
     nlohmann::json mj;
 
-    //std::string file2 = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + "_message.html";
     std::string file2_json = INDIVIDUAL_FILES_OUTPUT_DIRECTORY + students[S]->getUserName() + ".json";
-    //std::ofstream ostr2(file2.c_str());
     std::ofstream ostr2_json(file2_json.c_str());
-
-    /*mj["username"] = students[S]->getUserName();
-    mj["building"] = "DCC";
-    mj["room"] = "308";
-    mj["zone"] = "A";
-
-    ostr2_json << mj.dump(4);*/
 
     nlohmann::json::iterator special_message_itr = GLOBAL_CUSTOMIZATION_JSON.find("special_message");
     nlohmann::json special_message;
@@ -1667,7 +1336,6 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
       special_message = *special_message_itr;
     }
 
-    //PrintExamRoomAndZoneTable(ostr2,students[S],special_message);
     PrintExamRoomAndZoneTable(GLOBAL_ACTIVE_TEST_ID, mj,students[S],special_message);
 
     ostr2_json << mj.dump(4);
@@ -1764,15 +1432,15 @@ void SaveExtensionReports(const std::vector<Student*> &students) {
     }
     student_ostr << "<h3> Excused Absence Extensions for: " << username << "</h3>" << std::endl;
     student_ostr << "<table cellpadding=5 style=\"border:1px solid #aaaaaa; background-color:#ffffff;\">" << std::endl;
-    student_ostr << "<tr><td>Gradeable</td><td align=center>Days Extended</td><td align=center>Reason</td><td></td></tr>" << std::endl;
+    student_ostr << "<tr><td>GradeableList</td><td align=center>Days Extended</td><td align=center>Reason</td><td></td></tr>" << std::endl;
     for (size_t i2=0;i2<gradeablesWithExtensions.size();i2++) {
       ItemGrade item = std::get<0>(gradeablesWithExtensions[i2]);
       GRADEABLE_ENUM g = std::get<0>(std::get<1>(gradeablesWithExtensions[i2]));
-      int index = std::get<1>(std::get<1>(gradeablesWithExtensions[i2]));
-      std::string gradeable_id = GRADEABLES[g].getID(index);
+      auto index = GradeableIndex{(size_t)std::get<1>(std::get<1>(gradeablesWithExtensions[i2]))};
+      auto gradeable_id = GRADEABLES[g].getID(index);
       std::string gradeable_name = "";
       if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
-        gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
+        gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
       }
       student_ostr << "<tr><td>" << gradeable_name << "</td><td align=center>"
                    << item.getLateDayExceptions() << "</td><td align=center>"
@@ -1873,14 +1541,14 @@ int main(int argc, char* argv[]) {
     Student *sd = GetStudent(students,"LOWEST D");
 
     if (validSection(this_student->getSection())) {
-      std::string student_grade = this_student->grade(false,sd);
+      Grade student_grade{this_student->grade(false,sd)};
       grade_counts[student_grade]++;
       grade_avg[student_grade]+=this_student->overall();
     } else {
       dropped++;
     }
     if (GRADEABLES[GRADEABLE_ENUM::EXAM].getCount() != 0) {
-      if (this_student->getGradeableItemGrade(GRADEABLE_ENUM::EXAM,GRADEABLES[GRADEABLE_ENUM::EXAM].getCount()-1).getValue() > 0) {
+      if (this_student->getGradeableItemGrade(GRADEABLE_ENUM::EXAM,GradeableIndex{(size_t)GRADEABLES[GRADEABLE_ENUM::EXAM].getCount()-1}).getValue() > 0) {
         took_final++;
       }
     }
@@ -1914,11 +1582,12 @@ void suggest_curves(std::vector<Student*> &students) {
 
     // LOOP OVER ALL ITEMS IN THE GRADEABLE
     for (int item = 0; item < GRADEABLES[g].getCount(); item++) {
-      std::string gradeable_id = GRADEABLES[g].getID(item);
-      if (gradeable_id == "") continue;
+      auto item_index = GradeableIndex{(size_t)item};
+      const auto& gradeable_id = GRADEABLES[g].getID(item_index);
+      if (gradeable_id.value() == "") continue;
 
-      const std::string& gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-      std::cout << gradeable_to_string(g) << " " << gradeable_id << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
+      const std::string& gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).name;
+      std::cout << gradeable_enum_to_string(g) << " " << gradeable_id.value() << " " << gradeable_name/* << " statistics & suggested curve"*/ << std::endl;
       std::vector<float> scores;
 
       // gather the scores from the valid (non-omitted) sections
@@ -1926,8 +1595,8 @@ void suggest_curves(std::vector<Student*> &students) {
       for (unsigned int S = 0; S < students.size(); S++) {
         if (students[S]->getSection() != "null" &&
             (!OmitSectionFromStats(students[S]->getSection())) &&
-            students[S]->getGradeableItemGrade(g,item).getValue() > 0) {
-          scores.push_back(students[S]->getGradeableItemGrade(g,item).getValue());
+            students[S]->getGradeableItemGrade(g,item_index).getValue() > 0) {
+          scores.push_back(students[S]->getGradeableItemGrade(g,item_index).getValue());
           section_counts[students[S]->getSection()]++;
         }
       }
@@ -1939,14 +1608,14 @@ void suggest_curves(std::vector<Student*> &students) {
         }
         float average = sum / float(scores.size());
         std::cout << "    average=" << std::setprecision(2) << std::fixed << average;
-        student_average->setGradeableItemGrade(g,item,average);
+        student_average->setGradeableItemGrade(g,item_index,average);
         sum = 0;
         for (unsigned int x = 0; x < scores.size(); x++) {
           sum+=(average-scores[x])*(average-scores[x]);
         }
         float stddev = sqrt(sum/float(scores.size()));
         std::cout << "    stddev=" << std::setprecision(2) << std::fixed << stddev;
-        student_stddev->setGradeableItemGrade(g,item,stddev);
+        student_stddev->setGradeableItemGrade(g,item_index,stddev);
         std::cout << "    suggested curve:";
         std::cout << "    A- cutoff=" << scores[int(0.70*scores.size())];
         std::cout << "    B- cutoff=" << scores[int(0.45*scores.size())];

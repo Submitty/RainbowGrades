@@ -15,6 +15,43 @@
 
 extern std::vector<float> GLOBAL_earned_late_days;
 
+class score_object {
+public:
+  score_object(float s,float m,float p,float sm):score(s),max(m),percentage(p),scale_max(sm){}
+  float score;
+  float max;
+  float percentage;
+  float scale_max;
+private:
+  friend bool operator<(const score_object &a, const score_object &b) {
+    float s1 = a.score;
+    float m1 = a.max;
+    float p1 = a.percentage;
+    float sm1 = a.scale_max;
+    float my_max1 = std::max(m1,sm1);
+    float s2 = b.score;
+    float m2 = b.max;
+    float p2 = b.percentage;
+    float sm2 = b.scale_max;
+    float my_max2 = std::max(m2,sm2);
+    // Grades should be compared by the normalized grade only, not normalized grade multiplied by percentages. Otherwise, a grade of 90 for the gradeable
+    // with percentage 0.1 will always be considered lower than a grade of 60 for the gradeable with percentage 0.2, since 0.1 * 0.9 < 0.2 * 0.6
+    bool result;
+    // If any of the two scores has a max of 0 (but not both of them), it means it is extra credit, so it will always be considered larger, so that we do not
+    // remove extra credit assignment scores under the "drop the lowest" rule
+    if (((m1 == 0.0) && (m2 != 0.0)) || ((m1 != 0.0) && (m2 == 0.0))) {
+      result = (m1 == 0.0) ? false : true;
+    }
+    else if (std::abs(s1 / my_max1 - s2 / my_max2) > 0.001) {
+      result = (s1 / my_max1 < s2 / my_max2);
+    }
+      // otherwise, order by percentage decreasing, so that if two scores are equal, the gradable with the higher percentage is considered smaller.
+      // For example, for p1==0.1, s1/my_max1 == 0.9 and p2==0.2, s2/my_max2 == 0.9, the operator would return false.
+    else result = (p1 > p2);
+    return result;
+  }
+};
+
 //====================================================================
 //====================================================================
 // stores the grade for a single gradeable
@@ -38,23 +75,11 @@ public:
 
     float adjusted_value = value;
     if (late_days_used > 0) {
-      //std::cout << "LATE DAYS! " << late_days_used << std::endl;
       // FIXME:  Currently a flat penalty no matter how many days used
       adjusted_value = (1-LATE_DAY_PERCENTAGE_PENALTY)*value;
-      //std::cout << "value " << value << "-> " << adjusted_value << std::endl;
     }
     
-    /*
-    // grab the maximum score for this homework
-    assert (PERFECT_STUDENT_POINTER != NULL);
-    std::map<GRADEABLE_ENUM,std::vector<ItemGrade> >::const_iterator ps_itr = PERFECT_STUDENT_POINTER->all_item_grades.find(g);
-    assert (ps_itr != all_item_grades.end());
-    float ps_value = ps_itr->second[i].getValue();
-    */
-    // adjust the homework score
-    //value = std::max(0.0f, value - d*LATE_DAY_PERCENTAGE_PENALTY*ps_value);
-
-    return adjusted_value; 
+    return adjusted_value;
   }
   int getLateDaysUsed() const { return late_days_used; }
   int getLateDayExceptions() const { return late_day_exceptions; }
@@ -107,7 +132,7 @@ public:
   bool getIndependentStudy() const { return independentstudy; }
 
   // grade data
-  const ItemGrade& getGradeableItemGrade(GRADEABLE_ENUM g, int i) const;
+  const ItemGrade& getGradeableItemGrade(GRADEABLE_ENUM g, GradeableIndex i) const;
   std::string getZone(int i) const;
   int getAllowedLateDays(int which_lecture) const;
   int getPollsCorrect() const;
@@ -180,11 +205,11 @@ public:
 
   // grade data
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
-  void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status="");
-  void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
+  void setGradeableItemGrade(GRADEABLE_ENUM g, GradeableIndex i, float value, int late_days_used=0, const std::string &note="",const std::string &status="");
+  void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, GradeableIndex i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
   void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="",int exceptions=0, const std::string &reason="");
 
-  void academic_sanction(const std::string &gradeable, float penalty);
+  void academic_sanction(const GradeableID &gradeable, float penalty);
 
    //set in order of priority - top to bottom
     void set_event_academic_integrity(bool value) {academic_integrity = value;}
@@ -233,9 +258,9 @@ public:
 
 
   // HELPER FUNCTIONS
-  float GradeablePercent(GRADEABLE_ENUM g) const;
+  float GradeablePercent(GRADEABLE_ENUM gradeable_category) const;
   float overall() const { return overall_b4_academic_sanction() + academic_sanction_penalty; }
-  float adjusted_test(int i) const;
+  float adjusted_test(GradeableIndex i) const;
   float adjusted_test_pct() const;
   float lowest_test_counts_half_pct() const;
   float quiz_normalize_and_drop(int num) const;
@@ -311,7 +336,21 @@ private:
   int polls_correct;
   int polls_incorrect;
   bool earn_late_days_from_polls;
+
+
+  std::vector<score_object> fillScoreVector(GRADEABLE_ENUM &gradeable_category,
+                                            const GradeableList &gradeable,
+                                            float nonzero_sum,
+                                            int nonzero_count) const;
 };
+
+// TODO: move this to be 3 member functions of GradeableList
+void getNonzeroCounts(const GradeableList &gradeable, float &nonzero_sum,
+                      int &nonzero_count, int &non_extra_credit_count);
+
+float calculateScorePercentages(GradeableList &gradeable,
+                                int non_extra_credit_count,
+                                std::vector<score_object> &scores);
 
 //====================================================================
 //====================================================================
