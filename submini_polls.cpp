@@ -110,7 +110,18 @@ void LoadPolls(const std::vector<Student*> &students) {
     std::string question_type = "single-response-multiple-correct";
     nlohmann::json::iterator itr2 = itr->find("question_type");
     if (itr2 != itr->end()) question_type = itr2->get<std::string>();
-    std::string status = itr->find("status")->get<std::string>();
+
+    std::string status = "ended";
+    // original format: status stored as string
+    if (itr->find("status")!=itr->end()) status = itr->find("status")->get<std::string>();
+    // new format (April 2024): polls have an end time
+    std::string end_time = "";
+    if (itr->find("end_time") != itr->end()) end_time = itr->find("end_time")->get<std::string>();
+    if (end_time != "") {
+      // TODO: Parse the date and compare to "now"
+      // if end_date < now => status = "ended";
+      // if end_date > now => status = "closed";
+    }
     assert (status == "ended" || status == "closed" || status == "open");
 
     std::string lecture;
