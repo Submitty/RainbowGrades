@@ -125,7 +125,7 @@ void LoadPolls(const std::vector<Student*> &students) {
     if (itr2 != itr->end()) question_type = itr2->get<std::string>();
 
     std::string status = "ended";
-    // original format: status stored as string
+    // original format: status stored as string, "closed", "open", or "ended"
     itr2 = itr->find("status");
     if (itr2 != itr->end()) status = itr2->get<std::string>();
     // new format (April 2024): polls have an end time
@@ -133,13 +133,19 @@ void LoadPolls(const std::vector<Student*> &students) {
     itr2 = itr->find("end_time");
     if (itr2 != itr->end()) {
       if (itr2->is_null()) {
+        // if end_time is NULL that means the poll was never opened
         status = "closed";
       } else {
         end_time = itr->find("end_time")->get<std::string>();
         assert (end_time.size() == 10);
         assert (today_string.size() == 10);
-        if (end_time < today_string) status = "ended";
-        else {
+        if (end_time < today_string) {
+          // if end_time is in the past, then the poll was used/released to the class and is now ended
+          status = "ended";
+        } else {
+          // otherwise, the poll might either be currently open or will be open in the future
+          // NOTE: this may need revision in a future PR, if timestamps are added to the end_time,
+          //    to make sure we handle polls from today correctly
           status = "closed";
         }
       }
@@ -147,8 +153,12 @@ void LoadPolls(const std::vector<Student*> &students) {
     assert (status == "ended" || status == "closed" || status == "open");
 
     assert (release_date.size() == 10);
+    assert (today_string.size() == 10);
     if (release_date < today_string && status != "ended") {
-      std::cout << "Date inconsistency - this poll wasn't used/released. Setting " << std::endl;
+      // this should only happen if a poll was scheduled for a date in the past, but it wasn't used on that date.
+      // NOTE: this may need revision in a future PR, if timestamps are added to the end_time or
+      //     if logic / handling of unreleased past polls changes.
+      std::cout << "Date inconsistency - this poll wasn't used/released." << std::endl;
       std::cout << "   today = " << today_string << " poll release date = " << release_date << std::endl;
       std::cout << "   setting release_date to infinity" << std::endl;
       release_date = "9999-01-01";
