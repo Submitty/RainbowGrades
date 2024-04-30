@@ -80,6 +80,18 @@ std::string convert_date(const std::string &date) {
   return out.str();
 }
 
+std::string getToday() {
+  static std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+  time_t tt = std::chrono::system_clock::to_time_t(now);
+  tm local_tm = *localtime(&tt);
+  std::stringstream ss;
+  ss << local_tm.tm_year + 1900 << "-"
+     << std::setw(2) << std::setfill('0') << local_tm.tm_mon + 1 << "-"
+     << std::setw(2) << std::setfill('0') << local_tm.tm_mday;
+  std::string today_string = ss.str();
+  return today_string;
+}
+
 // =======================================================================================
 // =======================================================================================
 // Load all poll data
@@ -101,6 +113,7 @@ void LoadPolls(const std::vector<Student*> &students) {
   std::ifstream data_file("raw_data/polls/poll_questions.json");
   if (!data_file.good()) return;
   nlohmann::json j_data = nlohmann::json::parse(data_file);
+  std::string today_string = getToday();
 
   for (nlohmann::json::iterator itr = j_data.begin(); itr != j_data.end(); itr++) {
     int poll_id = itr->find("id")->get<int>();
@@ -110,8 +123,46 @@ void LoadPolls(const std::vector<Student*> &students) {
     std::string question_type = "single-response-multiple-correct";
     nlohmann::json::iterator itr2 = itr->find("question_type");
     if (itr2 != itr->end()) question_type = itr2->get<std::string>();
-    std::string status = itr->find("status")->get<std::string>();
+
+    std::string status = "ended";
+    // original format: status stored as string, "closed", "open", or "ended"
+    itr2 = itr->find("status");
+    if (itr2 != itr->end()) status = itr2->get<std::string>();
+    // new format (April 2024): polls have an end time
+    std::string end_time = "";
+    itr2 = itr->find("end_time");
+    if (itr2 != itr->end()) {
+      if (itr2->is_null()) {
+        // if end_time is NULL that means the poll was never opened
+        status = "closed";
+      } else {
+        end_time = itr->find("end_time")->get<std::string>();
+        assert (end_time.size() == 10);
+        assert (today_string.size() == 10);
+        if (end_time < today_string) {
+          // if end_time is in the past, then the poll was used/released to the class and is now ended
+          status = "ended";
+        } else {
+          // otherwise, the poll might either be currently open or will be open in the future
+          // NOTE: this may need revision in a future PR, if timestamps are added to the end_time,
+          //    to make sure we handle polls from today correctly
+          status = "closed";
+        }
+      }
+    }
     assert (status == "ended" || status == "closed" || status == "open");
+
+    assert (release_date.size() == 10);
+    assert (today_string.size() == 10);
+    if (release_date < today_string && status != "ended") {
+      // this should only happen if a poll was scheduled for a date in the past, but it wasn't used on that date.
+      // NOTE: this may need revision in a future PR, if timestamps are added to the end_time or
+      //     if logic / handling of unreleased past polls changes.
+      std::cout << "Date inconsistency - this poll wasn't used/released." << std::endl;
+      std::cout << "   today = " << today_string << " poll release date = " << release_date << std::endl;
+      std::cout << "   setting release_date to infinity" << std::endl;
+      release_date = "9999-01-01";
+    }
 
     std::string lecture;
     int which;
@@ -235,17 +286,7 @@ void LoadPolls(const std::vector<Student*> &students) {
 // into their individual rainbow grades report).
 // 
 void SavePollReports(const std::vector<Student*> &students) {
-
-  // make a string representing today's date:  yyyy-mm-dd
-  static std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-  time_t tt = std::chrono::system_clock::to_time_t(now);
-  tm local_tm = *localtime(&tt);
-  std::stringstream ss;
-  ss << local_tm.tm_year + 1900 << "-"
-     << std::setw(2) << std::setfill('0') << local_tm.tm_mon + 1 << "-"
-     << std::setw(2) << std::setfill('0') << local_tm.tm_mday;
-  std::string today_string = ss.str();  
-
+  std::string today_string = getToday();
   std::cout << "TODAY " << today_string << std::endl;
 
   std::ofstream late_days_ostr("late_days.csv");
