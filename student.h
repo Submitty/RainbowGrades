@@ -21,12 +21,14 @@ extern std::vector<float> GLOBAL_earned_late_days;
 
 class ItemGrade {
 public:
-  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false) {
+  ItemGrade(float v, int ldu=0, const std::string& n="", const std::string &s="", const std::string &e="", bool ai=false, int de=0, const std::string& r="") {
     value = v;
     late_days_used = ldu;
     note = n;
     event = e;
     academic_integrity = ai;
+    late_day_exceptions = de;
+    reason_for_exception = r;
     
     if (s != "UNKONWN") {
       status = s;
@@ -55,6 +57,8 @@ public:
     return adjusted_value; 
   }
   int getLateDaysUsed() const { return late_days_used; }
+  int getLateDayExceptions() const { return late_day_exceptions; }
+  const std::string& getReasonForException() const { return reason_for_exception; }
   const std::string& getNote() const { return note; }
   const std::string& getStatus() const { return status; }
   const std::string& getEvent() const { return event; }
@@ -63,10 +67,12 @@ public:
 private:
   float value;
   int late_days_used;
+  int late_day_exceptions;
   bool academic_integrity;
   std::string note;
   std::string status;
   std::string event;
+  std::string reason_for_exception;
 };
 
 //====================================================================
@@ -108,7 +114,9 @@ public:
   int getPollsIncorrect() const;
   float getPollPoints() const;
   int getUsedLateDays() const;
-  float getMossPenalty() const { return moss_penalty; }
+  int getLateDayExceptions() const;
+  std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > getItemsWithExceptions() const;
+  float getAcademicSanctionPenalty() const { return academic_sanction_penalty; }
 
   void setCurrentAllowedLateDays(int d) { current_allowed_late_days = d; }
   void setDefaultAllowedLateDays(int d) { default_allowed_late_days = d; }
@@ -174,17 +182,26 @@ public:
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
   void setGradeableItemGrade(GRADEABLE_ENUM g, int i, float value, int late_days_used=0, const std::string &note="",const std::string &status="");
   void setGradeableItemGrade_AcademicIntegrity(GRADEABLE_ENUM g, int i, float value, bool academic_integrity, int late_days_used=0, const std::string &note="",const std::string &status="");
-  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="");
+  void setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value, const std::string &event="", int late_days_used=0, const std::string &note="",const std::string &status="",int exceptions=0, const std::string &reason="");
 
-  void mossify(const std::string &gradeable, float penalty);
+  void academic_sanction(const std::string &gradeable, float penalty);
 
+   //set in order of priority - top to bottom
     void set_event_academic_integrity(bool value) {academic_integrity = value;}
-    void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
     void set_event_overridden(bool value) {overridden = value;}
+    void set_event_extension(bool value) {extension = value;}
+    void set_event_grade_inquiry(bool value) {grade_inquiry = value;}
+    void set_event_cancelled(bool value) {cancelled = value;}
+    void set_event_version_conflict(bool value) {version_conflict = value;}
     void set_event_bad_status(bool value) {bad_status = value;}
+
+    //bool in order of priority - top to bottom
     bool get_event_academic_integrity() {return academic_integrity;}
-    bool get_event_grade_inquiry() {return grade_inquiry;}
     bool get_event_overridden() {return overridden;}
+    bool get_event_extension() {return extension;}
+    bool get_event_grade_inquiry() {return grade_inquiry;}
+    bool get_event_cancelled() {return cancelled;}
+    bool get_event_version_conflict() {return version_conflict;}
     bool get_event_bad_status() {return bad_status;}
 
   // other grade-like data
@@ -217,14 +234,14 @@ public:
 
   // HELPER FUNCTIONS
   float GradeablePercent(GRADEABLE_ENUM g) const;
-  float overall() const { return overall_b4_moss() + moss_penalty; }
+  float overall() const { return overall_b4_academic_sanction() + academic_sanction_penalty; }
   float adjusted_test(int i) const;
   float adjusted_test_pct() const;
   float lowest_test_counts_half_pct() const;
   float quiz_normalize_and_drop(int num) const;
-  float overall_b4_moss() const;
-  std::string grade(bool flag_b4_moss, Student *lowest_d) const;
-  void outputgrade(std::ostream &ostr,bool flag_b4_moss,Student *lowest_d) const;
+  float overall_b4_academic_sanction() const;
+  std::string grade(bool flag_b4_academic_sanction, Student *lowest_d) const;
+  void outputgrade(std::ostream &ostr,bool flag_b4_academic_sanction,Student *lowest_d) const;
   
 private:
 
@@ -244,8 +261,11 @@ private:
   int current_allowed_late_days;
   int default_allowed_late_days;
   bool academic_integrity = false;
-  bool grade_inquiry = false;
   bool overridden = false;
+  bool extension = false;
+  bool grade_inquiry = false;
+  bool version_conflict = false;
+  bool cancelled = false;
   bool bad_status = false;
 
     // registration status
@@ -260,7 +280,7 @@ private:
   std::map<GRADEABLE_ENUM,std::vector<ItemGrade> > all_item_grades;
   
   std::vector<std::string> zones;
-  float moss_penalty;
+  float academic_sanction_penalty;
   float cached_hw;
   int rank;
 

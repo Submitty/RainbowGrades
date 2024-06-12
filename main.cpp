@@ -125,7 +125,7 @@ std::string BONUS_FILE;
 
 bool DISPLAY_INSTRUCTOR_NOTES = false;
 bool DISPLAY_EXAM_SEATING = false;
-bool DISPLAY_MOSS_DETAILS = false;
+bool DISPLAY_ACADEMIC_SANCTION_DETAILS = false;
 bool DISPLAY_FINAL_GRADE = false;
 bool DISPLAY_GRADE_SUMMARY = false;
 bool DISPLAY_GRADE_DETAILS = false;
@@ -152,8 +152,8 @@ void PrintExamRoomAndZoneTable(const std::string &id, nlohmann::json &mj, Studen
 
 
 bool by_overall(const Student* s1, const Student* s2) {
-  float s1_overall = s1->overall_b4_moss();
-  float s2_overall = s2->overall_b4_moss();
+  float s1_overall = s1->overall_b4_academic_sanction();
+  float s2_overall = s2->overall_b4_academic_sanction();
 
   if (s1 == AVERAGE_STUDENT_POINTER) return true;
   if (s2 == AVERAGE_STUDENT_POINTER) return false;
@@ -374,8 +374,8 @@ void preprocesscustomizationfile(const std::string &now_string,
         DISPLAY_INSTRUCTOR_NOTES = true;
       } else if (token == "exam_seating") {
         DISPLAY_EXAM_SEATING = true;
-      } else if (token == "moss_details") {
-        DISPLAY_MOSS_DETAILS = true;
+      } else if (token == "academic_sanction_details") {
+        DISPLAY_ACADEMIC_SANCTION_DETAILS = true;
       } else if (token == "final_grade") {
         DISPLAY_FINAL_GRADE = true;
       } else if (token == "grade_summary") {
@@ -766,8 +766,8 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_INSTRUCTOR_NOTES = true;
     } else if (token == "exam_seating") {
       DISPLAY_EXAM_SEATING = true;
-    } else if (token == "moss_details") {
-      DISPLAY_MOSS_DETAILS = true;
+    } else if (token == "academic_sanction_details" || token == "moss_details") {
+      DISPLAY_ACADEMIC_SANCTION_DETAILS = true;
     } else if (token == "final_grade") {
       DISPLAY_FINAL_GRADE = true;
     } else if (token == "grade_summary") {
@@ -776,12 +776,26 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_GRADE_DETAILS = true;
     } else if (token == "display_rank_to_individual"){
       DISPLAY_RANK_TO_INDIVIDUAL = true;
+    } else if (token == "display_benchmark") {
+      continue;
+    } else if (token == "benchmark_percent") {
+      continue;
+    } else if (token == "section") {
+      continue;
+    } else if (token == "messages") {
+      continue;
+    } else if (token == "warning") {
+      continue;
+    } else if (token == "manual_grade"){
+      continue;
+    } else if (token == "final_cutoff"){
+      continue;
     } else {
       std::cout << "OOPS " << token << std::endl;
       exit(0);
     }
   }
-  
+
   //std::cout << "4" << std::endl;
   
   // Set Display Benchmark
@@ -1074,7 +1088,7 @@ void processcustomizationfile(const std::string &now_string,
       Student *s = GetStudent(students,username);
       //std::cout << "USERNAME " << username << std::endl;
       assert (s != NULL);
-      s->mossify(hw,penalty);
+      s->academic_sanction(hw,penalty);
       s->set_event_academic_integrity(true);
     }
   } else if (token == "final_cutoff") {
@@ -1364,9 +1378,14 @@ void load_student_grades(std::vector<Student*> &students) {
                              event = "Bad";
                              s->set_event_bad_status(true);
                            }
-                           if (status_check == "Overridden") {
-                             event = "Overridden";
-                             s->set_event_overridden(true);
+                           std::string version_conflict = itr2->value("version_conflict", "");
+                           if (version_conflict == "true") {
+                             event = "Version_conflict";
+                             s->set_event_version_conflict(true);
+                           }
+                           if (status_check == "Cancelled") {
+                             event = "Cancelled";
+                             s->set_event_cancelled(true);
                            }
                            std::string inquiry = itr2->value("inquiry", "");
                            if ((inquiry != "None") && (inquiry != "Resolved") && (inquiry != "")) {
@@ -1374,7 +1393,18 @@ void load_student_grades(std::vector<Student*> &students) {
                              event = "Open";
                              s->set_event_grade_inquiry(true);
                            }
-                          s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status);
+                           int late_day_exceptions = itr2->value("late_day_exceptions",0);
+                           std::string reason_for_exception = itr2->value("reason_for_exception","");
+                           if (late_day_exceptions > 0) {
+                             event = "Extension";
+                             s->set_event_extension(true);
+                           }
+                           // Above itr2 status check, but in order of priority
+                           if (status_check == "Overridden") {
+                             event = "Overridden";
+                             s->set_event_overridden(true);
+                             }
+                           s->setGradeableItemGrade_border(g,which,score,event,late_days_charged,other_note,status,late_day_exceptions,reason_for_exception);
                         }
       }
 
@@ -1723,6 +1753,35 @@ void loadAllowedLateDays(std::vector<Student*> &students) {
   }
 }
 
+void SaveExtensionReports(const std::vector<Student*> &students) {
+  system ("mkdir -p student_extension_reports");
+  for (size_t i=0;i<students.size();i++) {
+    std::vector<std::tuple<ItemGrade,std::tuple<GRADEABLE_ENUM,int> > > gradeablesWithExtensions = students[i]->getItemsWithExceptions();
+    std::string username = students[i]->getUserName();
+    std::ofstream student_ostr("student_extension_reports/"+username+".html");
+    assert (student_ostr.good());
+    if (gradeablesWithExtensions.size() == 0) {
+      continue;
+    }
+    student_ostr << "<h3> Excused Absence Extensions for: " << username << "</h3>" << std::endl;
+    student_ostr << "<table cellpadding=5 style=\"border:1px solid #aaaaaa; background-color:#ffffff;\">" << std::endl;
+    student_ostr << "<tr><td>Gradeable</td><td align=center>Days Extended</td><td align=center>Reason</td><td></td></tr>" << std::endl;
+    for (size_t i2=0;i2<gradeablesWithExtensions.size();i2++) {
+      ItemGrade item = std::get<0>(gradeablesWithExtensions[i2]);
+      GRADEABLE_ENUM g = std::get<0>(std::get<1>(gradeablesWithExtensions[i2]));
+      int index = std::get<1>(std::get<1>(gradeablesWithExtensions[i2]));
+      std::string gradeable_id = GRADEABLES[g].getID(index);
+      std::string gradeable_name = "";
+      if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
+        gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
+      }
+      student_ostr << "<tr><td>" << gradeable_name << "</td><td align=center>"
+                   << item.getLateDayExceptions() << "</td><td align=center>"
+                   << item.getReasonForException() << "</td></tr>" << std::endl;
+    }
+    student_ostr << "</table>" << std::endl;
+  }
+}
 
 int main(int argc, char* argv[]) {
 
@@ -1743,6 +1802,8 @@ int main(int argc, char* argv[]) {
 
   LoadPolls(students);
   SavePollReports(students);
+
+  SaveExtensionReports(students);
 
   loadAllowedLateDays(students);
 
@@ -1766,7 +1827,7 @@ int main(int argc, char* argv[]) {
 
     DISPLAY_INSTRUCTOR_NOTES = false;
     DISPLAY_EXAM_SEATING = true;
-    DISPLAY_MOSS_DETAILS = false;
+    DISPLAY_ACADEMIC_SANCTION_DETAILS = false;
     DISPLAY_FINAL_GRADE = false;
     DISPLAY_GRADE_SUMMARY = false;
     DISPLAY_GRADE_DETAILS = false;

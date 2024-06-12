@@ -609,7 +609,7 @@ void start_table_output( bool /*for_instructor*/,
     std::cout << "DISPLAY FINAL GRADE" << std::endl;
     student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","FINAL GRADE"));
     student_data.push_back(counter); table.set(0,counter++,TableCell(grey_divider));
-    if (DISPLAY_MOSS_DETAILS) {
+    if (DISPLAY_ACADEMIC_SANCTION_DETAILS) {
       table.set(0,counter++,TableCell("ffffff","RAW GRADE"));
       table.set(0,counter++,TableCell(grey_divider));
     }
@@ -679,6 +679,7 @@ void start_table_output( bool /*for_instructor*/,
       //Late days headers
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED LATE DAYS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","USED LATE DAYS"));
+      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","EXCUSED EXTENSIONS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
     }
   }
@@ -948,14 +949,14 @@ void start_table_output( bool /*for_instructor*/,
     if (DISPLAY_FINAL_GRADE) {
       std::string g = this_student->grade(false,sd);      
       color = GradeColor(g);
-      if (this_student->getMossPenalty() < -0.00000001) {
+      if (this_student->getAcademicSanctionPenalty() < -0.00000001) {
         g += "@";
       }
       assert (color.size()==6);
       table.set(myrow,counter++,TableCell(color,g,"",0,CELL_CONTENTS_VISIBLE,"center"));
       table.set(myrow,counter++,TableCell(grey_divider));
 
-      if (DISPLAY_MOSS_DETAILS) {
+      if (DISPLAY_ACADEMIC_SANCTION_DETAILS) {
         std::string g2 = this_student->grade(true,sd);
         color = GradeColor(g2);
         table.set(myrow,counter++,TableCell(color,g2,"",0,CELL_CONTENTS_VISIBLE,"center"));
@@ -1035,12 +1036,17 @@ void start_table_output( bool /*for_instructor*/,
           std::string status = this_student->getGradeableItemGrade(g,j).getStatus();
           std::string event = this_student->getGradeableItemGrade(g,j).getEvent();
           bool Academic_integrity = this_student->getGradeableItemGrade(g,j).getAcademicIntegrity();
+          std::string reason = this_student->getGradeableItemGrade(g,j).getReasonForException();
+          std::string gID = GRADEABLES[g].getID(j);
+          std::string userName = this_student->getUserName();
           if (status.find("Bad") != std::string::npos) {
             details += " " + status;
           }
           int late_days_used = this_student->getGradeableItemGrade(g,j).getLateDaysUsed();
+          int daysExtended = this_student->getGradeableItemGrade(g,j).getLateDayExceptions();
           assert (color.size()==6);
-          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity));
+          std::string a = "right";
+          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName,daysExtended));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
@@ -1083,8 +1089,12 @@ void start_table_output( bool /*for_instructor*/,
           int used = this_student->getUsedLateDays();
           color = coloritcolor(allowed-used+2, 5+2, 3+2, 2+2, 1+2, 0+2);
           table.set(myrow,counter++,TableCell(color,used,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          int exceptions = this_student->getLateDayExceptions();
+          color = coloritcolor(exceptions,5,4,3,2,2);
+          table.set(myrow,counter++,TableCell(color,exceptions,"",0,CELL_CONTENTS_VISIBLE,"right"));
         } else {
           color="ffffff"; // default_color;
+          table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
@@ -1178,23 +1188,23 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   ostr << "<p>* = 1 late day used</p>" << std::endl;
 
 
-  bool print_moss_message = false;
-  if (s != NULL && s->getMossPenalty() < -0.0000001) {
-    print_moss_message = true;
+  bool print_academic_sanction_message = false;
+  if (s != NULL && s->getAcademicSanctionPenalty() < -0.0000001) {
+    print_academic_sanction_message = true;
   }
 
-  if (print_moss_message) {
+  if (print_academic_sanction_message) {
     ostr << "@ = Academic Integrity Violation penalty<p>&nbsp;<p>\n";
   }
 
   // Description of border outline that are in effect
-  if (s != NULL)
+  if (for_instructor || s != NULL)
   {
-      if (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity())
+      if (for_instructor || (s != NULL && (s->get_event_bad_status() || s->get_event_grade_inquiry() || s->get_event_overridden() || s->get_event_academic_integrity() || s->get_event_extension())))
       {
         ostr << "<style> .spacer {display: inline-block; width: 66px;} </style>\n";
         ostr << "<table style=\"border:1px solid #aaaaaa; background-color:#FFFFFF;\">\n";
-        if (s->get_event_academic_integrity())
+        if (for_instructor || (s != NULL && s->get_event_academic_integrity()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0a0a0a; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
@@ -1205,29 +1215,63 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
           ostr << "</td>";
           ostr << "</tr>\n";
         }
-        if (s->get_event_overridden())
+        if (for_instructor || (s != NULL && s->get_event_overridden()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fcca03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
           ostr << "<span class=\"spacer\"></span>";
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-          ostr << "<font size = \"-1\"> Grade override </font>";
+          ostr << "<font size = \"-1\"> Grade Override </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }
-        if (s->get_event_grade_inquiry())
+        if (for_instructor || (s != NULL && s->get_event_extension()))
+        {
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #0066e0; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+          ostr << "<span class=\"spacer\"></span>";
+          ostr << "</td>";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+          ostr << "<font size = \"-1\"> Excused Absence Extension </font>";
+          ostr << "</td>";
+          ostr << "</tr>\n";
+        }
+        if (for_instructor || (s != NULL && s->get_event_grade_inquiry()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #1cfc03; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
           ostr << "<span class=\"spacer\"></span>";
           ostr << "</td>";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
-          ostr << "<font size = \"-1\"> Grade inquiry in progress </font>";
+          ostr << "<font size = \"-1\"> Grade Inquiry in Progress </font>";
           ostr << "</td>";
           ostr << "</tr>\n";
         }
-        if (s->get_event_bad_status())
+       if (for_instructor || (s != NULL && s->get_event_cancelled()))
+        {
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #0a0a0a; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+          ostr << "<span class=\"spacer\"></span>";
+          ostr << "</td>";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+          ostr << "<font size = \"-1\"> Cancelled submission </font>";
+          ostr << "</td>";
+          ostr << "</tr>\n";
+        }
+       if (for_instructor || (s != NULL && s->get_event_version_conflict()))
+        {
+          ostr << "<tr>\n";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px dashed #fc0303; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
+          ostr << "<span class=\"spacer\"></span>";
+          ostr << "</td>";
+          ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << " \" align=\"" << "left" << "\">";
+          ostr << "<font size = \"-1\"> Version conflict = version conflict between <br> ";
+          ostr << "<span class=\"spacer\"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TA graded version and Active version  </font>";
+          ostr << "</td>";
+          ostr << "</tr>\n";
+        }
+        if (for_instructor || (s != NULL && s->get_event_bad_status()))
         {
           ostr << "<tr>\n";
           ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#FFFFFF" << "; " << "outline:4px solid #fc0303; outline-offset: -4px;" << " \" align=\"" << "left" << "\">";
@@ -1245,6 +1289,13 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
 
 
   if (s != NULL) {
+    std::ifstream istr2("student_extension_reports/"+s->getUserName()+".html");
+    if (istr2.good()) {
+      std::string tmp_s;
+      while (getline(istr2,tmp_s)) {
+        ostr << tmp_s;
+      }
+    }
     std::ifstream istr("student_poll_reports/"+s->getUserName()+".html");
     if (istr.good()) {
       std::string tmp_s;
