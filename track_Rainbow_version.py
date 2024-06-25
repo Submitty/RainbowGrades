@@ -7,7 +7,7 @@ import subprocess
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 RG_DIR = os.environ.get('RAINBOW_GRADES_DIRECTORY')
 REPORT_DIR = os.environ.get('REPORTS_DIRECTORY')
-WORKING_DIRECTORY = os.path.join(".")
+WORKING_DIRECTORY = "."
 
 if __name__ == "__main__":
 
