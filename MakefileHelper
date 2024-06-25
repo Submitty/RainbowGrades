@@ -45,6 +45,14 @@ push:
 	rsync -azP individual_summary_html/*.html ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/summary_html/
 	rsync -azP individual_summary_html/*.json ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/seating/final_exam/
 
+local_pull:
+	mkdir -p raw_data/
+	rsync -azPq ${REPORTS_DIRECTORY}/ raw_data/
+
+local_push:
+	rsync -azPq individual_summary_html/*.html ${REPORTS_DIRECTORY}/summary_html/
+	rsync -azPq individual_summary_html/*.json ${REPORTS_DIRECTORY}/seating/final_exam/
+
 pull_test:
 	mkdir -p raw_data/
 	rsync -azPq ${REPORTS_DIRECTORY}/ raw_data/
