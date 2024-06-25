@@ -103,7 +103,7 @@ compile: remove_json_comments version process_grades.out individual_summary_html
 clean:
 	rm -rf *~ *.dSYM
 	rm -f process_grades.out
-	rm -f customization_no_comments.json files_json.txt
+	rm -f customization_no_comments.json files_json.txt RG_version.json
 
 src_clean: clean
 	rm -f ${json_syntax_checker.py}

@@ -7,11 +7,11 @@ import subprocess
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 RG_DIR = os.environ.get('RAINBOW_GRADES_DIRECTORY')
 REPORT_DIR = os.environ.get('REPORTS_DIRECTORY')
-RESULT_PATH = os.path.join(REPORT_DIR, "..", "rainbow_grades")
+WORKING_DIRECTORY = os.path.join(".")
 
 if __name__ == "__main__":
 
-  json_dir = os.path.join(RESULT_PATH, "RG_version.json")
+  json_dir = os.path.join(WORKING_DIRECTORY, "RG_version.json")
   output_dict = {}
   current_commit_hash_rg = 'unknown'
   current_short_commit_hash_rg = 'unknown'
