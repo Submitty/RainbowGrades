@@ -119,6 +119,10 @@ public:
     assert (released.find(id) != released.end());
     return released.find(id)->second;
   }
+  bool isExtraCredit(const std::string &id) const {
+//    assert (extracreditmap.find(id) != extracreditmap.end());
+    return extracreditmap.find(id)->second;
+  }
   float getItemMaximum(const std::string &id) const {
     if (maximums.find(id) == maximums.end()){
       return 0;
@@ -181,6 +185,12 @@ public:
     released[id] = is_released;
   }
 
+  void setExtraCredit(const std::string&id, bool is_extracredit) {
+    assert (hasCorrespondence(id));
+    assert (extracreditmap.find(id) == extracreditmap.end());
+      extracreditmap[id] = is_extracredit;
+  }
+
   void setMaximum(const std::string&id, float maximum) {
     assert (hasCorrespondence(id));
     assert (maximums.find(id) == maximums.end());
@@ -230,6 +240,7 @@ private:
   std::vector<float> sorted_weights;
   std::map<std::string,float> clamps;
   std::map<std::string,bool> released;
+  std::map<std::string,bool> extracreditmap;
   std::map<std::string,std::string> original_ids;
   std::map<std::string,std::string> resubmit_ids;
   std::map<std::string,float> autograde_replacement_percentages;

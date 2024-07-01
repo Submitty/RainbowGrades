@@ -648,6 +648,11 @@ void preprocesscustomizationfile(const std::string &now_string,
         GRADEABLES[g].setReleased(token_key,released);
       }
 
+      bool extra_credit = grade_id.value("extra_credit", false);
+      if (extra_credit) {
+          GRADEABLES[g].setExtraCredit(token_key,extra_credit);
+      }
+
       float maximum = grade_id.value("max",0.0);
       GRADEABLES[g].setMaximum(token_key,maximum);
 
