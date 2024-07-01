@@ -778,8 +778,6 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_RANK_TO_INDIVIDUAL = true;
     } else if (token == "display_benchmark") {
       continue;
-    } else if (token == "benchmark_percent") {
-      continue;
     } else if (token == "section") {
       continue;
     } else if (token == "messages") {
