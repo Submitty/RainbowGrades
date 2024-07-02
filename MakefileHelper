@@ -1,4 +1,4 @@
-.PHONY: default pull push all compile overall section lab hw test quiz final zone clean src_clean remove_json_comments
+.PHONY: default pull push all compile overall section lab hw test quiz final zone clean src_clean remove_json_comments version
 
 default: overall
 
@@ -25,6 +25,9 @@ $(error Variable REPORTS_DIRECTORY not set)
 endif
 
 nlohmann_json_dir=${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann/json
+
+export RAINBOW_GRADES_DIRECTORY
+export REPORTS_DIRECTORY
 
 ${nlohmann_json_dir}:
 	mkdir -p ${nlohmann_json_dir}
@@ -75,6 +78,8 @@ endif
 
 json_include = -I${nlohmann_json_dir}/include/
 
+version:
+	python3 ${RAINBOW_GRADES_DIRECTORY}/track_Rainbow_version.py
 
 remove_json_comments: customization.json
 	cpp -xc++ $< | sed -e '/^#/d' > customization_no_comments.json
@@ -93,12 +98,12 @@ process_grades.out: \
 individual_summary_html all_students_summary_csv all_students_summary_html:
 	mkdir -p $@
 
-compile: remove_json_comments process_grades.out individual_summary_html all_students_summary_html all_students_summary_csv
+compile: remove_json_comments version process_grades.out individual_summary_html all_students_summary_html all_students_summary_csv
 
 clean:
 	rm -rf *~ *.dSYM
 	rm -f process_grades.out
-	rm -f customization_no_comments.json files_json.txt
+	rm -f customization_no_comments.json files_json.txt RG_version.json
 
 src_clean: clean
 	rm -f ${json_syntax_checker.py}
