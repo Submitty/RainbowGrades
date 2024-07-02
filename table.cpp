@@ -94,7 +94,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   academic_integrity = ai;
   event = e;
 
-  if (event == "Extension") {
+  if (event == "Extension" && reason != "") {
       extension = true;
       inquiry = bad_status = override = version_conflict = cancelled = false;
       hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a " + std::to_string(daysExtended) + " day extension due to " + reason + " on " + gID + "\" ";
