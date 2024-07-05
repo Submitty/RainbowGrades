@@ -95,12 +95,8 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   event = e;
 
   if (event == "Extension" && reason != "") {
-      extension = true;
-      inquiry = bad_status = override = version_conflict = cancelled = false;
       hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a " + std::to_string(daysExtended) + " day extension due to " + reason + " on " + gID + "\" ";
   } else if (event == "Bad") {
-      bad_status = true;
-      override = inquiry = extension = version_conflict = cancelled = false;
       hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a bad status on " + gID + "\" ";
       }
   
@@ -129,7 +125,6 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
    inquiry = bad_status = override = extension = version_conflict = cancelled = false;
   }
 }
-
 
 
 
