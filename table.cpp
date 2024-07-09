@@ -94,21 +94,15 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   academic_integrity = ai;
   event = e;
 
-  if (event == "Extension" && reason != "") {
-      hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a " + std::to_string(daysExtended) + " day extension due to " + reason + " on " + gID + "\" ";
-  } else if (event == "Bad") {
-      hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a bad status on " + gID + "\" ";
-      }
-  
-
 // Bool in order of priority - top to bottom
 // Don't think we need this logic, but leaving it as sort of assert
   if (event == "Overridden"){
     override = true;
     bad_status = inquiry = extension = version_conflict = cancelled = false;
-  } else if (event == "Extension"){
+  } else if (event == "Extension" && reason != ""){
     extension = true;
     inquiry = bad_status = override = version_conflict = cancelled = false;
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a " + std::to_string(daysExtended) + " day extension due to " + reason + " on " + gID + "\" ";
   } else if (event == "Open"){
     inquiry = true;
     bad_status = override = extension = version_conflict = cancelled = false;
@@ -121,6 +115,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   } else if (event == "Bad"){
     bad_status = true;
     override = inquiry = extension = version_conflict = cancelled = false;
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a bad status on " + gID + "\" ";
   } else {
    inquiry = bad_status = override = extension = version_conflict = cancelled = false;
   }
