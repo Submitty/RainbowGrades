@@ -577,12 +577,12 @@ void start_table_output( bool /*for_instructor*/,
   student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME"));
   student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID"));
   if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
-    table.set(0,counter++,TableCell("ffffff","LAST (LEGAL)"));
-    table.set(0,counter++,TableCell("ffffff","FIRST (LEGAL)"));
+    table.set(0,counter++,TableCell("ffffff","FAMILY (LEGAL)"));
+    table.set(0,counter++,TableCell("ffffff","GIVEN (LEGAL)"));
   }
   int last_name_counter=counter;
-  table.set(0,counter++,TableCell("ffffff","LAST"));
-  student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","FIRST"));
+  table.set(0,counter++,TableCell("ffffff","FAMILY"));
+  student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","GIVEN"));
   student_data.push_back(last_name_counter);
   student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
 
