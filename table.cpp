@@ -102,9 +102,9 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   } else if (event == "Extension"){
     extension = true;
     inquiry = bad_status = override = version_conflict = cancelled = false;
-    if (reason != ""){
-    hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a " + std::to_string(daysExtended) + " day extension due to " + reason + " on " + gID + "\" ";
-    }
+      if (reason != ""){
+      hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a " + std::to_string(daysExtended) + " day extension due to " + reason + " on " + gID + "\" ";
+      }
   } else if (event == "Open"){
     inquiry = true;
     bad_status = override = extension = version_conflict = cancelled = false;
