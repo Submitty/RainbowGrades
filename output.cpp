@@ -640,9 +640,11 @@ void start_table_output( bool /*for_instructor*/,
         }
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
+        std::string gradeable_url = "https://submitty.org/grading_details/" + gradeable_id; 
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
           //gradeable_name = spacify(gradeable_name);
+          gradeable_name = "<a href=\"" + gradeable_url + "\">" + gradeable_name + "</a>";
         }
         if (gradeable_name == "")
           gradeable_name = "<em><font color=\"aaaaaa\">future "
