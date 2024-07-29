@@ -127,11 +127,12 @@ void Student::setGradeableItemGrade_border(GRADEABLE_ENUM g, int i, float value,
 
 class score_object {
 public:
-  score_object(float s,float m,float p,float sm):score(s),max(m),percentage(p),scale_max(sm){}
+  score_object(float s,float m,float p,float sm,bool ec):score(s),max(m),percentage(p),scale_max(sm),extra_credit(ec){}
   float score;
   float max;
   float percentage;
   float scale_max;
+  bool extra_credit;
 };
 
 bool operator<(const score_object &a, const score_object &b) {
@@ -140,11 +141,13 @@ bool operator<(const score_object &a, const score_object &b) {
   float p1 = a.percentage;
   float sm1 = a.scale_max;
   float my_max1 = std::max(m1,sm1);
+  bool ec1 = a.extra_credit;
   float s2 = b.score;
   float m2 = b.max;
   float p2 = b.percentage;
   float sm2 = b.scale_max;
   float my_max2 = std::max(m2,sm2);
+  bool ec2 = b.extra_credit;
   // Grades should be compared by the normalized grade only, not normalized grade multiplied by percentages. Otherwise, a grade of 90 for the gradeable
   // with percentage 0.1 will always be considered lower than a grade of 60 for the gradeable with percentage 0.2, since 0.1 * 0.9 < 0.2 * 0.6
   bool result;
@@ -206,6 +209,8 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
 
   // collect the scores in a vector
   std::vector<score_object> scores;
+  std::vector<score_object> only_ec;
+
   for (int i = 0; i < GRADEABLES[g].getCount(); i++) {
     float s = getGradeableItemGrade(g,i).getValue();
     std::string id = GRADEABLES[g].getID(i);
@@ -213,20 +218,34 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     //if(!id.empty() && GRADEABLES[g].isReleased(id)){
     if(!id.empty()){
       m = GRADEABLES[g].getItemMaximum(id);
-      // std::cout << "m" << m << std::endl;
+//       std::cout << "m" << m << std::endl;
     }
+    bool ec = GRADEABLES[g].isExtraCredit(id);
     float p = GRADEABLES[g].getItemPercentage(id);
     float sm = GRADEABLES[g].getScaleMaximum(id);
-    scores.push_back(score_object(s,m,p,sm));
+    if(!ec) {
+        scores.push_back(score_object(s,m,p,sm,ec));
+    } else {
+        only_ec.push_back(score_object(s,m,p,sm,ec));
+    }
   }
 
   // sort the scores (smallest first)
+
   std::sort(scores.begin(),scores.end());
   //to check that the number of "drop the lowest" is less than the number of non extra credit gradeables,
   // i.e., it is not allowed to drop all non extra credit gradeables
   assert (GRADEABLES[g].getRemoveLowest() >= 0 && (
           (non_extra_credit_count > 0 && GRADEABLES[g].getRemoveLowest() < non_extra_credit_count)) ||
           (GRADEABLES[g].getRemoveLowest() == 0));
+
+  if (!( ((GRADEABLES[g].getRemoveLowest() >= 0) && (
+            (non_extra_credit_count > 0 && GRADEABLES[g].getRemoveLowest() < non_extra_credit_count))) ||
+          (GRADEABLES[g].getRemoveLowest() == 0))) {
+        std::cerr << "Error: Invalid value for removeLowest in gradeable Check the conditions.\n";
+        exit(1);
+  }
+
 
   // sum the remaining (higher) scores
   float sum_max = 0;
@@ -253,6 +272,7 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
     float m = scores[i].max;
     float p = scores[i].percentage;
     float sm = scores[i].scale_max;
+    bool ec = scores[i].extra_credit;
     float my_max = std::max(m,sm);
 
     if (p < 0) {
@@ -274,6 +294,24 @@ float Student::GradeablePercent(GRADEABLE_ENUM g) const {
       sum_percentage += p;
     }
   }
+
+
+
+    for (int i = 0; i < only_ec.size(); i++) {
+        float ec_s = only_ec[i].score;
+        float ec_m = only_ec[i].max;
+        float ec_p = only_ec[i].percentage;
+        float ec_sm = only_ec[i].scale_max;
+        bool ec_ec = only_ec[i].extra_credit;
+        float my_max = std::max(ec_m,ec_sm);
+
+        sum += ec_p * ec_s / my_max;
+
+
+
+    }
+
+
   const float tolerance = 0.000001;
   assert(sum_percentage <= 1.0 + tolerance);
   if (sum_max == 0) { // pure extra credit category
