@@ -639,7 +639,6 @@ void start_table_output( bool /*for_instructor*/,
   // ----------------------------
   // DETAILS OF EACH GRADEABLE
   if (DISPLAY_GRADE_DETAILS) {
-    Student* this_student = new Student();
     for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
       GRADEABLE_ENUM g = ALL_GRADEABLES[i];
       for (int j = 0; j < GRADEABLES[g].getCount(); j++) {
@@ -648,14 +647,13 @@ void start_table_output( bool /*for_instructor*/,
         }
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
-        std::string section = "";
         std::string base_url = getBaseUrl();
-        std::string gradeable_url = base_url + gradeable_id;
-        std::string fullUrl = base_url + "/" + section + "/gradeable/" + gradeable_id;
+        std::string semester = "f24/";
+        std::string course = "sample";
+        std::string fullUrl = base_url + "courses/" + semester + course + "/gradeable/" + gradeable_id;
 
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-          section = this_student->getSection();
           //gradeable_name = spacify(gradeable_name);
           gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black;\">" + gradeable_name + "&nbsp;&nbsp; <i class='fas fa-external-link-alt'></i></a>";
         }
