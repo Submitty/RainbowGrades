@@ -138,11 +138,14 @@ int convertMajor(const std::string &major) {
   else return 10;
 }
 
-std::string getBaseUrl() {
+std::tuple<std::string, std::string, std::string> getCourseDetails() {
     std::ifstream i("/var/local/submitty/courses/f24/sample/reports/base_url.json");
     nlohmann::json j;
     i >> j;
-    return j["base_url"].get<std::string>();
+    std::string baseUrl = j["base_url"].get<std::string>();
+    std::string term = j["term"].get<std::string>();
+    std::string course = j["course"].get<std::string>();
+    return {baseUrl, term, course};
 }
 
 // ==========================================================
@@ -645,12 +648,10 @@ void start_table_output( bool /*for_instructor*/,
         if (g != GRADEABLE_ENUM::NOTE) {
           student_data.push_back(counter);
         }
+        auto [base_url, semester, course] = getCourseDetails();
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
-        std::string base_url = getBaseUrl();
-        std::string semester = "f24/";
-        std::string course = "sample";
-        std::string fullUrl = base_url + "courses/" + semester + course + "/gradeable/" + gradeable_id;
+        std::string fullUrl = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
 
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
