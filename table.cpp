@@ -87,7 +87,12 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   if (automatic_zero) {
       d = 0; // Set final score to 0 if automatic zero
   } else if (late_days_used > 0) {
+        // Apply penalty if not an automatic zero
+  if (automatic_zero) {
+      d = 0; // Set final score to 0 if automatic zero
+  } else if (late_days_used > 0) {
       d = d * (1.0f - penalty_per_day * late_days_used); // Apply percentage deduction for late days
+  }
   }
   
   // Ensure numeric precision
@@ -120,14 +125,15 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
     bad_status = true;
     override = inquiry = extension = version_conflict = cancelled = false;
     if (automatic_zero) {
-      hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + CSVSanitizeString(userName) + 
-                  " received an automatic zero due to late submission.\" ";
+        hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + CSVSanitizeString(userName) +
+                    " received an automatic zero due to late submission.\" ";
     } else {
-      hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + CSVSanitizeString(userName) + 
-                  " received a bad status on " + CSVSanitizeString(gID) + ". Original score: " + 
-                  std::to_string(original_score) + ", Final score after " + std::to_string(late_days_used) +
-                  " late days and a penalty of " + std::to_string(penalty_per_day * 100) + "% per day: " + data + "\" ";
+        hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + CSVSanitizeString(userName) +
+                    " received a bad status on " + CSVSanitizeString(gID) + ". Original score: " +
+                    std::to_string(original_score) + ", Final score after " + std::to_string(late_days_used) +
+                    " late days and a penalty of " + std::to_string(penalty_per_day * 100) + "% per day: " + data + "\" ";
     }
+
   }
 }
 
