@@ -140,6 +140,17 @@ int convertMajor(const std::string &major) {
 
 // ==========================================================
 
+std::vector<string> getCourseDetails() {
+  std::vector<string> courseDetails;
+  std::ifstream i("/var/local/submitty/courses/f24/sample/reports/base_url.json");
+  nlohmann::json j;
+  i >> j;
+  courseDetails[0] = j["base_url"].get<std::string>();
+  courseDetails[1] = j["term"].get<std::string>();;
+  courseDetails[2] = j["course"].get<std::string>();;
+  return courseDetails;
+}
+
 class Color {
 public:
   Color(int r_=0, int g_=0, int b_=0) : r(r_),g(g_),b(b_) {}
@@ -638,11 +649,20 @@ void start_table_output( bool /*for_instructor*/,
         if (g != GRADEABLE_ENUM::NOTE) {
           student_data.push_back(counter);
         }
+
+        std::vector<string> courseDetails = getCourseDetails();
+        std::string base_url = courseDetails[0];
+        std::string semester = courseDetails[1];
+        std::string course = courseDetails[2];
+
+        std::string fullURL = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
+
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
           //gradeable_name = spacify(gradeable_name);
+          gradeable_name = "<a href=\"" + fullURL + "\"" gradeable_name + "&nbsp;&nbsp; <i class='fas fa-external-link-alt'></i></a>";
         }
         if (gradeable_name == "")
           gradeable_name = "<em><font color=\"aaaaaa\">future "
