@@ -141,8 +141,11 @@ int convertMajor(const std::string &major) {
 // ==========================================================
 
 std::vector<string> getCourseDetails() {
-  std::vector<string> courseDetails;
+  std::vector<std::string> courseDetails;
   std::ifstream i("/var/local/submitty/courses/f24/sample/reports/base_url.json");
+  if(!i){
+    return {}
+  }
   nlohmann::json j;
   i >> j;
   courseDetails[0] = j["base_url"].get<std::string>();
@@ -651,11 +654,13 @@ void start_table_output( bool /*for_instructor*/,
         }
 
         std::vector<string> courseDetails = getCourseDetails();
-        std::string base_url = courseDetails[0];
-        std::string semester = courseDetails[1];
-        std::string course = courseDetails[2];
+        if(courseDetails.size() == 3){
+          std::string base_url = courseDetails[0];
+          std::string semester = courseDetails[1];
+          std::string course = courseDetails[2];
 
-        std::string fullURL = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
+          std::string fullURL = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
+        }
 
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
