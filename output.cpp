@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <ctime>
 #include <cmath>
+#include <cstdlib>
 
 #include "student.h"
 #include "grade.h"
@@ -140,18 +141,18 @@ int convertMajor(const std::string &major) {
 
 // ==========================================================
 
-std::vector<string> getCourseDetails() {
-  std::vector<std::string> courseDetails;
-  std::ifstream i("/var/local/submitty/courses/f24/sample/reports/base_url.json");
-  if(!i){
-    return {}
-  }
+std::tuple<std::string, std::string, std::string> getCourseDetails() {
+  const char* reportsDir = std::getenv("REPORTS_DIRECTORY");
+  std::string path = std::string(reportsDir) + "/base_url.json";
+  std::ifstream i(path);
+
   nlohmann::json j;
   i >> j;
-  courseDetails[0] = j["base_url"].get<std::string>();
-  courseDetails[1] = j["term"].get<std::string>();;
-  courseDetails[2] = j["course"].get<std::string>();;
-  return courseDetails;
+  std::string baseUrl = j["base_url"].get<std::string>();
+  std::string term = j["term"].get<std::string>();
+  std::string course = j["course"].get<std::string>();
+
+  return {baseUrl, term, course};
 }
 
 class Color {
@@ -652,23 +653,21 @@ void start_table_output( bool /*for_instructor*/,
         if (g != GRADEABLE_ENUM::NOTE) {
           student_data.push_back(counter);
         }
-
-        std::vector<string> courseDetails = getCourseDetails();
-        if(courseDetails.size() == 3){
-          std::string base_url = courseDetails[0];
-          std::string semester = courseDetails[1];
-          std::string course = courseDetails[2];
-
-          std::string fullURL = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
-        }
-
+        
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
+        auto courseDetails = getCourseDetails();
+        std::string base_url = std::get<0>(courseDetails);
+        std::string semester = std::get<1>(courseDetails);
+        std::string course = std::get<2>(courseDetails);
+        std::string fullUrl = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
+
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-          //gradeable_name = spacify(gradeable_name);
-          gradeable_name = "<a href=\"" + fullURL + "\"" gradeable_name + "&nbsp;&nbsp; <i class='fas fa-external-link-alt'></i></a>";
+          // gradeable_name = spacify(gradeable_name);
+          gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black;\">" + gradeable_name + "&nbsp;&nbsp; <i class='fas fa-external-link-alt'></i></a>";
         }
+
         if (gradeable_name == "")
           gradeable_name = "<em><font color=\"aaaaaa\">future "
             + tolower(gradeable_to_string(g)) + "</font></em>";
