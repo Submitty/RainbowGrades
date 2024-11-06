@@ -664,7 +664,6 @@ void start_table_output( bool /*for_instructor*/,
 
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-          // gradeable_name = spacify(gradeable_name);
           gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black;\">" + gradeable_name + "&nbsp;&nbsp; <i class='fas fa-external-link-alt'></i></a>";
         }
 
