@@ -663,8 +663,9 @@ void start_table_output( bool /*for_instructor*/,
         std::string fullUrl = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
 
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
-          gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-          gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black;\">" + gradeable_name + "&nbsp;&nbsp; <i class='fas fa-external-link-alt'></i></a>";
+          gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;            
+          gradeable_name = gradeable_name + " <i class='fa-solid fa-arrow-up-right-from-square' style='color:blue;'></i>";
+          gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black; text-decoration:none;\" title=\"View Gradeable\">" + gradeable_name + "</a>";
         }
 
         if (gradeable_name == "")
