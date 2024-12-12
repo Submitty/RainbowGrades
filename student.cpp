@@ -17,7 +17,8 @@ Student::Student() {
   // registration status
   section = "null";  
   audit = false;
-  withdraw = false;
+  withdrawn = false;
+  graded = false;
   independentstudy = false;
 
   default_allowed_late_days = 0;
