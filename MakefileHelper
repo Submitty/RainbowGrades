@@ -43,6 +43,8 @@ pull:
 
 push:
 	rsync -azP individual_summary_html/*.html ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/summary_html/
+#FIXME: this should be generalized
+#	rsync -azP individual_summary_html/*.json ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/seating/test3/
 	rsync -azP individual_summary_html/*.json ${USERNAME}@${HWSERVER}:${REPORTS_DIRECTORY}/seating/final_exam/
 
 local_pull:
@@ -51,6 +53,8 @@ local_pull:
 
 local_push:
 	rsync -azPq individual_summary_html/*.html ${REPORTS_DIRECTORY}/summary_html/
+#FIXME: this should be generalized
+#	rsync -azPq individual_summary_html/*.json ${REPORTS_DIRECTORY}/seating/test3/
 	rsync -azPq individual_summary_html/*.json ${REPORTS_DIRECTORY}/seating/final_exam/
 
 pull_test:
