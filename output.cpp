@@ -618,6 +618,7 @@ void start_table_output( bool /*for_instructor*/,
   int counter = 0;
   table.set(0,counter++,TableCell("ffffff","#"));
   table.set(0,counter++,TableCell("ffffff","SECTION"));
+  table.set(0,counter++,TableCell("ffffff","reg type"));
   if (DISPLAY_INSTRUCTOR_NOTES) {
     table.set(0,counter++,TableCell("ffffff","part."));
     table.set(0,counter++,TableCell("ffffff","under."));
@@ -751,9 +752,9 @@ void start_table_output( bool /*for_instructor*/,
       table.set(0,counter++,TableCell("ffffff","INCORRECT POLLS"));
 
       //Late days headers
-      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED LATE DAYS"));
-      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","USED LATE DAYS"));
-      student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","EXCUSED EXTENSIONS"));
+      //student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","ALLOWED LATE DAYS"));
+      //student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","USED LATE DAYS"));
+      //student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","EXCUSED EXTENSIONS"));
       student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
     }
   }
@@ -828,8 +829,13 @@ void start_table_output( bool /*for_instructor*/,
     
     std::string section_color = default_color;
     std::string section_label = "";
+    std::string status = "";
     if(!csv_mode) {
         colorit_section2(this_student->getSection(), section_color, section_label);
+        if (validSection(this_student->getSection())) {
+          status = this_student->getRegistrationStatus();
+          if (status == "withdrawn") section_color = default_color;
+        }
     }
     else{
         if (validSection(this_student->getSection())) {
@@ -839,8 +845,10 @@ void start_table_output( bool /*for_instructor*/,
             section_label = this_student->getSection() + " (" + section_label + ")";
         }
     }
+    if (status != "graded") section_color = default_color;
     assert (section_color.size()==6);
     table.set(myrow,counter++,TableCell(section_color,section_label));
+    table.set(myrow,counter++,TableCell(default_color,status));
 
     if (DISPLAY_INSTRUCTOR_NOTES) {
       float participation = this_student->getParticipation();
@@ -1158,23 +1166,23 @@ void start_table_output( bool /*for_instructor*/,
           table.set(myrow,counter++,TableCell(color,polls_correct,"",0,CELL_CONTENTS_VISIBLE,"right"));
           table.set(myrow,counter++,TableCell(color,polls_incorrect,"",0,CELL_CONTENTS_VISIBLE,"right"));
 
-          std::string color = coloritcolor(allowed,5,4,3,2,2);
-          table.set(myrow,counter++,TableCell(color,allowed,"",0,CELL_CONTENTS_VISIBLE,"right"));
-          int used = this_student->getUsedLateDays();
-          color = coloritcolor(allowed-used+2, 5+2, 3+2, 2+2, 1+2, 0+2);
-          table.set(myrow,counter++,TableCell(color,used,"",0,CELL_CONTENTS_VISIBLE,"right"));
-          int exceptions = this_student->getLateDayExceptions();
-          color = coloritcolor(exceptions,5,4,3,2,2);
-          table.set(myrow,counter++,TableCell(color,exceptions,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          //std::string color = coloritcolor(allowed,5,4,3,2,2);
+          //table.set(myrow,counter++,TableCell(color,allowed,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          //int used = this_student->getUsedLateDays();
+          //color = coloritcolor(allowed-used+2, 5+2, 3+2, 2+2, 1+2, 0+2);
+          //table.set(myrow,counter++,TableCell(color,used,"",0,CELL_CONTENTS_VISIBLE,"right"));
+          //int exceptions = this_student->getLateDayExceptions();
+          //color = coloritcolor(exceptions,5,4,3,2,2);
+          //table.set(myrow,counter++,TableCell(color,exceptions,"",0,CELL_CONTENTS_VISIBLE,"right"));
         } else {
           color="ffffff"; // default_color;
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
           table.set(myrow,counter++,TableCell(color,""));
-          table.set(myrow,counter++,TableCell(color,""));
-          table.set(myrow,counter++,TableCell(color,""));
-          table.set(myrow,counter++,TableCell(color,""));
+          //table.set(myrow,counter++,TableCell(color,""));
+          //table.set(myrow,counter++,TableCell(color,""));
+          //table.set(myrow,counter++,TableCell(color,""));
         }
         table.set(myrow,counter++,TableCell(grey_divider));
       }
