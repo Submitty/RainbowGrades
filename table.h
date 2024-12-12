@@ -23,10 +23,11 @@ public:
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="left" , int s=1, int r=0);
   TableCell(const std::string& c         , float              d   , int precision, const std::string& n="", int ldu=0,
             CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& a="right", int s=1, int r=0);
-  TableCell(float              d   ,const std::string& c         , int precision, const std::string& n="", int ldu=0,
-            CELL_CONTENTS_STATUS v=CELL_CONTENTS_VISIBLE, const std::string& e="", bool ai = false, const std::string& a="right",
-            int s=1, int r=0, const std::string& reason="",const std::string& gID="",const std::string& userName="",int daysExtended=0);
-  
+  TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
+              CELL_CONTENTS_STATUS v, const std::string& e, bool ai, const std::string& a, 
+              int s, int r, const std::string& reason, const std::string& gID, const std::string& userName, 
+              int daysExtended, float penalty_per_day, bool automatic_zero);
+
   std::string make_cell_string(bool csv_mode) const;
   std::string color;
   std::string data;
@@ -40,6 +41,12 @@ public:
   bool cancelled = false;
   bool version_conflict = false;
   bool bad_status = false;
+  bool hasRedOutline() const;
+  bool isAutomaticZero() const;
+  bool hasPenalty() const;
+  float getOriginalScore() const;
+  float getScore() const;
+  std::string getData() const;
   std::string hoverText = "";
   std::string align;
   enum CELL_CONTENTS_STATUS visible;
@@ -49,6 +56,12 @@ public:
   const std::string& getNote() const { return note; }
 private:
   std::string note;
+  bool red_outline;
+  bool automatic_zero;
+  bool penalty;
+  float original_score;
+  float score;
+  std::string data;
 };
 
 
