@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <ctime>
 #include <cmath>
+#include <cstdlib>
 
 #include "student.h"
 #include "grade.h"
@@ -139,6 +140,54 @@ int convertMajor(const std::string &major) {
 }
 
 // ==========================================================
+
+std::tuple<std::string, std::string, std::string> getCourseDetails() {
+  const char* reportsDir = std::getenv("REPORTS_DIRECTORY");
+  std::string path = std::string(reportsDir) + "/base_url.json";
+  std::ifstream i(path);
+
+  nlohmann::json j;
+  i >> j;
+  std::string baseUrl = j["base_url"].get<std::string>();
+  std::string term = j["term"].get<std::string>();
+  std::string course = j["course"].get<std::string>();
+
+  return {baseUrl, term, course};
+}
+
+std::string getGradeableType(const std::string &firstUserName, const std::string &gradeableID) {
+    const char* reportsDir = std::getenv("REPORTS_DIRECTORY");
+
+    std::string path = std::string(reportsDir) + "/../rainbow_grades/raw_data/all_grades/" + firstUserName + "_summary.json";
+    std::ifstream i(path);
+
+    nlohmann::json j;
+    i >> j;
+
+    std::string gradeableType = "";
+
+    for (auto it = j.begin(); it != j.end(); ++it) {
+      if (!it.value().is_array()) {
+        continue;
+      }
+
+      for (const auto& item : it.value()) {
+        if (item.contains("id") && item["id"].is_string() && 
+          item["id"].get<std::string>() == gradeableID) {
+          if (item.contains("gradeable_type") && item["gradeable_type"].is_string()) {
+            gradeableType = item["gradeable_type"].get<std::string>();
+            break;
+          }
+        }
+      }
+
+      if (!gradeableType.empty()) {
+        break;
+      }
+    }
+
+  return gradeableType;
+}
 
 class Color {
 public:
@@ -633,18 +682,43 @@ void start_table_output( bool /*for_instructor*/,
   // ----------------------------
   // DETAILS OF EACH GRADEABLE
   if (DISPLAY_GRADE_DETAILS) {
+    std::string firstUserName = "";
+    for(unsigned int stu = 0; stu < students.size(); stu++){
+      Student *this_student = students[stu];
+      if(this_student->getUserName() == "AVERAGE" || this_student->getUserName() == "STDDEV"){
+        continue;
+      }
+      else{
+        firstUserName = this_student->getUserName();
+        break;
+      }
+    }
     for (unsigned int i = 0; i < ALL_GRADEABLES.size(); i++) {
       GRADEABLE_ENUM g = ALL_GRADEABLES[i];
       for (int j = 0; j < GRADEABLES[g].getCount(); j++) {
         if (g != GRADEABLE_ENUM::NOTE) {
           student_data.push_back(counter);
         }
+        
         std::string gradeable_id = GRADEABLES[g].getID(j);
         std::string gradeable_name = "";
+        auto courseDetails = getCourseDetails();
+        std::string base_url = std::get<0>(courseDetails);
+        std::string semester = std::get<1>(courseDetails);
+        std::string course = std::get<2>(courseDetails);
+        std::string fullUrl = base_url + "courses/" + semester + "/" + course + "/gradeable/" + gradeable_id;
+
+        std::string gradeableType = getGradeableType(firstUserName, gradeable_id);
+
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
-          //gradeable_name = spacify(gradeable_name);
+          bool checkReleased = GRADEABLES[g].isReleased(gradeable_id);
+          if(checkReleased && gradeableType == "Electronic File"){
+            gradeable_name = gradeable_name + " <i class='fa-solid fa-arrow-up-right-from-square' style='color:blue;'></i>";
+            gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black; text-decoration:none;\" title=\"View Gradeable\">" + gradeable_name + "</a>";
+          }
         }
+
         if (gradeable_name == "")
           gradeable_name = "<em><font color=\"aaaaaa\">future "
             + tolower(gradeable_to_string(g)) + "</font></em>";
