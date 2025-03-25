@@ -103,8 +103,16 @@ public:
   const std::string& getCourseSectionId()           const { return course_section_id; }
   int getRotatingSection()   const { return rotating_section; }
   bool getAudit()            const { return audit; }
-  bool getWithdraw()         const { return withdraw; }
+  bool getWithdrawn()        const { return withdrawn; }
+  bool getGraded()           const { return graded; }
   bool getIndependentStudy() const { return independentstudy; }
+
+  std::string getRegistrationStatus() const {
+    if (audit) return "audit";
+    if (withdrawn) return "withdrawn";
+    if (graded) return "graded";
+    return "other";
+  }
 
   // grade data
   const ItemGrade& getGradeableItemGrade(GRADEABLE_ENUM g, int i) const;
@@ -175,7 +183,8 @@ public:
   void setCourseSectionId(const std::string &x) { course_section_id = x; }
   void setRotatingSection(int x) { rotating_section = x; }
   void setAudit() { audit = true; }
-  void setWithdraw() { withdraw = true; }
+  void setWithdrawn() { withdrawn = true; }
+  void setGraded() { graded = true; }
   void setIndependentStudy() { independentstudy = true; }
 
   // grade data
@@ -273,7 +282,8 @@ private:
   std::string course_section_id;
   int rotating_section;
   bool audit;
-  bool withdraw;
+  bool withdrawn;
+  bool graded;
   bool independentstudy;
 
   // grade data

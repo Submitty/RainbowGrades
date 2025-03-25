@@ -72,7 +72,6 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
   rotate = 0;
 }
 
-
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, 
                      int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName, int daysExtended) {
@@ -95,12 +94,6 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   academic_integrity = ai;
   event = e;
 
-  if (reason != "") {
-    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension due to "+reason+" on "+gID+"\" ";
-  } else {
-    hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension without specified reason on "+gID+"\" ";
-  }
-
 // Bool in order of priority - top to bottom
 // Don't think we need this logic, but leaving it as sort of assert
   if (event == "Overridden"){
@@ -109,6 +102,11 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   } else if (event == "Extension"){
     extension = true;
     inquiry = bad_status = override = version_conflict = cancelled = false;
+    if (reason != ""){
+      hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a " + std::to_string(daysExtended) + " day extension due to " + reason + " on " + gID + "\" ";
+    } else {
+      hoverText = "class=\"hoverable-cell\" data-hover-text=\""+userName+" received a "+std::to_string(daysExtended)+" day extension without specified reason on "+gID+"\" ";
+    }
   } else if (event == "Open"){
     inquiry = true;
     bad_status = override = extension = version_conflict = cancelled = false;
@@ -121,10 +119,10 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
   } else if (event == "Bad"){
     bad_status = true;
     override = inquiry = extension = version_conflict = cancelled = false;
+    hoverText = "class=\"hoverable-cell\" data-hover-text=\"" + userName + " received a bad status on " + gID + "\" ";
   } else {
    inquiry = bad_status = override = extension = version_conflict = cancelled = false;
   }
-    
 }
 
 
@@ -151,11 +149,10 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
 
-    if (c.extension){
-        ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
+    if (c.extension || c.bad_status) {
+        ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << "\" align=\"" << c.align << "\">";
     } else {
-        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << " \" align=\"" << c.align << "\">";
-
+        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << "\" align=\"" << c.align << "\">";
     }
 
   if (0) { //rotate == 90) {

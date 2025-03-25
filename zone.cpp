@@ -119,6 +119,8 @@ int CountLefties(std::vector<Student*> &students,const std::string& lefty_file, 
       s->setLefty();
       if (s->getExamRoom() != "") {
         //std::cout << "ALREADY ASSIGNED ROOM " << user << std::endl;
+      } else if (s->getRegistrationStatus() != "graded") {
+        // skipping
       } else if (s->overall() < GLOBAL_MIN_OVERALL_FOR_ZONE_ASSIGNMENT) {
         //std::cout << "NOT ASSIGNING LEFTY " << user << std::endl;
       } else {
@@ -388,6 +390,8 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
     if (s->getExamRoom() != "") {
       already_zoned++;
     } else if (!validSection(s->getSection())) {
+      not_reg++;
+    } else if (s->getRegistrationStatus() != "graded") {
       not_reg++;
     } else if (s->overall() < GLOBAL_MIN_OVERALL_FOR_ZONE_ASSIGNMENT) {
       low_overall_grade++;

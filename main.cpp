@@ -1045,14 +1045,14 @@ void processcustomizationfile(const std::string &now_string,
         s->setAudit();
         s->addNote("AUDIT");
     }
-  } else if (token == "withdraw") {
+  } else if (token == "withdrawn") {
     std::vector<nlohmann::json> withdraw_list = itr.value();
     for (std::size_t i = 0; i < withdraw_list.size(); i++) {
       std::string username = withdraw_list[i];
         Student *s = GetStudent(students,username);
         assert (s != NULL);
-        assert (s->getWithdraw() == false);
-        s->setWithdraw();
+        assert (s->getWithdrawn() == false);
+        s->setWithdrawn();
         s->addNote("LATE WITHDRAW");
     }
   } else if (token == "independentstudy") {
@@ -1245,7 +1245,14 @@ void load_student_grades(std::vector<Student*> &students) {
       }
       s->setRotatingSection(a);
     } else if (token == "registration_type") {
-      // Skip this token for now
+      std::string type = j[token];
+      if (type == "withdrawn") s->setWithdrawn();
+      else if (type == "audit") s->setAudit();
+      else if (type == "staff") { }
+      else {
+        assert (type == "graded");
+        s->setGraded();
+      }
     } else if (token == "default_allowed_late_days") {
                   int value = 0;
                   if (!j[token].is_null()) {
