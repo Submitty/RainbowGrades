@@ -1880,6 +1880,7 @@ int main(int argc, char* argv[]) {
 
     if (validSection(this_student->getSection())) {
       std::string student_grade = this_student->grade(false,sd);
+      std::cout << " student_grade " << student_grade << " " << this_student->getFirstName() << " " << grade_counts[Grade("W")] << std::endl;
       grade_counts[student_grade]++;
       grade_avg[student_grade]+=this_student->overall();
     } else {
