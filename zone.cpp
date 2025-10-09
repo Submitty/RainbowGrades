@@ -252,7 +252,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
           //std::cout << "LEFTY DESK " << zi.zone << " " << row << " " << seat << std::endl;
           lefty_desk_count++;
         }
-        //skip = true;
+        skip = true;
         //std::cout << "USE SEAT " << seat << std::endl;
         zi.add_seat(row,all_seats[i]);
       }

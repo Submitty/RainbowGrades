@@ -47,8 +47,16 @@ public:
   int rotate;
   friend std::ostream& operator<<(std::ostream &ostr, const TableCell &c);
   const std::string& getNote() const { return note; }
+  bool ShowNoteToStudent() const { return show_note_to_student; }
+  bool ShowNoteToInstructor() const { return show_note_to_instructor; }
+  void SetNoteVisibility(bool s, bool i) {
+    show_note_to_student = s;
+    show_note_to_instructor = i;
+  }
 private:
   std::string note;
+  bool show_note_to_student;
+  bool show_note_to_instructor;
 };
 
 

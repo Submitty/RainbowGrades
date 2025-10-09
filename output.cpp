@@ -1055,7 +1055,10 @@ void start_table_output( bool /*for_instructor*/,
           int daysExtended = this_student->getGradeableItemGrade(g,j).getLateDayExceptions();
           assert (color.size()==6);
           std::string a = "right";
-          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName,daysExtended));
+          TableCell my_cell(grade,color,1,details,late_days_used,visible,event,
+                            Academic_integrity,a,1,0,reason,gID,userName,daysExtended);
+          my_cell.SetNoteVisibility(GRADEABLES[g].ShowNoteToStudent(gID),GRADEABLES[g].ShowNoteToInstructor(gID));
+          table.set(myrow,counter++,my_cell);
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
