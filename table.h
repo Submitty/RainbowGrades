@@ -49,10 +49,13 @@ public:
   const std::string& getNote() const { return note; }
   bool ShowNoteToStudent() const { return show_note_to_student; }
   bool ShowNoteToInstructor() const { return show_note_to_instructor; }
+  TableCell& MakeSticky() { sticky = true; return *this; }
   void SetNoteVisibility(bool s, bool i) {
     show_note_to_student = s;
     show_note_to_instructor = i;
   }
+  bool sticky = false;
+  int col_num;
 private:
   std::string note;
   bool show_note_to_student;
@@ -70,6 +73,8 @@ public:
   }
 
   void set(int r, int c, TableCell cell) {
+    cell.col_num = c;
+
     while(r >= numRows()) {
       cells.push_back(std::vector<TableCell>(numCols()));
     }
@@ -86,6 +91,7 @@ public:
               std::vector<int> which_data,
               bool csv_mode=false,
               bool transpose=false,
+              bool sticky_cells=false,
               bool show_details=false,
               std::string last_update="") const;
   

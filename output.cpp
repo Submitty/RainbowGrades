@@ -568,6 +568,13 @@ void start_table_output( bool /*for_instructor*/,
   // =====================================================================================================
   // DEFINE HEADER ROW
   int counter = 0;
+  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME").MakeSticky());
+  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID").MakeSticky());
+  int last_name_counter=counter;
+  table.set(0,counter++,TableCell("ffffff","FAMILY").MakeSticky());
+  student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","GIVEN").MakeSticky());
+  student_data.push_back(last_name_counter);
+  student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider).MakeSticky());
   table.set(0,counter++,TableCell("ffffff","#"));
   table.set(0,counter++,TableCell("ffffff","SECTION"));
   table.set(0,counter++,TableCell("ffffff","reg type"));
@@ -576,16 +583,10 @@ void start_table_output( bool /*for_instructor*/,
     table.set(0,counter++,TableCell("ffffff","under."));
     table.set(0,counter++,TableCell("ffffff","notes"));
   }
-  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME"));
-  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID"));
   if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
     table.set(0,counter++,TableCell("ffffff","FAMILY (LEGAL)"));
     table.set(0,counter++,TableCell("ffffff","GIVEN (LEGAL)"));
   }
-  int last_name_counter=counter;
-  table.set(0,counter++,TableCell("ffffff","FAMILY"));
-  student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","GIVEN"));
-  student_data.push_back(last_name_counter);
   student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
 
   if (DISPLAY_EXAM_SEATING) {
@@ -719,9 +720,16 @@ void start_table_output( bool /*for_instructor*/,
     Student *this_student = students[stu];
     
     std::string default_color="ffffff";
-
     myrow++;
     counter = 0;
+
+    assert (default_color.size()==6);
+    table.set(myrow,counter++,TableCell(default_color,this_student->getUserName()).MakeSticky());
+    table.set(myrow,counter++,TableCell(default_color,this_student->getNumericID()).MakeSticky());
+    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredLastName()).MakeSticky());
+    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredFirstName()).MakeSticky());
+    table.set(myrow,counter++,TableCell(grey_divider).MakeSticky());
+
     if (this_student->getLastName() == "") {
       if (this_student == sp) {
         default_color= coloritcolor(5,5,4,3,2,1);
@@ -851,15 +859,10 @@ void start_table_output( bool /*for_instructor*/,
     }
 
     //counter+=3;
-    assert (default_color.size()==6);
-    table.set(myrow,counter++,TableCell(default_color,this_student->getUserName()));
-    table.set(myrow,counter++,TableCell(default_color,this_student->getNumericID()));
     if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
       table.set(myrow,counter++,TableCell(default_color,this_student->getLastName()));
       table.set(myrow,counter++,TableCell(default_color,this_student->getFirstName()));
     }
-    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredLastName()));
-    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredFirstName()));
     table.set(myrow,counter++,TableCell(grey_divider));
 
 
@@ -1134,7 +1137,7 @@ void start_table_output( bool /*for_instructor*/,
       std::ofstream ostr_html(OUTPUT_FILE);
 
       GLOBAL_instructor_output = true;
-      table.output(ostr_html, all_students, instructor_data, csv_mode);
+      table.output(ostr_html, all_students, instructor_data, csv_mode, false, true);
 
       end_table(ostr_html, true, NULL);
       ostr_html.close();
@@ -1180,7 +1183,7 @@ void start_table_output( bool /*for_instructor*/,
     }
     GLOBAL_instructor_output = false;
 
-    table.output(ostr3, select_students,student_data, false,true,true,last_update);
+    table.output(ostr3, select_students,student_data, false,true,false,true,last_update);
 
     end_table(ostr3,false,s);
   }
