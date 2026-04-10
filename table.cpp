@@ -162,11 +162,23 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
 
-    if (c.sticky) {
-      if (c.data == "") {
-        stick = "class=\"sticky-col-boundry\" ";
+    if (c.sticky_row) {
+      if (c.sticky_col) {
+        if (c.data == "") {
+          stick = "class=\"sticky-corner sticky-col-boundry sticky-row\" ";
+        } else {
+          stick = "class=\"sticky-corner sticky-col sticky-row\" ";
+        }
       } else {
-        stick = "class=\"sticky-col\" ";
+        stick = "class=\"sticky-row\"";
+      }
+    } else {
+      if (c.sticky_col) {
+        if (c.data == "") {
+          stick = "class=\"sticky-col-boundry\" ";
+        } else {
+          stick = "class=\"sticky-col\" ";
+        }
       }
     }
 
@@ -336,6 +348,18 @@ void Table::output(std::ostream& ostr,
         ostr << ".sticky-col-boundry {";
         ostr << "    border-left: 2px solid #aaa;";
         ostr << "    border-right: 2px solid #aaa;";
+        ostr << "}";
+        ostr << ".sticky-row {";
+        ostr << "    position: sticky;";
+        ostr << "    z-index: 2;";
+        ostr << "    top: 0;";
+        ostr << "    border-top: 2px solid #aaa;";
+        ostr << "    border-bottom: 2px solid #aaa;";
+        ostr << "    border-left: 1px solid #aaa;";
+        ostr << "    border-right: 1px solid #aaa;";
+        ostr << "}";
+        ostr << ".sticky-corner {";
+        ostr << "    z-index: 3;";
         ostr << "}";
       }
       ostr << "</style>";
