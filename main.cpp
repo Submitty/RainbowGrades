@@ -651,6 +651,14 @@ void preprocesscustomizationfile(const std::string &now_string,
       float maximum = grade_id.value("max",0.0);
       GRADEABLES[g].setMaximum(token_key,maximum);
 
+      std::string show_notes = grade_id.value("show_notes", "never");
+      if (show_notes == "never") GRADEABLES[g].SetNoteVisibility(token_key,false,false);
+      else if (show_notes == "instructor_only") GRADEABLES[g].SetNoteVisibility(token_key,false,true);
+      else if (show_notes == "student_only") GRADEABLES[g].SetNoteVisibility(token_key,true,false);
+      else if (show_notes == "student_and_instructor" ||
+               show_notes == "instructor_and_student") GRADEABLES[g].SetNoteVisibility(token_key,true,true);
+      else { std::cerr << "ERROR! unknown show_notes value " << show_notes << std::endl; exit(1); }
+
       if (grade_id.find("scale_max") != grade_id.end()) {
         float scale_maximum = grade_id.value("scale_max",0.0);
         assert (scale_maximum > 0);
@@ -1113,10 +1121,8 @@ void processcustomizationfile(const std::string &now_string,
       std::string bonus = itr2.key();
       BONUS_WHICH_LECTURE = std::stoi(bonus);
       BONUS_FILE = j[token][bonus].get<std::string>();
-        std::cout << "BONUS LATE DAYS" << std::endl;
-      
       if (BONUS_FILE != "") {
-          load_bonus_late_day(students,BONUS_WHICH_LECTURE,BONUS_FILE);
+        load_bonus_late_day(students,BONUS_WHICH_LECTURE,BONUS_FILE);
       }
     }
   } else {
@@ -1701,10 +1707,9 @@ void load_bonus_late_day(std::vector<Student*> &students,
   while (istr >> username) {
     Student *s = GetStudent(students,username);
     if (s == NULL) {
-      //std::cerr << "ERROR!  bad username " << username << " cannot give bonus late day " << std::endl;
-      //exit(1);
+      std::cerr << "ERROR!  bad username " << username << " cannot give bonus late day " << std::endl;
+      exit(1);
     } else {
-      //std::cout << "BONUS DAY FOR USER " << username << std::endl;
       s->add_bonus_late_day(which_lecture);
       //std::cout << "add bonus late day for " << username << std::endl;
     }

@@ -67,7 +67,8 @@ const std::string GradeColor(const std::string &grade) {
   else if (grade == "C-") return HEX(255)+HEX(200)+HEX(200); 
   else if (grade == "D+") return HEX(255)+HEX(100)+HEX(100); 
   else if (grade == "D" ) return HEX(255)+HEX(  0)+HEX(  0); 
-  else if (grade == "F" ) return HEX(200)+HEX(  0)+HEX(  0); 
+  else if (grade == "F" ) return HEX(200)+HEX(  0)+HEX(  0);
+  else if (grade == "W" ) return HEX(255)+HEX(255)+HEX(255); 
   else return "ffffff";
 }
 
@@ -1128,7 +1129,10 @@ void start_table_output( bool /*for_instructor*/,
           int daysExtended = this_student->getGradeableItemGrade(g,j).getLateDayExceptions();
           assert (color.size()==6);
           std::string a = "right";
-          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName,daysExtended));
+          TableCell my_cell(grade,color,1,details,late_days_used,visible,event,
+                            Academic_integrity,a,1,0,reason,gID,userName,daysExtended);
+          my_cell.SetNoteVisibility(GRADEABLES[g].ShowNoteToStudent(gID),GRADEABLES[g].ShowNoteToInstructor(gID));
+          table.set(myrow,counter++,my_cell);
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
@@ -1397,8 +1401,9 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   int total_D = grade_counts[Grade("D+")] + grade_counts[Grade("D")];
   int total_passed = total_A + total_B + total_C + total_D;
   int total_F = grade_counts[Grade("F")];
+  int total_W = grade_counts[Grade("W")];
   int total_blank = grade_counts[Grade("")];
-  assert (total_blank == 0);
+  //assert (total_blank == 0);
   int total = total_passed + total_F + auditors + total_blank + dropped;
 
   ostr << "<p>\n";
@@ -1415,6 +1420,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   ostr << "<td align=center bgcolor="<<GradeColor("D+")<<" width=40>D+</td><td align=center bgcolor="<<GradeColor("D")<<" width=40>D</td>\n";
   if (for_instructor) {
     ostr << "<td align=center bgcolor="<<GradeColor("F")<<"width=40>F</td>\n";
+    ostr << "<td align=center bgcolor="<<GradeColor("W")<<"width=40>W</td>\n";
     //    ostr << "<td align=center width=40>dropped</td>\n";
     ostr << "<td align=center width=40>audit</td>\n";
     ostr << "<td align=center align=center width=40>took final</td>\n";
@@ -1433,6 +1439,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   
   if (for_instructor) {
     ostr << "<td align=center width=40>"<<grade_counts[Grade("F")]<<"</td>\n";
+    ostr << "<td align=center width=40>"<<grade_counts[Grade("W")]<<"</td>\n";
     //ostr << "<td align=center width=40>" << grade_counts[Grade("")]<<"</td>\n";
     ostr << "<td align=center width=40>"<<auditors<<"</td>\n";
     ostr << "<td align=center width=40>"<<took_final<<"</td>\n";

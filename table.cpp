@@ -28,10 +28,13 @@ std::string CSVSanitizeString(const std::string& s){
 
 TableCell::TableCell(const std::string& c, const std::string& d, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
+
   assert (c.size() == 6);
   color=c; 
   data=d; 
-  note=n; 
+  note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -41,10 +44,13 @@ TableCell::TableCell(const std::string& c, const std::string& d, const std::stri
 
 TableCell::TableCell(const std::string& c, int d, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
+
   assert (c.size() == 6);
   color=c; 
   data=std::to_string(d); 
-  note=n; 
+  note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -54,6 +60,7 @@ TableCell::TableCell(const std::string& c, int d, const std::string& n, int ldu,
 
 TableCell::TableCell(const std::string& c, float d, int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/) {
+
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c; 
@@ -65,6 +72,8 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
     data = "";
   }
   note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -75,6 +84,7 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, 
                      int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName, int daysExtended) {
+
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -86,6 +96,8 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
     data = "";
   }
   note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -176,17 +188,17 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
       if (c.late_days_used > 3) { ostr << " (" << std::to_string(c.late_days_used) << "*)"; }
       else { ostr << " " << std::string(c.late_days_used,'*'); }
     }
-      
+
+
+
+    bool showNote = c.ShowNoteToStudent();
+    if (!global_details) {
+      showNote = c.ShowNoteToInstructor();
+    }
     
     if (mynote.length() > 0 &&
         mynote != " " &&
-        (global_details 
-         /*
-        || 
-        c.visible==CELL_CONTENTS_HIDDEN
-         */
-         )
-        ) {
+        showNote) {
       ostr << "<br><em>" << mynote << "</em>";
     }
   }
