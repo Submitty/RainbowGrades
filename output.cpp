@@ -569,12 +569,12 @@ void start_table_output( bool /*for_instructor*/,
   // DEFINE HEADER ROW
   int counter = 0;
   student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME").MakeSticky());
-  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID").MakeSticky());
   int last_name_counter=counter;
   table.set(0,counter++,TableCell("ffffff","FAMILY").MakeSticky());
   student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","GIVEN").MakeSticky());
   student_data.push_back(last_name_counter);
   student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider).MakeSticky());
+  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID"));
   table.set(0,counter++,TableCell("ffffff","#"));
   table.set(0,counter++,TableCell("ffffff","SECTION"));
   table.set(0,counter++,TableCell("ffffff","reg type"));
@@ -725,11 +725,11 @@ void start_table_output( bool /*for_instructor*/,
 
     assert (default_color.size()==6);
     table.set(myrow,counter++,TableCell(default_color,this_student->getUserName()).MakeSticky());
-    table.set(myrow,counter++,TableCell(default_color,this_student->getNumericID()).MakeSticky());
     table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredLastName()).MakeSticky());
     table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredFirstName()).MakeSticky());
     table.set(myrow,counter++,TableCell(grey_divider).MakeSticky());
 
+    table.set(myrow,counter++,TableCell(default_color,this_student->getNumericID()));
     if (this_student->getLastName() == "") {
       if (this_student == sp) {
         default_color= coloritcolor(5,5,4,3,2,1);
