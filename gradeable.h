@@ -202,6 +202,13 @@ public:
     clamps[id] = clamp;
   }
 
+  bool ShowNoteToStudent(const std::string &id) const { return (show_note_to_student.find(id))->second; }
+  bool ShowNoteToInstructor(const std::string &id) const { return (show_note_to_instructor.find(id))->second; }
+  void SetNoteVisibility(const std::string &id, bool s, bool i) {
+    show_note_to_student[id] = s;
+    show_note_to_instructor[id] = i;
+  }
+
   void setResubmissionValues(const std::string &id,
                              const std::string &original_id, const std::string &resubmit_id,
                              const std::string &title,
@@ -233,6 +240,8 @@ private:
   std::map<std::string,std::string> original_ids;
   std::map<std::string,std::string> resubmit_ids;
   std::map<std::string,float> autograde_replacement_percentages;
+  std::map<std::string,bool> show_note_to_student;
+  std::map<std::string,bool> show_note_to_instructor;
 };
 
 // ===============================================================================

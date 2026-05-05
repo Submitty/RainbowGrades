@@ -66,7 +66,8 @@ const std::string GradeColor(const std::string &grade) {
   else if (grade == "C-") return HEX(255)+HEX(200)+HEX(200); 
   else if (grade == "D+") return HEX(255)+HEX(100)+HEX(100); 
   else if (grade == "D" ) return HEX(255)+HEX(  0)+HEX(  0); 
-  else if (grade == "F" ) return HEX(200)+HEX(  0)+HEX(  0); 
+  else if (grade == "F" ) return HEX(200)+HEX(  0)+HEX(  0);
+  else if (grade == "W" ) return HEX(255)+HEX(255)+HEX(255); 
   else return "ffffff";
 }
 
@@ -577,6 +578,13 @@ void start_table_output( bool /*for_instructor*/,
   // =====================================================================================================
   // DEFINE HEADER ROW
   int counter = 0;
+  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME").MakeSticky());
+  int last_name_counter=counter;
+  table.set(0,counter++,TableCell("ffffff","FAMILY").MakeSticky());
+  student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","GIVEN").MakeSticky());
+  student_data.push_back(last_name_counter);
+  student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider).MakeSticky());
+  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID"));
   table.set(0,counter++,TableCell("ffffff","#"));
   table.set(0,counter++,TableCell("ffffff","SECTION"));
   table.set(0,counter++,TableCell("ffffff","reg type"));
@@ -585,16 +593,10 @@ void start_table_output( bool /*for_instructor*/,
     table.set(0,counter++,TableCell("ffffff","under."));
     table.set(0,counter++,TableCell("ffffff","notes"));
   }
-  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","USERNAME"));
-  student_data.push_back(counter); table.set(0,counter++,TableCell("ffffff","NUMERIC ID"));
   if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
     table.set(0,counter++,TableCell("ffffff","FAMILY (LEGAL)"));
     table.set(0,counter++,TableCell("ffffff","GIVEN (LEGAL)"));
   }
-  int last_name_counter=counter;
-  table.set(0,counter++,TableCell("ffffff","FAMILY"));
-  student_data.push_back(counter);  table.set(0,counter++,TableCell("ffffff","GIVEN"));
-  student_data.push_back(last_name_counter);
   student_data.push_back(counter);  table.set(0,counter++,TableCell(grey_divider));
 
   if (DISPLAY_EXAM_SEATING) {
@@ -732,9 +734,16 @@ void start_table_output( bool /*for_instructor*/,
     Student *this_student = students[stu];
     
     std::string default_color="ffffff";
-
     myrow++;
     counter = 0;
+
+    assert (default_color.size()==6);
+    table.set(myrow,counter++,TableCell(default_color,this_student->getUserName()).MakeSticky());
+    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredLastName()).MakeSticky());
+    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredFirstName()).MakeSticky());
+    table.set(myrow,counter++,TableCell(grey_divider).MakeSticky());
+
+    table.set(myrow,counter++,TableCell(default_color,this_student->getNumericID()));
     if (this_student->getLastName() == "") {
       if (this_student == sp) {
         default_color= coloritcolor(5,5,4,3,2,1);
@@ -864,15 +873,10 @@ void start_table_output( bool /*for_instructor*/,
     }
 
     //counter+=3;
-    assert (default_color.size()==6);
-    table.set(myrow,counter++,TableCell(default_color,this_student->getUserName()));
-    table.set(myrow,counter++,TableCell(default_color,this_student->getNumericID()));
     if (DISPLAY_INSTRUCTOR_NOTES || DISPLAY_FINAL_GRADE) {
       table.set(myrow,counter++,TableCell(default_color,this_student->getLastName()));
       table.set(myrow,counter++,TableCell(default_color,this_student->getFirstName()));
     }
-    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredLastName()));
-    table.set(myrow,counter++,TableCell(default_color,this_student->getPreferredFirstName()));
     table.set(myrow,counter++,TableCell(grey_divider));
 
 
@@ -1068,7 +1072,10 @@ void start_table_output( bool /*for_instructor*/,
           int daysExtended = this_student->getGradeableItemGrade(g,j).getLateDayExceptions();
           assert (color.size()==6);
           std::string a = "right";
-          table.set(myrow,counter++,TableCell(grade,color,1,details,late_days_used,visible,event,Academic_integrity,a,1,0,reason,gID,userName,daysExtended));
+          TableCell my_cell(grade,color,1,details,late_days_used,visible,event,
+                            Academic_integrity,a,1,0,reason,gID,userName,daysExtended);
+          my_cell.SetNoteVisibility(GRADEABLES[g].ShowNoteToStudent(gID),GRADEABLES[g].ShowNoteToInstructor(gID));
+          table.set(myrow,counter++,my_cell);
         }
         table.set(myrow,counter++,TableCell(grey_divider));
 
@@ -1144,7 +1151,7 @@ void start_table_output( bool /*for_instructor*/,
       std::ofstream ostr_html(OUTPUT_FILE);
 
       GLOBAL_instructor_output = true;
-      table.output(ostr_html, all_students, instructor_data, csv_mode);
+      table.output(ostr_html, all_students, instructor_data, csv_mode, false, true);
 
       end_table(ostr_html, true, NULL);
       ostr_html.close();
@@ -1190,7 +1197,7 @@ void start_table_output( bool /*for_instructor*/,
     }
     GLOBAL_instructor_output = false;
 
-    table.output(ostr3, select_students,student_data, false,true,true,last_update);
+    table.output(ostr3, select_students,student_data, false,true,false,true,last_update);
 
     end_table(ostr3,false,s);
   }
@@ -1337,8 +1344,9 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   int total_D = grade_counts[Grade("D+")] + grade_counts[Grade("D")];
   int total_passed = total_A + total_B + total_C + total_D;
   int total_F = grade_counts[Grade("F")];
+  int total_W = grade_counts[Grade("W")];
   int total_blank = grade_counts[Grade("")];
-  assert (total_blank == 0);
+  //assert (total_blank == 0);
   int total = total_passed + total_F + auditors + total_blank + dropped;
 
   ostr << "<p>\n";
@@ -1355,6 +1363,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   ostr << "<td align=center bgcolor="<<GradeColor("D+")<<" width=40>D+</td><td align=center bgcolor="<<GradeColor("D")<<" width=40>D</td>\n";
   if (for_instructor) {
     ostr << "<td align=center bgcolor="<<GradeColor("F")<<"width=40>F</td>\n";
+    ostr << "<td align=center bgcolor="<<GradeColor("W")<<"width=40>W</td>\n";
     //    ostr << "<td align=center width=40>dropped</td>\n";
     ostr << "<td align=center width=40>audit</td>\n";
     ostr << "<td align=center align=center width=40>took final</td>\n";
@@ -1373,6 +1382,7 @@ void end_table(std::ofstream &ostr,  bool for_instructor, Student *s) {
   
   if (for_instructor) {
     ostr << "<td align=center width=40>"<<grade_counts[Grade("F")]<<"</td>\n";
+    ostr << "<td align=center width=40>"<<grade_counts[Grade("W")]<<"</td>\n";
     //ostr << "<td align=center width=40>" << grade_counts[Grade("")]<<"</td>\n";
     ostr << "<td align=center width=40>"<<auditors<<"</td>\n";
     ostr << "<td align=center width=40>"<<took_final<<"</td>\n";
