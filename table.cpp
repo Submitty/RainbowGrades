@@ -28,10 +28,13 @@ std::string CSVSanitizeString(const std::string& s){
 
 TableCell::TableCell(const std::string& c, const std::string& d, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
+
   assert (c.size() == 6);
   color=c; 
   data=d; 
-  note=n; 
+  note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -41,10 +44,13 @@ TableCell::TableCell(const std::string& c, const std::string& d, const std::stri
 
 TableCell::TableCell(const std::string& c, int d, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
+
   assert (c.size() == 6);
   color=c; 
   data=std::to_string(d); 
-  note=n; 
+  note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -54,6 +60,7 @@ TableCell::TableCell(const std::string& c, int d, const std::string& n, int ldu,
 
 TableCell::TableCell(const std::string& c, float d, int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v, const std::string& a, int s, int /*r*/) {
+
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c; 
@@ -65,6 +72,8 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
     data = "";
   }
   note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -75,6 +84,7 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
                      CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, 
                      int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName, int daysExtended) {
+
   assert (c.size() == 6);
   assert (precision >= 0);
   color=c;
@@ -86,6 +96,8 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
     data = "";
   }
   note=n;
+  show_note_to_student = false;
+  show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
@@ -132,6 +144,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     
     std::string outline = "";
     std::string mark = "";
+    std::string stick = "";
     if (c.academic_integrity){
         outline = "outline:4px solid #0a0a0a; outline-offset: -4px;";
         mark = "@";
@@ -149,10 +162,32 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
         outline = "outline:4px solid #fc0303; outline-offset: -4px;";
     }
 
-    if (c.extension || c.bad_status) {
-        ostr << "<td " << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << "\" align=\"" << c.align << "\">";
+    if (c.sticky_row) {
+      if (c.sticky_col) {
+        if (c.data == "") {
+          stick = "class=\"sticky-corner sticky-col-boundry sticky-row\" ";
+        } else {
+          stick = "class=\"sticky-corner sticky-col sticky-row\" ";
+        }
+      } else {
+        stick = "class=\"sticky-row\"";
+      }
     } else {
-        ostr << "<td style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << "\" align=\"" << c.align << "\">";
+      if (c.sticky_col) {
+        if (c.data == "") {
+          stick = "class=\"sticky-col-boundry\" ";
+        } else {
+          stick = "class=\"sticky-col\" ";
+        }
+      }
+    }
+
+    
+
+    if (c.extension || c.bad_status) {
+        ostr << "<td " << stick << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << "--col-num: " << c.col_num << ";\" align=\"" << c.align << "\">";
+    } else {
+        ostr << "<td " << stick << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << "--col-num: " << c.col_num << ";\" align=\"" << c.align << "\">";
     }
 
   if (0) { //rotate == 90) {
@@ -176,17 +211,17 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
       if (c.late_days_used > 3) { ostr << " (" << std::to_string(c.late_days_used) << "*)"; }
       else { ostr << " " << std::string(c.late_days_used,'*'); }
     }
-      
+
+
+
+    bool showNote = c.ShowNoteToStudent();
+    if (!global_details) {
+      showNote = c.ShowNoteToInstructor();
+    }
     
     if (mynote.length() > 0 &&
         mynote != " " &&
-        (global_details 
-         /*
-        || 
-        c.visible==CELL_CONTENTS_HIDDEN
-         */
-         )
-        ) {
+        showNote) {
       ostr << "<br><em>" << mynote << "</em>";
     }
   }
@@ -229,6 +264,7 @@ void Table::output(std::ostream& ostr,
                    std::vector<int> which_data,
                    bool csv_mode,
                    bool transpose,
+                   bool sticky_cells,
                    bool show_details,
                    std::string last_update) const {
 
@@ -267,6 +303,9 @@ void Table::output(std::ostream& ostr,
       ostr << ".hoverable-cell {";
       ostr << "    position: relative;";
       ostr << "}";
+      ostr << "table {";
+      ostr << "    border-collapse: separate;";
+      ostr << "}";
       ostr << ".hoverable-cell:hover::before {";
       ostr << "    content: attr(data-hover-text);";
       ostr << "    position: absolute;";
@@ -284,6 +323,45 @@ void Table::output(std::ostream& ostr,
       ostr << "    justify-content: left;";
       ostr << "    box-sizing: border-box;";
       ostr << "}";
+      ostr << ":root {";
+      ostr << "    --sticky-col-width: 65px;";
+      ostr << "}";
+      if (sticky_cells) {
+        ostr << ".sticky-col, ";
+        ostr << ".sticky-col-boundry {";
+        ostr << "    position: sticky;";
+        ostr << "    z-index: 2;";
+        ostr << "    border-top: 1px solid #aaa;";
+        ostr << "    border-bottom: 1px solid #aaa;";
+        ostr << "    overflow: hidden;";
+        ostr << "    white-space: nowrap;";
+        ostr << "    text-overflow: ellipsis;";
+        ostr << "    left: calc(var(--col-num) * var(--sticky-col-width));";
+        ostr << "}";
+        ostr << ".sticky-col {";
+        ostr << "    width: var(--sticky-col-width);";
+        ostr << "    min-width: var(--sticky-col-width);";
+        ostr << "    max-width: var(--sticky-col-width);";
+        ostr << "    border-left: 1px solid #aaa;";
+        ostr << "    border-right: 1px solid #aaa;";
+        ostr << "}";
+        ostr << ".sticky-col-boundry {";
+        ostr << "    border-left: 2px solid #aaa;";
+        ostr << "    border-right: 2px solid #aaa;";
+        ostr << "}";
+        ostr << ".sticky-row {";
+        ostr << "    position: sticky;";
+        ostr << "    z-index: 2;";
+        ostr << "    top: 0;";
+        ostr << "    border-top: 2px solid #aaa;";
+        ostr << "    border-bottom: 2px solid #aaa;";
+        ostr << "    border-left: 1px solid #aaa;";
+        ostr << "    border-right: 1px solid #aaa;";
+        ostr << "}";
+        ostr << ".sticky-corner {";
+        ostr << "    z-index: 3;";
+        ostr << "}";
+      }
       ostr << "</style>";
 
 
