@@ -139,7 +139,7 @@ int convertMajor(const std::string &major) {
 }
 
 std::tuple<std::string, std::string, std::string> getCourseDetails() {
-    std::ifstream i("/var/local/submitty/courses/f24/sample/reports/base_url.json");
+    std::ifstream i("./raw_data/base_url.json");
     nlohmann::json j;
     i >> j;
     std::string baseUrl = j["base_url"].get<std::string>();
