@@ -143,16 +143,17 @@ std::tuple<std::string, std::string, std::string> getCourseDetails() {
     std::ifstream i("./raw_data/base_url.json");
     nlohmann::json j;
     i >> j;
+    assert (j.find("base_url") != j.end());
     std::string baseUrl = j["base_url"].get<std::string>();
+    assert (j.find("term") != j.end());
     std::string term = j["term"].get<std::string>();
+    assert (j.find("course") != j.end());
     std::string course = j["course"].get<std::string>();
     return {baseUrl, term, course};
 }
 
 std::string getGradeableType(const std::string &firstUserName, const std::string &gradeableID) {
-    // std::string path = "./raw_data/all_grades/" + firstUserName + "_summary.json";
     std::ifstream i( ("./raw_data/all_grades/" + firstUserName + "_summary.json") );
-
     nlohmann::json j;
     i >> j;
 
@@ -162,7 +163,6 @@ std::string getGradeableType(const std::string &firstUserName, const std::string
       if (!it.value().is_array()) {
         continue;
       }
-
       for (const auto& item : it.value()) {
         if (item.contains("id") && item["id"].is_string() && 
           item["id"].get<std::string>() == gradeableID) {
@@ -680,10 +680,8 @@ void start_table_output( bool /*for_instructor*/,
     std::string firstUserName = "";
     for(unsigned int stu = 0; stu < students.size(); stu++){
       Student *this_student = students[stu];
-      if(this_student->getUserName() == "AVERAGE" || this_student->getUserName() == "STDDEV"){
-        continue;
-      }
-      else{
+      if (!validSection(this_student->getSection())) continue;
+      else {
         firstUserName = this_student->getUserName();
         break;
       }
