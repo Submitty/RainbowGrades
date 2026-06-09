@@ -333,9 +333,8 @@ void Table::output(std::ostream& ostr,
         ostr << "    z-index: 2;";
         ostr << "    border-top: 1px solid #aaa;";
         ostr << "    border-bottom: 1px solid #aaa;";
-        ostr << "    overflow: hidden;";
-        ostr << "    white-space: nowrap;";
-        ostr << "    text-overflow: ellipsis;";
+        ostr << "    overflow-wrap: break-word;";
+        ostr << "    white-space: normal;";
         ostr << "    left: calc(var(--col-num) * var(--sticky-col-width));";
         ostr << "}";
         ostr << ".sticky-col {";
