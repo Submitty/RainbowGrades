@@ -27,34 +27,34 @@ std::string CSVSanitizeString(const std::string& s){
 }
 
 TableCell::TableCell(const std::string& c, const std::string& d, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
+                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) {
 
   assert (c.size() == 6);
-  color=c; 
-  data=d; 
+  color=c;
+  data=d;
   note=n;
   show_note_to_student = false;
   show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
-  span=s; 
+  span=s;
   rotate=r;
 }
 
 TableCell::TableCell(const std::string& c, int d, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) { 
+                     CELL_CONTENTS_STATUS v, const std::string& a, int s, int r) {
 
   assert (c.size() == 6);
-  color=c; 
-  data=std::to_string(d); 
+  color=c;
+  data=std::to_string(d);
   note=n;
   show_note_to_student = false;
   show_note_to_instructor = false;
   late_days_used=ldu,
   visible=v;
   align=a;
-  span=s; 
+  span=s;
   rotate=r;
 }
 
@@ -63,11 +63,11 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
 
   assert (c.size() == 6);
   assert (precision >= 0);
-  color=c; 
+  color=c;
   if (fabs(d) > 0.0001) {
     std::stringstream ss;
     ss << std::setprecision(precision) << std::fixed << d;
-    data=ss.str(); span=s; 
+    data=ss.str(); span=s;
   } else {
     data = "";
   }
@@ -77,12 +77,12 @@ TableCell::TableCell(const std::string& c, float d, int precision, const std::st
   late_days_used=ldu,
   visible=v;
   align=a;
-  span=s; 
+  span=s;
   rotate = 0;
 }
 
 TableCell::TableCell(float d, const std::string& c, int precision, const std::string& n, int ldu,
-                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a, 
+                     CELL_CONTENTS_STATUS v,const std::string& e,bool ai, const std::string& a,
                      int s, int /*r*/,const std::string& reason,const std::string& gID,const std::string& userName, int daysExtended) {
 
   assert (c.size() == 6);
@@ -141,7 +141,7 @@ TableCell::TableCell(float d, const std::string& c, int precision, const std::st
 
 std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   assert (c.color.size() == 6);
-    
+
     std::string outline = "";
     std::string mark = "";
     std::string stick = "";
@@ -182,7 +182,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
       }
     }
 
-    
+
 
     if (c.extension || c.bad_status) {
         ostr << "<td " << stick << c.hoverText << "style=\"border:1px solid #aaaaaa; background-color:#" << c.color << "; " << outline << "--col-num: " << c.col_num << ";\" align=\"" << c.align << "\">";
@@ -202,11 +202,11 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
   }
   else if ((c.data == "" && mynote=="")
       || c.visible==CELL_CONTENTS_HIDDEN
-      || (c.visible==CELL_CONTENTS_VISIBLE_INSTRUCTOR && GLOBAL_instructor_output == false) 
+      || (c.visible==CELL_CONTENTS_VISIBLE_INSTRUCTOR && GLOBAL_instructor_output == false)
       || (c.visible==CELL_CONTENTS_VISIBLE_STUDENT    && GLOBAL_instructor_output == true)) {
     ostr << "<div></div>";
   } else {
-    ostr << c.data; 
+    ostr << c.data;
     if (c.late_days_used > 0) {
       if (c.late_days_used > 3) { ostr << " (" << std::to_string(c.late_days_used) << "*)"; }
       else { ostr << " " << std::string(c.late_days_used,'*'); }
@@ -218,7 +218,7 @@ std::ostream& operator<<(std::ostream &ostr, const TableCell &c) {
     if (!global_details) {
       showNote = c.ShowNoteToInstructor();
     }
-    
+
     if (mynote.length() > 0 &&
         mynote != " " &&
         showNote) {
@@ -335,13 +335,11 @@ void Table::output(std::ostream& ostr,
         ostr << "    border-bottom: 1px solid #aaa;";
         ostr << "    overflow: hidden;";
         ostr << "    white-space: nowrap;";
-        ostr << "    text-overflow: ellipsis;";
-        ostr << "    left: calc(var(--col-num) * var(--sticky-col-width));";
+        ostr << "    left: var(--this-col-left, 0px);";
         ostr << "}";
         ostr << ".sticky-col {";
-        ostr << "    width: var(--sticky-col-width);";
-        ostr << "    min-width: var(--sticky-col-width);";
-        ostr << "    max-width: var(--sticky-col-width);";
+        ostr << "    width: max-content;";
+        ostr << "    min-width: var(--this-col-width, 65px);";
         ostr << "    border-left: 1px solid #aaa;";
         ostr << "    border-right: 1px solid #aaa;";
         ostr << "}";
@@ -361,6 +359,34 @@ void Table::output(std::ostream& ostr,
         ostr << ".sticky-corner {";
         ostr << "    z-index: 3;";
         ostr << "}";
+
+        // Calculate Dynamic Width for Sticky Columns
+        if (!which_students.empty() && !which_data.empty()) {
+            int current_left_px = 0;
+            int col_idx = 1;
+
+            for (int c : which_data) {
+                int max_len = 0;
+                bool is_sticky = false;
+                for (int r : which_students) {
+                    int len = cells[r][c].make_cell_string(false).length();
+                    if (len > max_len) max_len = len;
+                    if (cells[r][c].sticky_col) is_sticky = true;
+                }
+                // Approx 8px per char. Minimum 65px.
+                int col_width = std::max(65, (max_len * 8));
+
+                ostr << "table tr td:nth-child(" << col_idx << ") {";
+                ostr << " --this-col-left: " << current_left_px << "px;";
+                ostr << " --this-col-width: " << col_width << "px;";
+                ostr << "}";
+
+                if (is_sticky) {
+                    current_left_px += col_width;
+                }
+                col_idx++;
+            }
+        }
       }
       ostr << "</style>";
 
@@ -405,7 +431,7 @@ void Table::output(std::ostream& ostr,
               ostr << "\n";
           }
       }
-  } 
+  }
 
   if(!csv_mode) {
       ostr << "</table>" << std::endl;
