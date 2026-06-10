@@ -361,54 +361,30 @@ void Table::output(std::ostream& ostr,
         ostr << "}";
 
         // Calculate Dynamic Width for Sticky Columns
-        if (!which_students.empty() && !which_data.empty()){
+        if (!which_students.empty() && !which_data.empty()) {
             int current_left_px = 0;
             int col_idx = 1;
-            if (!transpose) {
-                for (int c : which_data) {
-                    int max_len = 0;
-                    bool is_sticky = false;
-                    for (int r : which_students) {
-                        int len = cells[r][c].make_cell_string(false).length();
-                        if (len > max_len) max_len = len;
-                        if (cells[r][c].sticky_col) is_sticky = true;
-                    }
-                    // Approx 8px per char. Minimum 65px.
-                    int col_width = std::max(65, (max_len * 8));
 
-                    ostr << "table tr td:nth-child(" << col_idx << ") {";
-                    ostr << " --this-col-left: " << current_left_px << "px;";
-                    ostr << " --this-col-width: " << col_width << "px;";
-                    ostr << "}";
-
-                    if (is_sticky) {
-                        current_left_px += col_width;
-                    }
-                    col_idx++;
-                }
-            }
-            else {
+            for (int c : which_data) {
+                int max_len = 0;
+                bool is_sticky = false;
                 for (int r : which_students) {
-                    int max_len = 0;
-                    bool is_sticky = false;
-                    for (int c : which_data) {
-                        int len = cells[r][c].make_cell_string(false).length();
-                        if (len > max_len) max_len = len;
-                        if (cells[r][c].sticky_col) is_sticky = true;
-                    }
-                    // Approx 8px per char. Minimum 65px.
-                    int col_width = std::max(65, (max_len * 8));
-
-                    ostr << "table tr td:nth-child(" << col_idx << ") {";
-                    ostr << " --this-col-left: " << current_left_px << "px;";
-                    ostr << " --this-col-width: " << col_width << "px;";
-                    ostr << "}";
-
-                    if (is_sticky) {
-                        current_left_px += col_width;
-                    }
-                    col_idx++;
+                    int len = cells[r][c].make_cell_string(false).length();
+                    if (len > max_len) max_len = len;
+                    if (cells[r][c].sticky_col) is_sticky = true;
                 }
+                // Approx 8px per char. Minimum 65px.
+                int col_width = std::max(65, (max_len * 8));
+
+                ostr << "table tr td:nth-child(" << col_idx << ") {";
+                ostr << " --this-col-left: " << current_left_px << "px;";
+                ostr << " --this-col-width: " << col_width << "px;";
+                ostr << "}";
+
+                if (is_sticky) {
+                    current_left_px += col_width;
+                }
+                col_idx++;
             }
         }
       }
