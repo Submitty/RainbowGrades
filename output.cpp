@@ -1223,14 +1223,14 @@ void start_table_output( bool /*for_instructor*/,
   std::stringstream ss;
 
   if(!csv_mode) {
-      ss << ALL_STUDENTS_OUTPUT_DIRECTORY << "output_" << month << "_" << day << "_" << year << ".html";
-      std::string command = "cp -f output.html " + ss.str();
+      ss << ALL_STUDENTS_OUTPUT_DIRECTORY << "output_" << GLOBAL_sort_order << "_" << month << "_" << day << "_" << year << ".html";
+      std::string command = "cp -f " + OUTPUT_FILE + " " + ss.str();
       std::cout << "RUN COMMAND " << command << std::endl;
       system(command.c_str());
   }
-  else{
-      ss << ALL_STUDENTS_OUTPUT_DIRECTORY_CSV << "output_" << month << "_" << day << "_" << year << ".csv";
-      std::string command = "cp -f output.csv " + ss.str();
+  else {
+      ss << ALL_STUDENTS_OUTPUT_DIRECTORY_CSV << "output_" << GLOBAL_sort_order << "_" << month << "_" << day << "_" << year << ".csv";
+      std::string command = "cp -f " + OUTPUT_CSV_FILE + " " + ss.str();
       std::cout << "RUN COMMAND " << command << std::endl;
       system(command.c_str());
   }

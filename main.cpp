@@ -1822,6 +1822,8 @@ int main(int argc, char* argv[]) {
   if (GLOBAL_sort_order.empty()) {
     GLOBAL_sort_order = "by_overall";
   }
+  OUTPUT_FILE     = output_filename_for(GLOBAL_sort_order, "html");
+  OUTPUT_CSV_FILE = output_filename_for(GLOBAL_sort_order, "csv");
 
   std::vector<Student*> students;  
   processcustomizationfile(now_string,students);
