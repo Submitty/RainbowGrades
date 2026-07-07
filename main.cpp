@@ -1793,6 +1793,19 @@ void SaveExtensionReports(const std::vector<Student*> &students) {
   }
 }
 
+// Map a sort order to a distinct filename
+std::string output_filename_for(const std::string& sort_order,
+                                const std::string& extension) {
+  if (sort_order.empty() || sort_order == "by_overall") {
+    return "./output." + extension;
+  }
+  std::string suffix = sort_order;
+  if (suffix.substr(0, 3) == "by_") {
+    suffix = suffix.substr(3);
+  }
+  return "./output-by-" + suffix + "." + extension;
+}
+
 int main(int argc, char* argv[]) {
 
   //std::string sort_order = "by_overall";
@@ -1805,6 +1818,9 @@ int main(int argc, char* argv[]) {
   if (argc > 1) {
     assert (argc == 2);
     GLOBAL_sort_order = argv[1];
+  }
+  if (GLOBAL_sort_order.empty()) {
+    GLOBAL_sort_order = "by_overall";
   }
 
   std::vector<Student*> students;  
