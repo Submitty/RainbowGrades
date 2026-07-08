@@ -90,6 +90,7 @@ remove_json_comments: customization.json
 	python3 -m json.tool customization_no_comments.json > /dev/null
 
 process_grades.out: \
+	${nlohmann_json_dir} \
 	${RAINBOW_GRADES_DIRECTORY}/main.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/output.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/table.cpp \
