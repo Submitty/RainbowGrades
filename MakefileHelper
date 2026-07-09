@@ -90,14 +90,14 @@ remove_json_comments: customization.json
 	python3 -m json.tool customization_no_comments.json > /dev/null
 
 process_grades.out: \
-	${nlohmann_json_dir} \
 	${RAINBOW_GRADES_DIRECTORY}/main.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/output.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/table.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/student.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/zone.cpp \
 	${RAINBOW_GRADES_DIRECTORY}/benchmark.cpp \
-	${RAINBOW_GRADES_DIRECTORY}/submini_polls.cpp
+	${RAINBOW_GRADES_DIRECTORY}/submini_polls.cpp \
+	| ${nlohmann_json_dir}
 	clang++ -Wall -Wextra ${flags} ${memory_flags} ${json_include} $^ -g -o $@
 
 individual_summary_html all_students_summary_csv all_students_summary_html:
