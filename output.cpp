@@ -427,7 +427,9 @@ void PrintExamRoomAndZoneTable(const std::string &g_id, nlohmann::json &mj, Stud
 
   // ==============================================================
 
-  if ( DISPLAY_EXAM_SEATING == false) return;
+  if (DISPLAY_EXAM_SEATING == false) return;
+
+  if (GRADEABLES[GRADEABLE_ENUM::TEST].getCount() == 0) return;
 
   std::string room = GLOBAL_EXAM_DEFAULT_ROOM;
   std::string building = GLOBAL_EXAM_DEFAULT_BUILDING;
