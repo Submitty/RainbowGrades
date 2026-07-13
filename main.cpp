@@ -1864,9 +1864,8 @@ int main(int argc, char* argv[]) {
   std::sort(students.begin(),students.end(),by_overall);
   assign_ranks(students);
   
+  // If there are no gradeables referenced by the sort order, skip this gradeable
   if (!sort_order_is_applicable(GLOBAL_sort_order)) {
-    std::cout << "Skipping " << GLOBAL_sort_order
-              << ": this course has no gradeables of that type." << std::endl;
     return 0;
   }
 
