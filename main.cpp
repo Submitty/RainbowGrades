@@ -1806,6 +1806,26 @@ std::string output_filename_for(const std::string& sort_order,
   return "./output-by-" + suffix + "." + extension;
 }
 
+bool sort_order_is_applicable(const std::string& sort_order) {
+  if (sort_order == "by_overall" || sort_order == "by_name" || sort_order == "by_section") {
+    return true;
+  }
+  if (sort_order == "by_zone") {
+    return GRADEABLES[GRADEABLE_ENUM::TEST].getCount() > 0;
+  }
+  if (sort_order == "by_test_and_exam") {
+    return GRADEABLES[GRADEABLE_ENUM::TEST].getCount() > 0
+        || GRADEABLES[GRADEABLE_ENUM::EXAM].getCount() > 0;
+  }
+  if (sort_order.size() > 3 && sort_order.substr(0, 3) == "by_") {
+    GRADEABLE_ENUM g;
+    if (string_to_gradeable_enum(sort_order.substr(3), g)) {
+      return GRADEABLES[g].getCount() > 0;
+    }
+  }
+  return true;
+}
+
 int main(int argc, char* argv[]) {
 
   //std::string sort_order = "by_overall";
@@ -1843,7 +1863,12 @@ int main(int argc, char* argv[]) {
   // SORT
   std::sort(students.begin(),students.end(),by_overall);
   assign_ranks(students);
-
+  
+  if (!sort_order_is_applicable(GLOBAL_sort_order)) {
+    std::cout << "Skipping " << GLOBAL_sort_order
+              << ": this course has no gradeables of that type." << std::endl;
+    return 0;
+  }
 
   if (GLOBAL_sort_order == std::string("by_overall")) {
     std::sort(students.begin(),students.end(),by_overall);
