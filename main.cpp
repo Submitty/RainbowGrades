@@ -1260,7 +1260,7 @@ void load_student_grades(std::vector<Student*> &students) {
         s->setGraded();
       }
     } else if (token == "date_registered") {
-    // parsed by Submitty's grade summaries; not currently used by rainbow grades
+    // gets parsed, not currently used by rainbow grades
     } else if (token == "default_allowed_late_days") {
                   int value = 0;
                   if (!j[token].is_null()) {
