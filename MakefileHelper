@@ -1,4 +1,4 @@
-.PHONY: default pull push all compile overall section lab hw test quiz final zone clean src_clean remove_json_comments version tables clean_tables
+.PHONY: default pull push all compile overall section lab hw test quiz final zone clean src_clean remove_json_comments version
 
 default: overall
 
@@ -164,16 +164,5 @@ test_exam: compile
 
 zone: compile
 	./process_grades.out by_zone
-
-SORT_ORDERS ?= by_overall by_section by_hw by_lab by_test by_exam
-
-clean_tables:
-	rm -f output.html output.csv output-by-*.html output-by-*.csv
-
-tables: compile clean_tables
-	@for order in $(SORT_ORDERS); do \
-		echo "=== building table: $$order ==="; \
-		./process_grades.out $$order || exit 1; \
-	done
 
 # =============================================================================
