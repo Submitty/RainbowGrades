@@ -10,6 +10,7 @@
 #include <ctime>
 #include <cmath>
 #include "benchmark.h"
+#include "constants_and_globals.h"
 #include "submini_polls.h"
 
 std::string GLOBAL_sort_order;
@@ -131,7 +132,7 @@ bool DISPLAY_GRADE_SUMMARY = false;
 bool DISPLAY_GRADE_DETAILS = false;
 bool DISPLAY_LATE_DAYS = false;
 bool DISPLAY_RANK_TO_INDIVIDUAL = false;
-
+bool DISPLAY_DATE_REGISTERED = false;
 
 std::vector<std::string> MESSAGES;
 
@@ -382,6 +383,7 @@ void preprocesscustomizationfile(const std::string &now_string,
         DISPLAY_GRADE_SUMMARY = true;
       } else if (token == "grade_details") {
         DISPLAY_GRADE_DETAILS = true;
+
 
       } else {
         std::cout << "OOPS " << token << std::endl;
@@ -784,6 +786,8 @@ void preprocesscustomizationfile(const std::string &now_string,
       DISPLAY_GRADE_DETAILS = true;
     } else if (token == "display_rank_to_individual"){
       DISPLAY_RANK_TO_INDIVIDUAL = true;
+    } else if (token == "date_registered") {
+      DISPLAY_DATE_REGISTERED = true;
     } else if (token == "display_benchmark") {
       continue;
     } else if (token == "section") {
@@ -1260,7 +1264,9 @@ void load_student_grades(std::vector<Student*> &students) {
         s->setGraded();
       }
     } else if (token == "date_registered") {
-    // gets parsed, not currently used by rainbow grades
+      if (!j[token].is_null()) {
+        s->setDateRegistered(j[token].get<std::string>());
+      }
     } else if (token == "default_allowed_late_days") {
                   int value = 0;
                   if (!j[token].is_null()) {

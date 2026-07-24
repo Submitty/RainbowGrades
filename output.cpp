@@ -622,6 +622,9 @@ void start_table_output( bool /*for_instructor*/,
   table.set(0,counter++,TableCell("ffffff","#"));
   table.set(0,counter++,TableCell("ffffff","SECTION"));
   table.set(0,counter++,TableCell("ffffff","reg type"));
+  if (DISPLAY_DATE_REGISTERED) {
+    table.set(0,counter++,TableCell("ffffff","reg date"));
+  }
   if (DISPLAY_INSTRUCTOR_NOTES) {
     table.set(0,counter++,TableCell("ffffff","part."));
     table.set(0,counter++,TableCell("ffffff","under."));
@@ -854,6 +857,10 @@ void start_table_output( bool /*for_instructor*/,
     assert (section_color.size()==6);
     table.set(myrow,counter++,TableCell(section_color,section_label));
     table.set(myrow,counter++,TableCell(default_color,status));
+
+    if (DISPLAY_DATE_REGISTERED) {
+      table.set(myrow,counter++,TableCell(default_color,this_student->getDateRegisteredShort()));
+    }
 
     if (DISPLAY_INSTRUCTOR_NOTES) {
       float participation = this_student->getParticipation();

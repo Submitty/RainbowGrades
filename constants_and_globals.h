@@ -17,6 +17,7 @@ extern bool DISPLAY_GRADE_SUMMARY;
 extern bool DISPLAY_GRADE_DETAILS;
 extern bool DISPLAY_LATE_DAYS;
 extern bool DISPLAY_RANK_TO_INDIVIDUAL;
+extern bool DISPLAY_DATE_REGISTERED;
 
 // ==========================================================
 // messages for zone assignment
