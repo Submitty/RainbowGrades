@@ -24,15 +24,23 @@ ifndef REPORTS_DIRECTORY
 $(error Variable REPORTS_DIRECTORY not set)
 endif
 
-nlohmann_json_dir=${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann/json
+include ${RAINBOW_GRADES_DIRECTORY}/versions.mk
+nlohmann_json_dir = ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann/json
 
 export RAINBOW_GRADES_DIRECTORY
 export REPORTS_DIRECTORY
 
-${nlohmann_json_dir}:
-	mkdir -p ${nlohmann_json_dir}
-	wget https://github.com/nlohmann/json/releases/download/v3.1.2/include.zip -O ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip
-	unzip -o ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip -d ${nlohmann_json_dir}
+.PHONY: nlohmann_json
+nlohmann_json:
+	@if [ ! -f ${nlohmann_json_dir}/VERSION ] || [ "$$(cat ${nlohmann_json_dir}/VERSION)" != "${nlohmann_json_Version}" ]; then \
+		echo "Fetching nlohmann/json ${nlohmann_json_Version}..."; \
+		mkdir -p ${nlohmann_json_dir}; \
+		rm -rf ${nlohmann_json_dir}/include ${nlohmann_json_dir}/single_include; \
+		wget -nv https://github.com/nlohmann/json/releases/download/${nlohmann_json_Version}/include.zip -O ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip; \
+		unzip -o -q ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip "include/*" -d ${nlohmann_json_dir}; \
+		rm -f ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip; \
+		echo "${nlohmann_json_Version}" > ${nlohmann_json_dir}/VERSION; \
+	fi
 
 
 # =============================================================================
@@ -118,7 +126,7 @@ all: pull overall push
 # =============================================================================
 # the different sorting orders & details of tables
 
-overall: ${nlohmann_json_dir} ${json_syntax_checker.py} compile
+overall: nlohmann_json ${json_syntax_checker.py} compile
 	./process_grades.out by_overall
 
 memory_debug: compile
