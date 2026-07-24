@@ -32,13 +32,17 @@ export REPORTS_DIRECTORY
 
 .PHONY: nlohmann_json
 nlohmann_json:
+	@if [ -z "${nlohmann_json_Version}" ]; then \
+		echo "ERROR: nlohmann_json_Version is empty — is versions.mk included and the name spelled exactly?"; \
+		exit 1; \
+	fi
 	@if [ ! -f ${nlohmann_json_dir}/VERSION ] || [ "$$(cat ${nlohmann_json_dir}/VERSION)" != "${nlohmann_json_Version}" ]; then \
-		echo "Fetching nlohmann/json ${nlohmann_json_Version}..."; \
-		mkdir -p ${nlohmann_json_dir}; \
-		rm -rf ${nlohmann_json_dir}/include ${nlohmann_json_dir}/single_include; \
-		wget -nv https://github.com/nlohmann/json/releases/download/${nlohmann_json_Version}/include.zip -O ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip; \
-		unzip -o -q ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip "include/*" -d ${nlohmann_json_dir}; \
-		rm -f ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip; \
+		echo "Fetching nlohmann/json ${nlohmann_json_Version}..." && \
+		mkdir -p ${nlohmann_json_dir} && \
+		rm -rf ${nlohmann_json_dir}/include ${nlohmann_json_dir}/single_include && \
+		curl -fsSL https://github.com/nlohmann/json/releases/download/${nlohmann_json_Version}/include.zip -o ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip && \
+		unzip -o -q ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip "include/*" -d ${nlohmann_json_dir} && \
+		rm -f ${RAINBOW_GRADES_DIRECTORY}/../vendor/nlohmann_json.zip && \
 		echo "${nlohmann_json_Version}" > ${nlohmann_json_dir}/VERSION; \
 	fi
 
