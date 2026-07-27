@@ -115,7 +115,6 @@ public:
   }
 
   const std::string& getDateRegistered() const { return date_registered; }
-  // ISO-8601 from Submitty; the date half is what's worth showing
   std::string getDateRegisteredShort() const {
     return date_registered.substr(0, date_registered.find('T'));
   }
