@@ -10,7 +10,6 @@
 #include <ctime>
 #include <cmath>
 #include "benchmark.h"
-#include "constants_and_globals.h"
 #include "submini_polls.h"
 
 std::string GLOBAL_sort_order;
