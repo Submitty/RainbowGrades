@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <ctime>
 #include <cmath>
+#include <cctype>
 #include "benchmark.h"
 #include "submini_polls.h"
 
@@ -116,9 +117,6 @@ std::string GLOBAL_EXAM_SEATING_COUNT = "";
 std::string GLOBAL_LEFT_RIGHT_HANDEDNESS = "";
 
 float GLOBAL_MIN_OVERALL_FOR_ZONE_ASSIGNMENT = 0.1;
-
-int BONUS_WHICH_LECTURE = -1;
-std::string BONUS_FILE;
 
 //====================================================================
 // INFO ABOUT OUTPUT FORMATTING
@@ -865,6 +863,23 @@ bool OmitSectionFromStats(const std::string &section) {
   return false;
 }
 
+bool is_iso_date(const std::string &section) {
+  if (s.size() != 10) {
+    return false;
+  }
+  if (s[4] != '-' || s[7] != '-') {
+    return false;
+  }
+  for (int i = 0; i < 10; i++) {
+    if (i == 4 || i == 7) {
+      continue;
+    }
+    if (!std::isdigit(static_cast<unsigned char>(s[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
 
 // defined in zone.cpp
 void LoadExamSeatingFile(const std::string &zone_counts_filename,
@@ -875,7 +890,7 @@ void LoadExamSeatingFile(const std::string &zone_counts_filename,
 
 void load_student_grades(std::vector<Student*> &students);
 
-void load_bonus_late_day(std::vector<Student*> &students, int which_lecture, std::string bonus_late_day_file);
+void load_bonus_late_day(std::vector<Student*> &students, const std::string &date, const std::string &bonus_late_day_file);
 
 void processcustomizationfile(const std::string &now_string,
                               std::vector<Student*> &students) {
@@ -1118,11 +1133,15 @@ void processcustomizationfile(const std::string &now_string,
   } else if (token == "bonus_latedays") {
     nlohmann::json bonusJson = j[token];
     for (nlohmann::json::iterator itr2 = bonusJson.begin(); itr2 != bonusJson.end(); itr2++) {
-      std::string bonus = itr2.key();
-      BONUS_WHICH_LECTURE = std::stoi(bonus);
-      BONUS_FILE = j[token][bonus].get<std::string>();
-      if (BONUS_FILE != "") {
-        load_bonus_late_day(students,BONUS_WHICH_LECTURE,BONUS_FILE);
+      std::string date = itr2.key();
+      if (!is_iso_date(date)) {
+        std::cerr << "ERROR: bonus_latedays keys must be dates in YYYY-MM-DD format.  "
+                  << "Lecture numbers are no longer supported.  Got: '" << date << "'" << std::endl;
+        exit(1);
+      }
+      std::string bonus_file = itr2.value().get<std::string>();
+      if (bonus_file != "") {
+        load_bonus_late_day(students, date, bonus_file);
       }
     }
   } else {
