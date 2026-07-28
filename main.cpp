@@ -863,7 +863,7 @@ bool OmitSectionFromStats(const std::string &section) {
   return false;
 }
 
-bool is_iso_date(const std::string &section) {
+bool is_iso_date(const std::string &s) {
   if (s.size() != 10) {
     return false;
   }
@@ -1731,7 +1731,7 @@ void load_bonus_late_day(std::vector<Student*> &students,
       std::cerr << "ERROR!  bad username " << username << " cannot give bonus late day " << std::endl;
       exit(1);
     } else {
-      s->add_bonus_late_day(which_lecture);
+      s->add_bonus_late_day(date);
       //std::cout << "add bonus late day for " << username << std::endl;
     }
   } 

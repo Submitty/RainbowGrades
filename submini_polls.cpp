@@ -338,7 +338,7 @@ void SavePollReports(const std::vector<Student*> &students) {
       }
       assert (student_obj != NULL);
       
-      if (student_obj->get_bonus_late_day(which_lecture)) {
+      if (student_obj->get_bonus_late_day(lect)) {
         late_days++;
         late_days_ostr << username << "," << foo << "," << late_days << "\r" << std::endl;
         THING += " BONUS LATE DAY #" + std::to_string(late_days) + " on " + foo;

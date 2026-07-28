@@ -1156,7 +1156,7 @@ void start_table_output( bool /*for_instructor*/,
       if (DISPLAY_LATE_DAYS) {
         // LATE DAYS
         if (this_student->getLastName() != "") {
-          int allowed = this_student->getAllowedLateDays(100);
+          int allowed = this_student->getAllowedLateDays("9999-12-31");
           int polls_correct = this_student->getPollsCorrect();
           int polls_incorrect = this_student->getPollsIncorrect();
           int total_polls = polls_correct + polls_incorrect;
