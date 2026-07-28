@@ -36,6 +36,8 @@ extern std::string GLOBAL_sort_order;
 
 extern int GLOBAL_ACTIVE_TEST_ZONE;
 
+std::string getToday();
+
 // ==========================================================
 
 std::string HEX(int h) {
@@ -1156,7 +1158,7 @@ void start_table_output( bool /*for_instructor*/,
       if (DISPLAY_LATE_DAYS) {
         // LATE DAYS
         if (this_student->getLastName() != "") {
-          int allowed = this_student->getAllowedLateDays("9999-12-31");
+          int allowed = this_student->getAllowedLateDays(getToday());
           int polls_correct = this_student->getPollsCorrect();
           int polls_incorrect = this_student->getPollsIncorrect();
           int total_polls = polls_correct + polls_incorrect;

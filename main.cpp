@@ -1135,7 +1135,7 @@ void processcustomizationfile(const std::string &now_string,
     for (nlohmann::json::iterator itr2 = bonusJson.begin(); itr2 != bonusJson.end(); itr2++) {
       std::string date = itr2.key();
       if (!is_iso_date(date)) {
-        std::cerr << "ERROR: bonus_latedays keys must be dates in YYYY-MM-DD format.  "
+        std::cerr << "ERROR: bonus_latedays keys must be dates in YYYY-MM-DD format. "
                   << "Lecture numbers are no longer supported.  Got: '" << date << "'" << std::endl;
         exit(1);
       }
@@ -1713,8 +1713,8 @@ void output_helper(std::vector<Student*> &students,  std::string &GLOBAL_sort_or
 // =============================================================================================
 
 void load_bonus_late_day(std::vector<Student*> &students, 
-                         int which_lecture,
-                         std::string bonus_late_day_file) {
+                         const std::string &date,
+                         const std::string &bonus_late_day_file) {
 
   std::cout << "LOAD BONUS LATE" << std::endl;
 
@@ -1726,9 +1726,10 @@ void load_bonus_late_day(std::vector<Student*> &students,
 
   std::string username;
   while (istr >> username) {
-    Student *s = GetStudent(students,username);
+    Student *s = GetStudent(students, username);
     if (s == NULL) {
-      std::cerr << "ERROR!  bad username " << username << " cannot give bonus late day " << std::endl;
+      std::cerr << "Error: bad username " << username << " in " << bonus_late_day_file
+                << " cannot give bonus late day" << std::endl;
       exit(1);
     } else {
       s->add_bonus_late_day(date);
