@@ -117,7 +117,8 @@ public:
   // grade data
   const ItemGrade& getGradeableItemGrade(GRADEABLE_ENUM g, int i) const;
   std::string getZone(int i) const;
-  int getAllowedLateDays(int which_lecture) const;
+
+  int getAllowedLateDays(const std::string &as_of_date) const;
   int getPollsCorrect() const;
   int getPollsIncorrect() const;
   float getPollPoints() const;
@@ -131,14 +132,13 @@ public:
 
   int getDefaultAllowedLateDays() const { return default_allowed_late_days; }
 
-  void add_bonus_late_day(int which_lecture) {
-    //std::cout << "ADD BONUS " << which_lecture << " " << username << std::endl;
-    bonus_late_days_which_lecture.push_back(which_lecture);
+  void add_bonus_late_day(const std::string &date) {
+    bonus_late_days_dates.push_back(date);
   }
-  bool get_bonus_late_day(int which_lecture) const {
-    for (unsigned int i = 0; i < bonus_late_days_which_lecture.size(); i++) {
-      if (bonus_late_days_which_lecture[i] == which_lecture) {
-        //std::cout << "YES BONUS " << which_lecture << " " << username << std::endl;
+
+  bool get_bonus_late_day(const std::string &date) const {
+    for (unsigned int i = 0; i < bonus_late_days_dates.size(); i++) {
+      if (bonus_late_days_dates[i] == date) {
         return true;
       }
     }
@@ -300,7 +300,7 @@ private:
   float participation;
   float understanding;
 
-  std::vector<int> bonus_late_days_which_lecture;
+  std::vector<std::string> bonus_late_days_which_lecture;
 
   // info about exam assignments
   std::string exam_zone;

@@ -387,7 +387,7 @@ float Student::lowest_test_counts_half_pct() const {
 // =============================================================================================
 // =============================================================================================
 
-int Student::getAllowedLateDays(int which_lecture) const {
+int Student::getAllowedLateDays(const std::string &as_of_date) const {
   if (getSection() == "null") return 0;
 
   //int answer = 2;
@@ -412,7 +412,7 @@ int Student::getAllowedLateDays(int which_lecture) const {
   }
 
   for (unsigned int i = 0; i < bonus_late_days_which_lecture.size(); i++) {
-    if (bonus_late_days_which_lecture[i] <= which_lecture) {
+    if (bonus_late_days_which_lecture[i] <= as_of_date) {
       answer++;
     }
   }
