@@ -300,7 +300,7 @@ private:
   float participation;
   float understanding;
 
-  std::vector<std::string> bonus_late_days_which_lecture;
+  std::vector<std::string> bonus_late_days_dates;
 
   // info about exam assignments
   std::string exam_zone;

@@ -411,8 +411,8 @@ int Student::getAllowedLateDays(const std::string &as_of_date) const {
     }
   }
 
-  for (unsigned int i = 0; i < bonus_late_days_which_lecture.size(); i++) {
-    if (bonus_late_days_which_lecture[i] <= as_of_date) {
+  for (unsigned int i = 0; i < bonus_late_days_dates.size(); i++) {
+    if (bonus_late_days_dates[i] <= as_of_date) {
       answer++;
     }
   }
