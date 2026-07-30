@@ -114,6 +114,11 @@ public:
     return "other";
   }
 
+  const std::string& getDateRegistered() const { return date_registered; }
+  std::string getDateRegisteredShort() const {
+    return date_registered.substr(0, date_registered.find('T'));
+  }
+
   // grade data
   const ItemGrade& getGradeableItemGrade(GRADEABLE_ENUM g, int i) const;
   std::string getZone(int i) const;
@@ -186,6 +191,7 @@ public:
   void setWithdrawn() { withdrawn = true; }
   void setGraded() { graded = true; }
   void setIndependentStudy() { independentstudy = true; }
+  void setDateRegistered(const std::string &x) { date_registered = x; }
 
   // grade data
   void setTestZone(int which_test, const std::string &zone)  { zones[which_test] = zone; }
@@ -280,6 +286,7 @@ private:
     // registration status
   std::string section;
   std::string course_section_id;
+  std::string date_registered;
   int rotating_section;
   bool audit;
   bool withdrawn;
