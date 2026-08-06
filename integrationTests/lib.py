@@ -357,4 +357,89 @@ def __run_single_test_module(name, case):
     print()
     return module_success
 
-def
+def __compile_test_module(case):
+    try:
+        print("Starting compilation...")
+        case.prebuild()
+        case.wrapper.build()
+        print("Finished comilation...")
+        return True
+    except Exception as e:
+        print(f"Build failed with exception: {e}")
+        return False
+
+
+def __collect_test_cases(case, name):
+    if len(name) > 1:
+        return [
+            case.testcases[i]
+            for i in range(len(case.testcases))
+            if str(case.testcase_names[i]).lower() == name[1].lower():
+        ]
+    return case.testcases
+
+
+def __execute_test_case(index, test_case):
+    try:
+        test_case()
+        return True
+    except Exception as e:
+        with bold + red:
+            lineno = None
+            tb = traceback.extract_tb(sys.exec_info()[2])
+            for i in range(len(tb) - 1, -1, -1):
+                if os.path.basename(tb[i][0]) == "__init__.py":
+                    lineno = tb[i][1]
+            print(f"Testcase {index} failed on line {lineno} with exception: {e}")
+        return False
+
+
+###################################################################################
+# Decorators
+###################################################################################
+
+def prebuild(func)
+    """Register a function that stages inputs before the module is compiled"""
+    mod = inspect.getmodule(inspect.stack()[1][0])
+    path = os.path.dirname(mod.__file__)
+    modname = mod.__name__
+    tw = TestcaseWrapper(path)
+
+    @wraps(func) # Allows pickling for this lambda
+    def wrapper():
+        print(f"Starting prebuild for {modname}...", end="")
+        func(tw)
+        print("Done")
+
+    global to_run
+    to_run[modname].wrapper = tw
+    to_run[modname].prebuild = wrapper
+    return wrapper
+
+
+def testcase(func):
+    """Register a single check within a test module"""
+    mod = inspect.getmodule(inspect.stack()[1][0])
+    path = os.path.dirname(mod.__file__)
+    modname = mod.__name__
+    tw = TestcaseWrapper(path)
+
+    @wraps(func) # allows pickling for this lambda
+    def wrapper():
+        print(f"Starting testcase {modname}.{func.__name__}...", end="")
+        try:
+            func(tw)
+            with bold + green:
+                print("PASSED")
+        except Exception:
+            with bold + red:
+                print("FAILED")
+            # blank raise will raise the last exception as is
+            raise
+
+    global to_run
+    to_run[modname].wrapper = tw
+    to_run[modname].testcases.append(wrapper)
+    to_run[modname].testcases_names.append(func.__name__)
+    return wrapper
+
