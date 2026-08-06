@@ -294,7 +294,7 @@ def run_tests(names):
         if name[0] not in to_run:
             available = ", ".join(sorted(to_run.keys()))
             raise SystemExit(
-                f"Unknown test module '{name[0]}'. Available modules: {avilable}"
+                f"Unknown test module '{name[0]}'. Available modules: {available}"
             )
         case = to_run[name[0]]
         if len(name) > 1 and name[1].lower() not in [
@@ -333,7 +333,7 @@ def __run_single_test_module(name, case):
     with bold:
         print(f"---- BEGIN TEST MODULE {key.upper()} ----")
 
-    module_success = __compile_test_case(case)
+    module_success = __compile_test_module(case)
     if module_success:
         testcases = __collect_test_cases(case, name)
         succeed_count = len(testcases)
@@ -374,7 +374,7 @@ def __collect_test_cases(case, name):
         return [
             case.testcases[i]
             for i in range(len(case.testcases))
-            if str(case.testcase_names[i]).lower() == name[1].lower():
+            if str(case.testcase_names[i]).lower() == name[1].lower()
         ]
     return case.testcases
 
@@ -398,7 +398,7 @@ def __execute_test_case(index, test_case):
 # Decorators
 ###################################################################################
 
-def prebuild(func)
+def prebuild(func):
     """Register a function that stages inputs before the module is compiled"""
     mod = inspect.getmodule(inspect.stack()[1][0])
     path = os.path.dirname(mod.__file__)
