@@ -15,6 +15,8 @@ correct behavior.
 import os
 import sys
 
+# Ensure the lib and tests packages can be imported regardless of
+# the directory where this was called from
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 import lib
@@ -33,7 +35,7 @@ for flag in flags:
         sys.exit(1)
 
 
-# Load all test packages, which will populate the registry in the lib module.
+# Load all test packages, which will populate the registry in the lib module
 import tests    # noqa: E402
 
 if arguments:
