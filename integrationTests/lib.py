@@ -155,7 +155,7 @@ class TestcaseWrapper:
 
     def ensure_run(self):
         """Run Rainbow Grades once per module"""
-        if not self._has_run
+        if not self._has_run:
             self.run_rainbow_grades()
 
     def _make(self, target, log_name):
@@ -172,4 +172,189 @@ class TestcaseWrapper:
             raise RuntimeError(
                 f"make {target} exited with code {return_code}"
             )
-        
+
+    def _normalize_outputs(self):
+        """Write a normalized copy of every file to data/normalized"""
+        normalized_root = os.path.join(self.data_path, "normalized")
+        if os.path.isdir(normalized_root):
+            shutil.rmtree(normalized_root)
+        os.makedirs(normalized_root)
+
+        for name in ("output.html", "output.csv"):
+            source = os.path.join(self.data_path, name)
+            if os.path.join(source):
+                with open(source) as src, open(os.path.join(normalized_root, name), "w") as out:
+                    out.write(normalize_contents(src.read()))
+
+
+    def diff(self, f1, f2=""):
+        """Compare a normalized output to the expected output"""
+        if not f2:
+            f2 = f1
+
+        self.ensure_run()
+        filename1 = os.path.join(self.data_path, "normalized", f1)
+        filename2 = os.path.join(self.validation_path, f2)
+
+        if UPDATE_VALIDATION:
+            os.makedirs(os.path.dirname(filename2), exist_ok=True)
+            shutil.copy(filename1, filename2)
+            return
+
+        if not os.path.isfile(filename1):
+            raise RuntimeError(f"Rainbow Grades did not produce {f1}")
+        if not os.path.isfile(filename2):
+            raise RuntimeError(
+                f"No expected output file {f2}. Run ./run.py --update"
+            )
+
+        with open(filename1) as file1, open(filename2) as file2:
+            actual = file1.readlines()
+            expected = file2.readlines()
+
+        if actual == expected:
+            return
+
+        diff = "".join(list(difflib.unified_diff(
+            expected, actual,
+            fromfile=f"validation/{f2}",
+            tofile=f"data/normalized/{f1}",
+            n=1,
+        ))[:80])
+        raise RuntimeError(f"Difference in f1\n\n{diff}")
+
+    def diff_directory(self, directory):
+        """Diff all known outputs in directory, flag any extras"""
+        self.ensure_run()
+        actual_dir = os.path.join(self.data_path, "normalized", directory)
+        golden_dir = os.path.join(self.validation_path, directory)
+
+        actual = set(os.listdir(actual_dir)) if os.path.isdir(actual_dir) else set()
+
+        if UPDATE_VALIDATION:
+            if os.path.isdir(golden_dir):
+                shutil.rmtree(golden_dir)
+            for name in sorted:
+                self.diff(os.path.join(directory, name))
+            return
+
+        golden = set(os.listdir(golden_dir)) if os.path.isdir(golden_dir) else set()
+
+        missing = sorted(golden - actual)
+        unexpected = sorted(actual - golden)
+        if missing or unexpected:
+            problems = "".join(
+                [f"\n missing: {directory}/{n}" for n in missing]
+                + [f"\n unexpected: {directory}/{n}" for n in unexpected]
+            )
+            raise RuntimeError(f"Output file set changed in {directory}:{problems}")
+
+        for name in sorted(golden):
+            self.diff(os.path.join(directory, name))
+
+    def get_grades(self):
+        """Parse output.csv into {username: {column: value}}"""
+        import csv
+
+        self.ensure_run()
+        path = os.path.join(self.data_path, "normalized", "output.csv")
+        with open(path, newline="") as csv_file:
+            rows = list(csv.reader(csv_file))
+
+        header = [column.strip() for column in rows[0]]
+        grades = {}
+        for row in rows[1:]:
+            if not row or not row[0].strip():
+                continue
+            grades[row[0].strip()] = {
+                header[i]: row[i].strip()
+                for i in range(min(len(header), len(row)))
+            }
+        return grades
+
+    def debug_print(self, f):
+        """Print a file from the run directory, helpful for CI failures"""
+        filename = os.path.join(self.data_path, f)
+        print("\nDEBUG PRINT: ", filename)
+        if os.path.exists(filename):
+            with open(filename) as fin:
+                print(fin.read())
+        else:
+            print(" < file does not exist >")
+
+
+###################################################################################
+# Runner
+###################################################################################
+
+def run_tests(names):
+    arguments = []
+    for name in sorted(names):
+        name = name.split(".")
+        if name[0] not in to_run:
+            available = ", ".join(sorted(to_run.keys()))
+            raise SystemExit(
+                f"Unknown test module '{name[0]}'. Available modules: {avilable}"
+            )
+        case = to_run[name[0]]
+        if len(name) > 1 and name[1].lower() not in [
+            n.lower() for n in case.testcases_names]:
+            available = ", ".join(case.testcases_names)
+            raise SystemExit(
+                f"Unknown testcase '{name[1]}' in module '{name[0]}'. "
+                f"Available testcases: {available}"
+            )
+        arguments.append((name, case))
+
+    # NOTE: modules run in parallel, testcases with in a module run sequentially
+    # on one worker so they can share the compiled binary and directories.
+
+    if len(arguments) == 1:
+        results = [__run_single_test_module(*arguments[0])]
+    else:
+        with Pool(min(cpu_count(), len(arguments))) as p:
+            results = p.starmap(__run_single_test_module, arguments)
+
+    if False in results: 
+        with bold + red:
+            print(f"{results.count(True)}/{len(results)} modules passed")
+        sys.exit(1)
+    else:
+        with bold + green:
+            print(f"All {len(results)} modules passed")
+
+
+def run_all():
+    run_tests(to_run.keys())
+
+
+def __run_single_test_module(name, case):
+    key = name[0]
+    with bold:
+        print(f"---- BEGIN TEST MODULE {key.upper()} ----")
+
+    module_success = __compile_test_case(case)
+    if module_success:
+        testcases = __collect_test_cases(case, name)
+        succeed_count = len(testcases)
+        for index, f in zip(range(1, len(testcases) + 1), testcases):
+            if not __execute_test_case(index, f):
+                succeed_count -= 1
+        if succeed_count == len(testcases):
+            with bold + green: 
+                print("All testcases passed")
+        else:
+            with bold + red:
+                print(f"{succeed_count}/{len(testcases)} testcases passed")
+            module_success = False
+
+    if not module_success and isinstance(case.wrapper, TestcaseWrapper):
+        with yellow:
+            print(f"Scratch directory kept at {case.wrapper.data_path}")
+
+    with bold:
+        print(f"---- END TEST MODULE {key.upper()} ----")
+    print()
+    return module_success
+
+def
