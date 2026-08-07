@@ -170,7 +170,9 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
 
 
     def build(self):
-        """Compile Rainbow Grades through the normal Makefilehelper path"""
+        """Fetch dependencies and compile Rainbow Grades through the normal Makefilehelper path"""
+        seed_vendor_directory()
+        self._make("nlohmann_json", "fetch_dependencies")
         self._make("compile", "build")
 
     def run_rainbow_grades(self, sort_order=None):
@@ -180,7 +182,7 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
         self._has_run = True
 
     def ensure_run(self):
-        """Run Rainbow Grades once per module"""
+        """Run Rainbow Grades once per module, on demand"""
         if not self._has_run:
             self.run_rainbow_grades()
 
@@ -212,6 +214,23 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
                 with open(source) as src, open(os.path.join(normalized_root, name), "w") as out:
                     out.write(normalize_contents(src.read()))
 
+        for directory in self.OUTPUT_DIRECTORIES:
+            source_dir = os.path.join(self.data_path, directory)
+            if not os.path.isdir(source_dir):
+                continue
+            target_dir = os.path.join(normalized_root, directory)
+            os.makedirs(target_dir, exist_ok=True)
+            for name in sorted(os.listdir(source_dir)):
+                source = os.path.join(source_dir, name)
+                if not os.path.isfile(source):
+                    continue
+                # Per-student JSON holds exam seating assignments, which are
+                # null unless seating is configured. Nothing to compare.
+                if name.endswith(".json"):
+                    continue
+                target = os.path.join(target_dir, normalize_filename(name))
+                with open(source) as src, open(target, "w") as out:
+                    out.write(normalize_contents(src.read()))
 
     def diff(self, f1, f2=""):
         """Compare a normalized output to the expected output"""
@@ -231,7 +250,7 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
             raise RuntimeError(f"Rainbow Grades did not produce {f1}")
         if not os.path.isfile(filename2):
             raise RuntimeError(
-                f"No expected output file {f2}. Run ./run.py --update"
+                f"No golden file {f2}. Run ./run.py --update"
             )
 
         with open(filename1) as file1, open(filename2) as file2:
@@ -250,7 +269,7 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
         raise RuntimeError(f"Difference in f1\n\n{diff}")
 
     def diff_directory(self, directory):
-        """Diff all known outputs in directory, flag any extras"""
+        """Diff every golden file in directory, flag any extras"""
         self.ensure_run()
         actual_dir = os.path.join(self.data_path, "normalized", directory)
         golden_dir = os.path.join(self.validation_path, directory)
@@ -314,7 +333,7 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
 ###################################################################################
 
 def run_tests(names):
-    arguments = []
+    arguments = []      # Arguments for __run_single_test_module(list<str>, TestcaseFile)
     for name in sorted(names):
         name = name.split(".")
         if name[0] not in to_run:
