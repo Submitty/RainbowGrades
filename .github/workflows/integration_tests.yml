@@ -9,14 +9,10 @@ on:
 jobs:
   integration-tests:
     name: RainbowGrades Integration Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    container: submitty/rainbow-grades-tests:latest
     steps:
       - uses: actions/checkout@v7
-
-      - name: Install clang
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang
 
       - name: Run integration tests
         working-directory: integrationTests
