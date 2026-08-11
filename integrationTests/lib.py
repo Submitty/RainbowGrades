@@ -73,12 +73,12 @@ yellow = ASCIIEscapeManager([33])
 
 # The page footer embeds the current year, the most recent git tag, and the
 # commit hash.
-COPYRIGHT_LINE = re.compile(r"^<p>copy;.*RainbowGrades.*</p>$")
+COPYRIGHT_LINE = re.compile(r"^<p>&copy;.*RainbowGrades.*</p>$")
 COPYRIGHT_PLACEHOLDER = "<p>&copy; [YEAR] [RAINBOW GRADES VERESION]</p>"
 
 # Rainbow Grades archives the all students report under a dated filename. The
 # contents are compared, so we strip the date out of the name
-DATED_OUTPUT = re.compile(r"^output_\d+_\d+_\d+_\d+\.(html|csv)$")
+DATED_OUTPUT = re.compile(r"^output_\d+_\d+_\d+\.(html|csv)$")
 
 
 def normalize_filename(name):
@@ -186,7 +186,7 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
 
         for name in ("output.html", "output.csv"):
             source = os.path.join(self.data_path, name)
-            if os.path.join(source):
+            if os.path.isfile(source):
                 with open(source) as src, open(os.path.join(normalized_root, name), "w") as out:
                     out.write(normalize_contents(src.read()))
 
@@ -257,7 +257,7 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
         if UPDATE_VALIDATION:
             if os.path.isdir(golden_dir):
                 shutil.rmtree(golden_dir)
-            for name in sorted:
+            for name in sorted(actual):
                 self.diff(os.path.join(directory, name))
             return
 
@@ -398,7 +398,7 @@ def __compile_test_module(case):
 def __collect_test_cases(case, name):
     if len(name) > 1:
         return [
-            case.testcases[i]
+            case.testcases_names[i]
             for i in range(len(case.testcases))
             if str(case.testcase_names[i]).lower() == name[1].lower()
         ]
@@ -412,7 +412,7 @@ def __execute_test_case(index, test_case):
     except Exception as e:
         with bold + red:
             lineno = None
-            tb = traceback.extract_tb(sys.exec_info()[2])
+            tb = traceback.extract_tb(sys.exc_info()[2])
             for i in range(len(tb) - 1, -1, -1):
                 if os.path.basename(tb[i][0]) == "__init__.py":
                     lineno = tb[i][1]

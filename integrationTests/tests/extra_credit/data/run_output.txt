@@ -1,0 +1,26 @@
+cpp -xc++ customization.json | sed -e '/^#/d' > customization_no_comments.json
+python3 -m json.tool customization_no_comments.json > /dev/null
+python3 /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/track_Rainbow_version.py
+Commit d3875b6d60ae512e8594746ef2cef2aa1ab8fdbf is currently installed on this system.
+Tag v26.07.05 is the most recent git tag.
+./process_grades.out by_overall
+TODAY 2026-08-11
+HOMEWORK hw01 Homework 01
+    average=88.75    stddev=10.57    suggested curve:    A- cutoff=95.00    B- cutoff=88.00    C- cutoff=72.00    D  cutoff=72.00
+    sec1=2   sec2=2    TOTAL = 4
+HOMEWORK hw02 Homework 02
+    average=85.75    stddev=13.31    suggested curve:    A- cutoff=91.00    B- cutoff=88.00    C- cutoff=64.00    D  cutoff=64.00
+    sec1=2   sec2=2    TOTAL = 4
+HOMEWORK hw03_extra_credit Homework 03 (Extra Credit)
+    average=8.33    stddev=2.36    suggested curve:    A- cutoff=10.00    B- cutoff=10.00    C- cutoff=5.00    D  cutoff=5.00
+    sec1=1   sec2=2    TOTAL = 3
+PARTICIPATION participation01 Participation 01
+    average=4.38    stddev=1.08    suggested curve:    A- cutoff=5.00    B- cutoff=5.00    C- cutoff=2.50    D  cutoff=2.50
+    sec1=1   sec2=3    TOTAL = 4
+PARTICIPATION participation02 Participation 02
+    average=5.00    stddev=0.00    suggested curve:    A- cutoff=5.00    B- cutoff=5.00    C- cutoff=5.00    D  cutoff=5.00
+    sec1=1   sec2=2    TOTAL = 3
+WRITE ALL.html
+RUN COMMAND cp -f output.html ./all_students_summary_html/output_8_11_2026.html
+WRITE ALL.csv
+RUN COMMAND cp -f output.csv ./all_students_summary_csv/output_8_11_2026.csv

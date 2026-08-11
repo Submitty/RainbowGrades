@@ -1,0 +1,37 @@
+cpp -xc++ customization.json | sed -e '/^#/d' > customization_no_comments.json
+python3 -m json.tool customization_no_comments.json > /dev/null
+python3 /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/track_Rainbow_version.py
+Commit d3875b6d60ae512e8594746ef2cef2aa1ab8fdbf is currently installed on this system.
+Tag v26.07.05 is the most recent git tag.
+clang++ -Wall -Wextra -g -std=c++11  -I/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/../vendor/nlohmann/json/include/ /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/main.cpp /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/output.cpp /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/table.cpp /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/student.cpp /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/zone.cpp /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/benchmark.cpp /Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/submini_polls.cpp -g -o process_grades.out
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/main.cpp:467:9: warning: variable 'sum_of_percents' set but not used [-Wunused-but-set-variable]
+  467 |   float sum_of_percents = 0;
+      |         ^
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/main.cpp:1167:7: warning: variable 'count' set but not used [-Wunused-but-set-variable]
+ 1167 |   int count = 0;
+      |       ^
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/main.cpp:1637:7: warning: variable 'next_rank' set but not used [-Wunused-but-set-variable]
+ 1637 |   int next_rank = 1;
+      |       ^
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/main.cpp:1908:7: warning: variable 'runningtotal' set but not used [-Wunused-but-set-variable]
+ 1908 |   int runningtotal = 0;
+      |       ^
+4 warnings generated.
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/output.cpp:1166:15: warning: unused variable 'allowed' [-Wunused-variable]
+ 1166 |           int allowed = this_student->getAllowedLateDays(100);
+      |               ^~~~~~~
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/output.cpp:1410:7: warning: unused variable 'total_W' [-Wunused-variable]
+ 1410 |   int total_W = grade_counts[Grade("W")];
+      |       ^~~~~~~
+2 warnings generated.
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/student.cpp:470:69: warning: unused parameter 'lowest_d' [-Wunused-parameter]
+  470 | std::string Student::grade(bool flag_b4_academic_sanction, Student *lowest_d) const {
+      |                                                                     ^
+1 warning generated.
+/Users/ericmcnitt/Documents/submitty/GIT_CHECKOUT/RainbowGrades/zone.cpp:382:7: warning: variable 'already_zoned' set but not used [-Wunused-but-set-variable]
+  382 |   int already_zoned = 0;
+      |       ^
+1 warning generated.
+mkdir -p individual_summary_html
+mkdir -p all_students_summary_html
+mkdir -p all_students_summary_csv
