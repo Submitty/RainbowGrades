@@ -1,6 +1,9 @@
 """Loads every test module in this directory.
 
-Importing this package populates the registry in lib via decorators.
+Importing this package populates the registry in lib via the @prebuild and @testcase decorators.
+
+Each module is deliberately imported under its bare name so that the runner can address an
+individual testcase as ``<module>.<testcase>`` on the command line.
 
 Submitty's equivalent loader uses loader.find_module().load_module(), which
 was removed in Python 3.12, importlib.util is the supported way to do the

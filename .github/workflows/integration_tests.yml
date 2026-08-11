@@ -8,11 +8,16 @@ on:
 
 jobs:
   integration-tests:
-    name: RainbowGrades Integration Tests
+    name: Rainbow Grades Integration Tests
+    # Matching current Submitty version, they should be kept in sync
     runs-on: ubuntu-22.04
-    container: submitty/rainbow-grades-tests:latest
     steps:
       - uses: actions/checkout@v7
+
+      - name: Install clang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang
 
       - name: Run integration tests
         working-directory: integrationTests
@@ -23,5 +28,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: rainbow-grades-test-output
-          path: integrationTests/tests/*/data/
+          path: integrationTests/tests/*/data
           retention-days: 3

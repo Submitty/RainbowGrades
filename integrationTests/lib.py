@@ -93,32 +93,6 @@ def normalize_contents(text):
     )
 
 
-def seed_vendor_directory():
-    """Populate the vendor directory from pre-staged copy, if offered
-    
-    This is only ever a cache. versions.mk remains the pin: MakefileHelper
-    compares it against the copied VERSION file and re-downloads on a mismatch,
-    so a stale or missing seed costs a download, never a failure. Outside a
-    container the variable is unset and this does nothing.
-    """
-    seed = os.environ.get("RAINBOW_VENDOR_SEED")
-    if not seed or not os.path.isdir(seed):
-        return
-
-    vendor = os.path.join(os.path.dirname(RAINBOW_GRADES_DIR), "vendor")
-    # Test for the headers
-    if os.path.isdir(os.path.join(vendor, "nlohmann", "json", "include")):
-        # Already populated
-        return
-
-    try:
-        shutil.copytree(seed, vendor, dirs_exist_ok=True)
-    except OSError as e:
-        # Not fatal, without the seed the build downloads its dependency, which
-        # is the normal path outside a container.
-        print(f"Could not seed vendor directory from {seed}: {e}")
-
-
 class TestcaseWrapper:
     """Passed to every @prebuild and @testcase function as test"""
     # Where Rainbow Grades writes its output
@@ -171,18 +145,20 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
 
     def build(self):
         """Fetch dependencies and compile Rainbow Grades through the normal Makefilehelper path"""
-        seed_vendor_directory()
         self._make("nlohmann_json", "fetch_dependencies")
         self._make("compile", "build")
 
     def run_rainbow_grades(self, sort_order=None):
-        """Run Rainbow Grades and normalize its output"""
+        """Run Rainbow Grades and normalize its output into data/normalized"""
         self._make(sort_order or self.sort_order, "run")
         self._normalize_outputs()
         self._has_run = True
 
     def ensure_run(self):
-        """Run Rainbow Grades once per module, on demand"""
+        """Run Rainbow Grades once per module, on demand
+        Test cases can be run individually on the command line, so a
+        testcase cannot assume that an earlier one already produced output.
+        """
         if not self._has_run:
             self.run_rainbow_grades()
 
@@ -233,7 +209,9 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
                     out.write(normalize_contents(src.read()))
 
     def diff(self, f1, f2=""):
-        """Compare a normalized output to the expected output"""
+        """Compare a normalized output to the expected output
+        f1 is relative to data/normalized and f2 is relative to validation
+        """
         if not f2:
             f2 = f1
 
@@ -266,10 +244,10 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
             tofile=f"data/normalized/{f1}",
             n=1,
         ))[:80])
-        raise RuntimeError(f"Difference in f1\n\n{diff}")
+        raise RuntimeError(f"Difference in {f1}\n\n{diff}")
 
     def diff_directory(self, directory):
-        """Diff every golden file in directory, flag any extras"""
+        """Diff every golden file in `directory`, flag any extras"""
         self.ensure_run()
         actual_dir = os.path.join(self.data_path, "normalized", directory)
         golden_dir = os.path.join(self.validation_path, directory)
@@ -298,7 +276,10 @@ include ${{RAINBOW_GRADES_DIRECTORY}}/MakefileHelper
             self.diff(os.path.join(directory, name))
 
     def get_grades(self):
-        """Parse output.csv into {username: {column: value}}"""
+        """Parse output.csv into {username: {column: value}}
+        Allow a testcase to assert on a specific number instead of the whole file,
+        failures can be more specific and verbose about what went wrong.
+        """
         import csv
 
         self.ensure_run()
@@ -461,7 +442,9 @@ def prebuild(func):
     to_run[modname].prebuild = wrapper
     return wrapper
 
-
+# inspect.stack() index 1 is the frame of the module calling this decorator,
+# which gives us the module's path and name without the test author repeating
+# them.
 def testcase(func):
     """Register a single check within a test module"""
     mod = inspect.getmodule(inspect.stack()[1][0])
@@ -487,4 +470,3 @@ def testcase(func):
     to_run[modname].testcases.append(wrapper)
     to_run[modname].testcases_names.append(func.__name__)
     return wrapper
-

@@ -29,6 +29,7 @@ for flag in flags:
         lib.UPDATE_VALIDATION = True
     elif flag in ("--help", "-h"):
         print(__doc__)
+        sys.exit(0)
     else:
         print(f"Unknown option: {flag}\n")
         print(__doc__)
