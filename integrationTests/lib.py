@@ -74,7 +74,7 @@ yellow = ASCIIEscapeManager([33])
 # The page footer embeds the current year, the most recent git tag, and the
 # commit hash.
 COPYRIGHT_LINE = re.compile(r"^<p>&copy;.*RainbowGrades.*</p>$")
-COPYRIGHT_PLACEHOLDER = "<p>&copy; [YEAR] [RAINBOW GRADES VERESION]</p>"
+COPYRIGHT_PLACEHOLDER = "<p>&copy; [YEAR] [RAINBOW GRADES VERSION]</p>"
 
 # Rainbow Grades archives the all students report under a dated filename. The
 # contents are compared, so we strip the date out of the name

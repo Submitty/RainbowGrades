@@ -1,5 +1,0 @@
-./raw_data/all_grades/aalpha_summary.json
-./raw_data/all_grades/bbeta_summary.json
-./raw_data/all_grades/cgamma_summary.json
-./raw_data/all_grades/ddelta_summary.json
-./raw_data/all_grades/eepsilon_summary.json
