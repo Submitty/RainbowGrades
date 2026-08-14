@@ -36,69 +36,6 @@ To build with a different compiler:
 RAINBOW_CXX=g++ ./run.py
 ```
 
-### In Docker
-
-Optional. The image supplies clang, make, and python3, so Docker is the only
-thing you install.
-
-The image is `ubuntu:22.04`, matching what Submitty currently runs.
-
-```bash
-cd integrationTests
-
-./docker_test.sh                                 # every module
-./docker_test.sh extra_credit                    # one module
-./docker_test.sh extra_credit.all_students_summary_csv
-./docker_test.sh --update                        # regenerate golden files
-```
-
-`docker_test.sh` is a thin wrapper over `docker compose`. It exists to pass
-your user id into the container so that generated files under `tests/*/data/`
-belong to you rather than to root. The equivalent by hand:
-
-```bash
-HOST_UID=$(id -u) HOST_GID=$(id -g) docker compose run --rm tests ./run.py
-```
-
-The repository is bind-mounted, not copied, so edits take effect immediately
-with no rebuild. To pick up a newer published image:
-
-```bash
-docker compose pull
-```
-
-The image lives in [Submitty/DockerImages](https://github.com/Submitty/DockerImages)
-under `dockerfiles/rainbow-grades-tests/`, and is published to Docker Hub as
-`submitty/rainbow-grades-tests` by that repository's build pipeline. There is no
-Dockerfile here, CI pulls the same published image these commands do, so local
-and CI are the same environment.
-
-The image copies nothing from this repository, so it only needs republishing
-when its own definition changes.
-
-It does stage a copy of nlohmann/json at `$RAINBOW_VENDOR_SEED`, which the
-framework copies into place so that a containerized run needs no network. That
-copy is a cache, not a pin. `versions.mk` should remain where the version is pinned,
-and `MakefileHelper` re-downloads whenever the two disagree. So if the image's
-copy is ever stale the tests still pass, they just fetch, exactly as they do
-on a machine with no image at all. Outside a container the variable is unset
-and nothing changes.
-
-> **On Apple Silicon.** Docker runs arm64 images by default, while CI and the
-> committed golden files come from x86-64. RainbowGrades uses no `long double`,
-> so its `float`/`double` arithmetic is plain IEEE754 and should agree across
-> both, but this has not been verified on arm64. If you ever see a diff
-> locally that CI does not reproduce, rule the architecture out by forcing the
-> platform:
->
-> ```bash
-> export DOCKER_DEFAULT_PLATFORM=linux/amd64
-> docker compose pull
-> ./docker_test.sh
-> ```
->
-> This runs under emulation and is slower, so it is not the default.
-
 ## Layout
 
 ```
