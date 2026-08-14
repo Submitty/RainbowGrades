@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import lib
 
 arguments = [a for a in sys.argv[1:] if not a.startswith("-")]
-flags = [a for a in sys.argv[1:] if not a.startswith("-")]
+flags = [a for a in sys.argv[1:] if a.startswith("-")]
 
 for flag in flags:
     if flag in ("--update", "-u"):
