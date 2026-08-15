@@ -4,7 +4,8 @@ Library for the Rainbow Grades integration tests.
 
 from collections import defaultdict
 from functools import wraps
-from multiprocessing import Pool, cpu_count
+import multiprocessing
+from multiprocessing import cpu_count
 import difflib
 import inspect
 import os
@@ -338,7 +339,15 @@ def run_tests(names):
     if len(arguments) == 1:
         results = [__run_single_test_module(*arguments[0])]
     else:
-        with Pool(min(cpu_count(), len(arguments))) as p:
+        # Each test module is loaded by tests/__init__.py under a bare name
+        # (e.g. "extra_credit") that only exists in sys.modules, not as a
+        # real importable package. A worker needs that already done before
+        # it can unpickle tasks referencing those modules' functions, which
+        # only "spawn" (the macOS/Windows default) leaves out, since it
+        # starts from a blank interpreter instead of copying the parent's
+        # already-populated sys.modules. Forcing "fork" keeps the loaded
+        # modules.
+        with multiprocessing.get_context("fork").Pool(min(cpu_count(), len(arguments))) as p:
             results = p.starmap(__run_single_test_module, arguments)
 
     if False in results: 

@@ -21,25 +21,34 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 import lib
 
+<<<<<<< Updated upstream
 arguments = [a for a in sys.argv[1:] if not a.startswith("-")]
 flags = [a for a in sys.argv[1:] if a.startswith("-")]
+=======
+if __name__ == "__main__":
+    # multiprocessing's "spawn" start method (the macOS/Windows default)
+    # re-imports this file as __main__ in each worker process, so anything
+    # that starts a Pool (lib.run_tests, for more than one module) must be
+    # guarded here rather than run at module scope.
+    arguments = [a for a in sys.argv[1:] if not a.startswith("-")]
+    flags = [a for a in sys.argv[1:] if a.startswith("-")]
+>>>>>>> Stashed changes
 
-for flag in flags:
-    if flag in ("--update", "-u"):
-        lib.UPDATE_VALIDATION = True
-    elif flag in ("--help", "-h"):
-        print(__doc__)
-        sys.exit(0)
+    for flag in flags:
+        if flag in ("--update", "-u"):
+            lib.UPDATE_VALIDATION = True
+        elif flag in ("--help", "-h"):
+            print(__doc__)
+            sys.exit(0)
+        else:
+            print(f"Unknown option: {flag}\n")
+            print(__doc__)
+            sys.exit(1)
+
+    # Load all test packages, which will populate the registry in the lib module
+    import tests    # noqa: E402
+
+    if arguments:
+        lib.run_tests(arguments)
     else:
-        print(f"Unknown option: {flag}\n")
-        print(__doc__)
-        sys.exit(1)
-
-
-# Load all test packages, which will populate the registry in the lib module
-import tests    # noqa: E402
-
-if arguments:
-    lib.run_tests(arguments)
-else:
-    lib.run_all()
+        lib.run_all()
