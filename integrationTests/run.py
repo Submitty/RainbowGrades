@@ -21,10 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 import lib
 
-<<<<<<< Updated upstream
-arguments = [a for a in sys.argv[1:] if not a.startswith("-")]
-flags = [a for a in sys.argv[1:] if a.startswith("-")]
-=======
+
 if __name__ == "__main__":
     # multiprocessing's "spawn" start method (the macOS/Windows default)
     # re-imports this file as __main__ in each worker process, so anything
@@ -32,7 +29,7 @@ if __name__ == "__main__":
     # guarded here rather than run at module scope.
     arguments = [a for a in sys.argv[1:] if not a.startswith("-")]
     flags = [a for a in sys.argv[1:] if a.startswith("-")]
->>>>>>> Stashed changes
+
 
     for flag in flags:
         if flag in ("--update", "-u"):
