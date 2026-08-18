@@ -1,0 +1,79 @@
+{
+    "user_id": "bbeta",
+    "legal_first_name": "Bob",
+    "legal_last_name": "Beta",
+    "preferred_first_name": "Bob",
+    "registration_section": "1",
+    "registration_type": "graded",
+    "default_allowed_late_days": 2,
+    "last_update": "Monday, January 20, 2020",
+    "Homework": [
+        {
+            "id": "hw01",
+            "name": "Homework 01",
+            "gradeable_type": "Electronic File",
+            "grade_released_date": "2020-01-15 23:59:59 -0500",
+            "overall_comment": "",
+            "score": 100,
+            "autograding_score": 100,
+            "tagrading_score": 0,
+            "days_late": 0,
+            "status": "Good",
+            "components": []
+        },
+        {
+            "id": "hw02",
+            "name": "Homework 02",
+            "gradeable_type": "Electronic File",
+            "grade_released_date": "2020-01-15 23:59:59 -0500",
+            "overall_comment": "",
+            "score": 100,
+            "autograding_score": 100,
+            "tagrading_score": 0,
+            "days_late": 0,
+            "status": "Good",
+            "components": []
+        },
+        {
+            "id": "hw03_extra_credit",
+            "name": "Homework 03 (Extra Credit)",
+            "gradeable_type": "Electronic File",
+            "grade_released_date": "2020-01-15 23:59:59 -0500",
+            "overall_comment": "",
+            "score": 0,
+            "autograding_score": 0,
+            "tagrading_score": 0,
+            "days_late": 0,
+            "status": "Good",
+            "components": []
+        }
+    ],
+    "Participation": [
+        {
+            "id": "participation01",
+            "name": "Participation 01",
+            "gradeable_type": "Electronic File",
+            "grade_released_date": "2020-01-15 23:59:59 -0500",
+            "overall_comment": "",
+            "score": 0,
+            "autograding_score": 0,
+            "tagrading_score": 0,
+            "days_late": 0,
+            "status": "Good",
+            "components": []
+        },
+        {
+            "id": "participation02",
+            "name": "Participation 02",
+            "gradeable_type": "Electronic File",
+            "grade_released_date": "2020-01-15 23:59:59 -0500",
+            "overall_comment": "",
+            "score": 0,
+            "autograding_score": 0,
+            "tagrading_score": 0,
+            "days_late": 0,
+            "status": "Good",
+            "components": []
+        }
+    ]
+}
