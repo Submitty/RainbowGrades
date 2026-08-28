@@ -713,12 +713,9 @@ void start_table_output( bool /*for_instructor*/,
         if (GRADEABLES[g].hasCorrespondence(gradeable_id)) {
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
           bool checkReleased = GRADEABLES[g].isReleased(gradeable_id);
-          if(checkReleased && gradeableType == "Electronic File"){
-            gradeable_name = gradeable_name + " <i class='fa-solid fa-arrow-up-right-from-square' style='color:blue;'></i>";
-            gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black; text-decoration:none;\" title=\"View Gradeable\">" + gradeable_name + "</a>";
+          if (checkReleased && gradeableType == "Electronic File") {
+            gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black; text-decoration:none;\" title=\"View Gradeable\">" + gradeable_name + "&nbsp;&nbsp;<i class='fas fa-external-link-alt'></i></a>";
           }
-          //gradeable_name = spacify(gradeable_name);
-          gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black;\">" + gradeable_name + "&nbsp;&nbsp; <i class='fas fa-external-link-alt'></i></a>";
         }
         if (gradeable_name == "")
           gradeable_name = "<em><font color=\"aaaaaa\">future "
