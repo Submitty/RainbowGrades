@@ -714,7 +714,7 @@ void start_table_output( bool /*for_instructor*/,
           gradeable_name = GRADEABLES[g].getCorrespondence(gradeable_id).second;
           bool checkReleased = GRADEABLES[g].isReleased(gradeable_id);
           if (checkReleased && gradeableType == "Electronic File") {
-            gradeable_name = "<a href=\"" + fullUrl + "\" style=\"color:black; text-decoration:none;\" title=\"View Gradeable\">" + gradeable_name + "&nbsp;&nbsp;<i class='fas fa-external-link-alt'></i></a>";
+            gradeable_name = gradeable_name + "&nbsp;&nbsp;<a href=\"" + fullUrl + "\" style=\"color:blue; text-decoration:none;\" title=\"View Gradeable\"><i class='fa-solid fa-arrow-up-right-from-square' style='color:blue;'></i></a>";
           }
         }
         if (gradeable_name == "")
