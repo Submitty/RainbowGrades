@@ -9,3 +9,5 @@
 *.out
 *.synctex.gz
 /.idea/
+# RainbowGrades integration test scratch directories
+/integrationTests/tests/*/data/

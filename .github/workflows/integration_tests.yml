@@ -1,0 +1,32 @@
+name: Integration Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  integration-tests:
+    name: Rainbow Grades Integration Tests
+    # Matching current Submitty version, they should be kept in sync
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install clang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang
+
+      - name: Run integration tests
+        working-directory: integrationTests
+        run: ./run.py
+
+      - name: Upload output on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rainbow-grades-test-output
+          path: integrationTests/tests/*/data
+          retention-days: 3
